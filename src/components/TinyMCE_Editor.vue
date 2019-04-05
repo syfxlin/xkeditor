@@ -1,21 +1,11 @@
 <template>
-<div>
-  <ul>
-  <template v-for="n in 24">
-    <li style="display:inline-block;padding:5px;margin:5px;border:1px solid #000;" class="icon icon-bold"></li>
-  </template>
-  </ul>
-  <div class="row">
-    <at-textarea v-model="content" placeholder="这里是输入框..." class="col-md-12"></at-textarea>
-    <div class="col-md-12" v-html="html_content"></div>
-    <div class="tinymce"><editor v-model="html_content" :init="init"></editor></div>
-    <div class="col-md-12"><ace v-model="content"></ace></div>
+  <div class="tinymce">
+    <editor ref="tinymce" :init="init">{{ value }}</editor>
+    <button v-on:click="change">switch</button>
   </div>
-</div>
 </template>
 
 <script>
-//TinyMCE编辑器
 import tinymce from 'tinymce/tinymce'
 import 'tinymce/themes/silver'
 import Editor from '@tinymce/tinymce-vue'
@@ -47,17 +37,12 @@ import 'tinymce/plugins/lists'
 import 'tinymce/plugins/wordcount'
 import 'tinymce/plugins/imagetools'
 import 'tinymce/plugins/textpattern'
-//HTML和Markdown互转
-import turndown from 'turndown'
-var turndownGfm = require('turndown-plugin-gfm')
-import marked from 'marked'
-
 export default {
-  name: 'HelloWorld',
-  data () {
+  props: {
+    value: String
+  },
+  data() {
     return {
-      content: '# Welcome to Your Vue.js App',
-      html_content: "wsg",
       init: {
         language_url: '/static/tinymce/langs/zh_CN.js',
         language: 'zh_CN',
@@ -78,30 +63,16 @@ export default {
       }
     }
   },
-  watch: {
-    content: function (val) {
-      this.html_content = marked(val)
-    },
-    // html_content: function(val) {
-    //   var turndownService = new turndown({
-    //     headingStyle: 'atx',
-    //     hr: '---',
-    //     bulletListMarker: '-',
-    //     codeBlockStyle: 'fenced'
-    //   })
-    //   turndownService.use(turndownGfm.gfm)
-    //   var markdown = turndownService.turndown(val)
-    //   this.content = markdown
-    // }
-  },
   mounted () {
     tinymce.init({})
   },
   components: {
     'editor': Editor
+  },
+  methods: {
+    change () {
+      this.$emit('input', this.aceEditor.getSession().getValue())
+    }
   }
 }
 </script>
-
-<style scoped>
-</style>

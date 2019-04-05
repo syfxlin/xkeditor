@@ -18,6 +18,13 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
+"@tinymce/tinymce-vue@^2.0.0":
+  version "2.0.0"
+  resolved "http://registry.npm.taobao.org/@tinymce/tinymce-vue/download/@tinymce/tinymce-vue-2.0.0.tgz#41cea256f67f195ac52f71b1cc0bcbda850c86f0"
+  integrity sha1-Qc6iVvZ/GVrFL3GxzAvL2oUMhvA=
+  dependencies:
+    vue "^2.5.17"
+
 "@types/strip-bom@^3.0.0":
   version "3.0.0"
   resolved "http://registry.npm.taobao.org/@types/strip-bom/download/@types/strip-bom-3.0.0.tgz#14a8ec3956c2e81edb7520790aecf21c290aebd2"
@@ -45,6 +52,11 @@ accepts@~1.3.4, accepts@~1.3.5:
   dependencies:
     mime-types "~2.1.18"
     negotiator "0.6.1"
+
+ace-builds@^1.4.3:
+  version "1.4.3"
+  resolved "http://registry.npm.taobao.org/ace-builds/download/ace-builds-1.4.3.tgz#789c5e72226c01d9bbe1095c8aeea37afb57f41b"
+  integrity sha1-eJxeciJsAdm74Qlciu6jevtX9Bs=
 
 acorn-dynamic-import@^2.0.0:
   version "2.0.2"
@@ -4379,7 +4391,7 @@ jsbn@~0.1.0:
   resolved "http://registry.npm.taobao.org/jsbn/download/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
   integrity sha1-peZUwuWi3rXyAdls77yoDA7y9RM=
 
-jsdom@^11.5.1:
+jsdom@^11.5.1, jsdom@^11.9.0:
   version "11.12.0"
   resolved "http://registry.npm.taobao.org/jsdom/download/jsdom-11.12.0.tgz#1a80d40ddd378a1de59656e9e6dc5a3ba8657bc8"
   integrity sha1-GoDUDd03ih3lllbp5txaO6hle8g=
@@ -7195,6 +7207,11 @@ timers-browserify@^2.0.4:
   dependencies:
     setimmediate "^1.0.4"
 
+tinymce@^5.0.3:
+  version "5.0.3"
+  resolved "http://registry.npm.taobao.org/tinymce/download/tinymce-5.0.3.tgz#40fa8658b5bdf58e7f04c816b38e1b06f96f6cfe"
+  integrity sha1-QPqGWLW99Y5/BMgWs44bBvlvbP4=
+
 tmpl@1.0.x:
   version "1.0.4"
   resolved "http://registry.npm.taobao.org/tmpl/download/tmpl-1.0.4.tgz#23640dd7b42d00433911140820e5cf440e521dd1"
@@ -7299,6 +7316,18 @@ tunnel-agent@^0.6.0:
   integrity sha1-J6XeoGs2sEoKmWZ3SykIaPD8QP0=
   dependencies:
     safe-buffer "^5.0.1"
+
+turndown-plugin-gfm@^1.0.2:
+  version "1.0.2"
+  resolved "http://registry.npm.taobao.org/turndown-plugin-gfm/download/turndown-plugin-gfm-1.0.2.tgz#6f8678a361f35220b2bdf5619e6049add75bf1c7"
+  integrity sha1-b4Z4o2HzUiCyvfVhnmBJrddb8cc=
+
+turndown@^5.0.3:
+  version "5.0.3"
+  resolved "http://registry.npm.taobao.org/turndown/download/turndown-5.0.3.tgz#a1350b66155d7891f10e451432170b0f7cd7449a"
+  integrity sha1-oTULZhVdeJHxDkUUMhcLD3zXRJo=
+  dependencies:
+    jsdom "^11.9.0"
 
 tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"
@@ -7637,7 +7666,7 @@ vue-template-es2015-compiler@^1.5.3, vue-template-es2015-compiler@^1.6.0:
   resolved "http://registry.npm.taobao.org/vue-template-es2015-compiler/download/vue-template-es2015-compiler-1.9.1.tgz#1ee3bc9a16ecbf5118be334bb15f9c46f82f5825"
   integrity sha1-HuO8mhbsv1EYvjNLsV+cRvgvWCU=
 
-vue@^2.5.13, vue@^2.5.2:
+vue@^2.5.13, vue@^2.5.17, vue@^2.6.10:
   version "2.6.10"
   resolved "http://registry.npm.taobao.org/vue/download/vue-2.6.10.tgz?cache=0&other_urls=http%3A%2F%2Fregistry.npm.taobao.org%2Fvue%2Fdownload%2Fvue-2.6.10.tgz#a72b1a42a4d82a721ea438d1b6bf55e66195c637"
   integrity sha1-pysaQqTYKnIepDjRtr9V5mGVxjc=

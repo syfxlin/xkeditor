@@ -8,7 +8,10 @@ import 'at-ui-style'
 Vue.use(AtComponents)
 import marked from 'marked'
 //导入js，随处可用
-Object.defineProperty(Vue.prototype, '$marked', { value: marked });
+Object.defineProperty(Vue.prototype, '$marked', { value: marked })
+
+import ACE from './components/ACE_Editor.vue'
+Vue.component('ace', ACE)
 
 Vue.config.productionTip = false
 
@@ -16,6 +19,8 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
-  components: { App },
+  components: {
+    App
+  },
   template: '<App/>'
 })
