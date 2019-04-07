@@ -1,6 +1,6 @@
 <template>
   <div class="tinymce">
-    <editor ref="tinymce" :init="init">{{ value }}</editor>
+    <editor ref="tinymce" :init="init" v-model="html_content"></editor>
     <button v-on:click="change">switch</button>
   </div>
 </template>
@@ -43,12 +43,13 @@ export default {
   },
   data() {
     return {
+      html_value: null,
       init: {
         language_url: '/static/tinymce/langs/zh_CN.js',
         language: 'zh_CN',
         skin_url: '/static/tinymce/skins/ui/oxide',
         plugins: 'print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern',
-        toolbar: 'formatselect | fontsizeselect | bold italic underline strikethrough forecolor backcolor | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent blockquote code | removeformat | undo redo',
+        toolbar: 'formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat code | undo redo',
         image_advtab: true,
         importcss_append: true,
         height: 400,
@@ -69,9 +70,24 @@ export default {
   components: {
     'editor': Editor
   },
+  watch: {
+    value: function() {
+      this.html_content = this.value
+    }
+  },
+  computed: {
+    html_content: {
+      get: function() {
+        return this.value
+      },
+      set: function(val) {
+        this.html_value = val
+      }
+    },
+  },
   methods: {
     change () {
-      this.$emit('input', this.aceEditor.getSession().getValue())
+      this.$emit('input', this.html_value?this.html_value:this.value + " ")
     }
   }
 }
