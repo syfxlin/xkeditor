@@ -37,7 +37,8 @@ export default {
         headingStyle: 'atx',
         hr: '---',
         bulletListMarker: '-',
-        codeBlockStyle: 'fenced'
+        codeBlockStyle: 'fenced',
+        emDelimiter: '*',
       })
       turndownService.keep([
         'iframe',

@@ -210,6 +210,14 @@ export default {
           icon: 'eraser',
         },
         {
+          info: '设置',
+          icon: 'cog',
+        },
+        {
+          info: '',
+          icon: '|',
+        },
+        {
           info: '帮助',
           icon: 'question-circle',
         },
@@ -247,6 +255,7 @@ export default {
           hr: '---',
           bulletListMarker: '-',
           codeBlockStyle: 'fenced',
+          emDelimiter: '*',
         })
         turndownService.keep([
           'iframe',
@@ -267,12 +276,32 @@ export default {
     toolbar_click: function(operate) {
       var str = null
       var isStart = false
+      var toLeft = 0;
+      var selectText = this.aceEditor.getSelectedText()
       if(operate.match(/^h(\d)/)) {
         str = '#'.repeat(operate.substring(1)) + ' '
         isStart = true
+      } else if(operate === 'bold') {
+        str = '**' + selectText + '**'
+        toLeft = 2
+      } else if(operate === 'italic') {
+        str = '*' + selectText + '*'
+        toLeft = 1
+      } else if(operate === 'underline') {
+        str = '<span style="text-decoration: underline;">' + selectText + '</span>'
+        toLeft = 7
+      } else if(operate === 'strikethrough') {
+        str = '~' + selectText + '~'
+        toLeft = 1
       } else if(operate === 'quote-left') {
         str = '> '
         isStart = true
+      } else if(operate === 'code') {
+        str = '`' + selectText + '`'
+        toLeft = 1
+      } else if(operate === 'terminal') {
+        str = '```\n```'
+        toLeft = 4
       } else if(operate === 'list-ul') {
         str = '- '
         isStart = true
@@ -298,11 +327,9 @@ export default {
         this.allLine = this.aceEditor.session.getLength()
         this.isShowModal = true
       } else if(operate === 'search') {
-        let mockKeyboardEvent = new KeyboardEvent('keydown', {
-          code: "KeyF",
-          ctrlKey: true
-        });
-        document.dispatchEvent(mockKeyboardEvent);
+        this.aceEditor.commands.commands.find.exec(this.aceEditor)
+      } else if(operate === 'cog') {
+        this.aceEditor.commands.commands.showSettingsMenu.exec(this.aceEditor)
       }
       let range = this.aceEditor.getSelectionRange()
       if(isStart) {
@@ -311,7 +338,12 @@ export default {
         }
       } else {
         this.aceEditor.session.replace(range, str);
+        // window.ace_editor = this.aceEditor
       }
+      if(toLeft) {
+        this.aceEditor.navigateLeft(toLeft)
+      }
+      this.aceEditor.focus()
     }
   }
 }
