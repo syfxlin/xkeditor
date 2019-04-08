@@ -24,36 +24,46 @@ export default {
   },
   watch: {
     md_content: function (val) {
+      var markedRenderer = new marked.Renderer()
+      markedRenderer.tex = function(text) {
+        if(/\$\$(.*)\$\$/g.test(text)) {
+          text = text.replace(/(\$\$([^\$]*)\$\$)/g, function($1, $2) {
+            return $2.replace(/\$/g, "")
+          })
+        }
+        return text
+      }
       marked.setOptions({
         langPrefix: "line-numbers language-",
+        renderer: markedRenderer
       })
       this.html_content = marked(val)
       this.$nextTick(function() {
         Prism.highlightAll()
       })
     },
-    html_content: function(val) {
-      var turndownService = new turndown({
-        headingStyle: 'atx',
-        hr: '---',
-        bulletListMarker: '-',
-        codeBlockStyle: 'fenced',
-        emDelimiter: '*',
-      })
-      turndownService.keep([
-        'iframe',
-        'style',
-        'script',
-        'title',
-        'span',
-        'font'
-      ])
-      turndownService.use(turndownGfm.gfm)
-      this.md_content = turndownService.turndown(val)
-      this.$nextTick(function() {
-        Prism.highlightAll()
-      })
-    }
+    // html_content: function(val) {
+    //   var turndownService = new turndown({
+    //     headingStyle: 'atx',
+    //     hr: '---',
+    //     bulletListMarker: '-',
+    //     codeBlockStyle: 'fenced',
+    //     emDelimiter: '*',
+    //   })
+    //   turndownService.keep([
+    //     'iframe',
+    //     'style',
+    //     'script',
+    //     'title',
+    //     'span',
+    //     'font'
+    //   ])
+    //   turndownService.use(turndownGfm.gfm)
+    //   this.md_content = turndownService.turndown(val)
+    //   this.$nextTick(function() {
+    //     Prism.highlightAll()
+    //   })
+    // }
   },
 }
 </script>

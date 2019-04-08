@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import AtComponents from 'at-ui'
 import 'at-ui-style'
+import './components/dialogDrag'
 Vue.use(AtComponents)
 import marked from 'marked'
 //导入js，随处可用
