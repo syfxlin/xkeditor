@@ -15,7 +15,7 @@
             :key="item.id"
             type="text"
             :title="item.info"
-            @click="toolbar_click(item.icon)"
+            @click="toolbarClick(item.icon)"
           >
             <fa-icon :icon="item.icon"/>
           </at-button>
@@ -107,9 +107,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 library.add(fas);
 
-import marked from "marked";
-import turndown from "turndown";
-var turndownGfm = require("turndown-plugin-gfm");
+import { toHtml, toMarkdown } from './switchContent.js'
 
 export default {
   components: {
@@ -130,11 +128,11 @@ export default {
       fontSize: "17px",
       wrap: true
     })),
-      this.aceEditor.setOptions({
-        enableSnippets: true,
-        enableLiveAutocompletion: true,
-        enableBasicAutocompletion: true
-      });
+    this.aceEditor.setOptions({
+      enableSnippets: true,
+      enableLiveAutocompletion: true,
+      enableBasicAutocompletion: true
+    });
     // this.aceEditor.getSession().on('change', this.change)
   },
   data() {
@@ -287,52 +285,19 @@ export default {
     },
     switch_html: function() {
       if (this.isMarkdownMode) {
-
-        var markedRenderer = new marked.Renderer()
-        markedRenderer.paragraph = function(text) {
-          if(/\$\$(.*)\$\$/g.test(text)) {
-            text = text.replace(/(\$\$([^\$]*)\$\$)/g, function($1, $2) {
-              return $2.replace(/\$/g, "")
-            })
-          }
-          return text
-        }
-
-        marked.setOptions({
-          langPrefix: "line-numbers language-",
-          renderer: markedRenderer
-        });
         this.aceEditor.session.setMode("ace/mode/html");
-        this.aceEditor.setValue(marked(this.aceEditor.getSession().getValue()));
+        this.aceEditor.setValue(toHtml(this.aceEditor.getSession().getValue()))
         this.isMarkdownMode = false;
       }
     },
     switch_md: function() {
       if (!this.isMarkdownMode) {
         this.aceEditor.session.setMode("ace/mode/markdown");
-        var turndownService = new turndown({
-          headingStyle: "atx",
-          hr: "---",
-          bulletListMarker: "-",
-          codeBlockStyle: "fenced",
-          emDelimiter: "*"
-        });
-        turndownService.keep([
-          "iframe",
-          "style",
-          "script",
-          "title",
-          "span",
-          "font"
-        ]);
-        turndownService.use(turndownGfm.gfm);
-        this.aceEditor.setValue(
-          turndownService.turndown(this.aceEditor.getSession().getValue())
-        );
+        this.aceEditor.setValue(toMarkdown(this.aceEditor.getSession().getValue()));
         this.isMarkdownMode = true;
       }
     },
-    toolbar_click: function(operate) {
+    toolbarClick: function(operate) {
       this.aceToolbarModal.data.operate = operate
       let str = null;
       let isStart = false;
