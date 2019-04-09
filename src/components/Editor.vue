@@ -1,9 +1,11 @@
 <template>
 <div>
   <div class="row">
-    <div class="col-md-12"><tinymce v-model="html_content"></tinymce></div>
-    <div class="col-md-12"><ace v-model="md_content"></ace></div>
+    <div class="col-md-12"><tinymce v-model="html_content" ref="tinymce"></tinymce></div>
+    <div class="col-md-12"><ace v-model="md_content" ref="ace"></ace></div>
     <div class="col-md-24" v-html="html_content"></div>
+    <button @click="$refs.ace.setValue(md_content)">switchToAce</button>
+    <button @click="$refs.tinymce.setValue(html_content)">switchToTinymce</button>
   </div>
 </div>
 </template>
@@ -29,6 +31,7 @@ export default {
     },
     html_content: function(val) {
       this.md_content = toMarkdown(val)
+      // this.$refs.ace.setValue()
       this.$nextTick(function() {
         Prism.highlightAll()
       })

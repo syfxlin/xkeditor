@@ -4547,6 +4547,13 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
+katex@^0.10.1:
+  version "0.10.1"
+  resolved "http://registry.npm.taobao.org/katex/download/katex-0.10.1.tgz#5bb0b72bf19cecfc1fa217a9261760e5d301efff"
+  integrity sha1-W7C3K/Gc7PwfohepJhdg5dMB7/8=
+  dependencies:
+    commander "^2.19.0"
+
 killable@^1.0.0:
   version "1.0.1"
   resolved "http://registry.npm.taobao.org/killable/download/killable-1.0.1.tgz#4c8ce441187a061c7474fb87ca08e2a638194892"

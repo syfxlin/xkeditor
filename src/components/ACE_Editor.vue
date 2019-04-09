@@ -1,3 +1,19 @@
+<!--
+  /**
+  * Ace编辑器
+  * @module /components
+  * @desc 将Ace编辑器封装为Markdown编辑器，数据实时同步至父组件，父组件通过调用函数将数据传入该组件，初始化数据通过props传输，之后通过setValue方法传输
+  * @author Otstar Lin
+  * @date 2019年4月
+  * @param {String} [value]  - 初始数据
+  * @example 调用示例
+  *  <ace v-model="md_content" ref="ace"></ace>
+  *  <button @click="$refs.ace.setValue(md_content)">switchToAce</button>
+  * @import 导入
+  *  import ACE from './components/ACE_Editor.vue'
+  *  Vue.component('ace', ACE)
+  */
+-->
 <template>
   <div class="ace-container">
     <div class="ace-toolbar" v-show="aceToolbarShow">
@@ -23,9 +39,8 @@
       </template>
     </div>
     <div class="ace-editor" ref="ace"></div>
-    <button v-on:click="change">switch</button>
-    <button v-on:click="switch_html">switch-html</button>
-    <button v-on:click="switch_md">switch-md</button>
+    <button v-on:click="switchToHtml">switch-html</button>
+    <button v-on:click="switchToMarkdown">switch-md</button>
 
     <at-modal v-model="aceToolbarModal.base.isShowModal" @on-confirm="aceToolbarSubmit" class="ace-toolbar-modal" :title="aceToolbarModal.data.modalTitle" v-dialogDrag>
       <div v-show="aceToolbarModal.link">
@@ -107,7 +122,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 library.add(fas);
 
-import { toHtml, toMarkdown } from './switchContent.js'
+import { toHtml, toMarkdown } from './switchContent'
 
 export default {
   components: {
@@ -133,7 +148,7 @@ export default {
       enableLiveAutocompletion: true,
       enableBasicAutocompletion: true
     });
-    // this.aceEditor.getSession().on('change', this.change)
+    this.aceEditor.getSession().on('change', this.updateValue)
   },
   data() {
     return {
@@ -145,7 +160,7 @@ export default {
           isShowModal: false,
         },
         data: {
-          modalTitle: '',
+          modalTitle: ' ',
           allLine: 1,
         },
         link: false,
@@ -308,23 +323,21 @@ export default {
       ]
     };
   },
-  watch: {
-    value: function(val) {
-      this.aceEditor.setValue(this.value);
-    }
-  },
   methods: {
-    change: function() {
-      this.$emit("input", this.aceEditor.getSession().getValue() + " ");
+    setValue: function(val) {
+      this.aceEditor.setValue(val);
     },
-    switch_html: function() {
+    updateValue: function() {
+      this.$emit("input", this.aceEditor.getSession().getValue());
+    },
+    switchToHtml: function(markdownValue) {
       if (this.isMarkdownMode) {
         this.aceEditor.session.setMode("ace/mode/html");
         this.aceEditor.setValue(toHtml(this.aceEditor.getSession().getValue()))
         this.isMarkdownMode = false;
       }
     },
-    switch_md: function() {
+    switchToMarkdown: function(htmlValue) {
       if (!this.isMarkdownMode) {
         this.aceEditor.session.setMode("ace/mode/markdown");
         this.aceEditor.setValue(toMarkdown(this.aceEditor.getSession().getValue()));
@@ -408,7 +421,7 @@ export default {
         return;
       }
       this.aceToolbarModal[operate] = true;
-      this.modalTitle = title
+      this.aceToolbarModal.data.modalTitle = title
       this.aceToolbarModal.base.isShowModal = true;
     },
     operateAceContent: function(isStart, toLeft, str) {

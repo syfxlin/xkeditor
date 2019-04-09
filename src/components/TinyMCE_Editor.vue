@@ -1,7 +1,22 @@
+<!--
+  /**
+  * TinuMCE编辑器
+  * @module /components
+  * @desc 对TinyMCE编辑器进行封装，数据实时同步至父组件，父组件通过调用函数将数据传入该组件，初始化数据通过props传输，之后通过setValue方法传输
+  * @author Otstar Lin
+  * @date 2019年4月
+  * @param {String} [value]  - 初始数据
+  * @example 调用示例
+  *  <tinymce v-model="html_content" ref="tinymce"></tinymce>
+  *  <button @click="$refs.tinymce.setValue(html_content)">switchToTinymce</button>
+  * @import 导入
+  *  import TinyMCE from './components/TinyMCE_Editor.vue'
+  *  Vue.component('tinymce', TinyMCE)
+  */
+-->
 <template>
   <div class="tinymce">
-    <editor ref="tinymce" :init="init" v-model="html_content"></editor>
-    <button v-on:click="change">switch</button>
+    <editor ref="tinymce" :init="init" v-model="tinymceHtml"></editor>
   </div>
 </template>
 
@@ -43,7 +58,7 @@ export default {
   },
   data() {
     return {
-      html_value: null,
+      tinymceHtml: '',
       init: {
         language_url: '/static/tinymce/langs/zh_CN.js',
         language: 'zh_CN',
@@ -66,28 +81,23 @@ export default {
   },
   mounted () {
     tinymce.init({})
+    //赋初值
+    this.tinymceHtml = this.value
   },
   components: {
     'editor': Editor
   },
   watch: {
-    value: function() {
-      this.html_content = this.value
+    tinymceHtml: function() {
+      this.updateValue()
     }
   },
-  computed: {
-    html_content: {
-      get: function() {
-        return this.value
-      },
-      set: function(val) {
-        this.html_value = val
-      }
-    },
-  },
   methods: {
-    change () {
-      this.$emit('input', this.html_value?this.html_value:this.value + " ")
+    setValue: function(val) {
+      this.tinymceHtml = val
+    },
+    updateValue: function() {
+      this.$emit('input', this.tinymceHtml)
     }
   }
 }
