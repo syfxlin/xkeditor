@@ -2,11 +2,11 @@
   <div class="ace-container">
     <div class="ace-toolbar" v-show="aceToolbarShow">
       <template v-for="num in 6">
-        <at-button type="text" :key="num.id" :title="'标题' + num" @click="toolbar_click('h' + num)">
+        <at-button type="text" :key="num.id" :title="'标题' + num" @click="toolbarClick('h' + num)">
           <b>H{{ num }}</b>
         </at-button>
       </template>
-      <template v-for="item in button_list">
+      <template v-for="item in aceToolbarButtons">
         <template v-if="item.icon === '|'">
           <span :key="item.id">|</span>
         </template>
@@ -14,8 +14,8 @@
           <at-button
             :key="item.id"
             type="text"
-            :title="item.info"
-            @click="toolbarClick(item.icon)"
+            :title="item.title"
+            @click="toolbarClick(item.operate)"
           >
             <fa-icon :icon="item.icon"/>
           </at-button>
@@ -27,7 +27,7 @@
     <button v-on:click="switch_html">switch-html</button>
     <button v-on:click="switch_md">switch-md</button>
 
-    <at-modal v-model="isShowModal" @on-confirm="aceToolbarSubmit" class="ace-toolbar-modal" title=" " v-dialogDrag>
+    <at-modal v-model="aceToolbarModal.base.isShowModal" @on-confirm="aceToolbarSubmit" class="ace-toolbar-modal" :title="aceToolbarModal.data.modalTitle" v-dialogDrag>
       <div v-show="aceToolbarModal.link">
         <label>链接</label>
         <at-input v-model="aceToolbarModal.data.href" placeholder="请输入链接" icon="link" autofocus></at-input>
@@ -49,7 +49,7 @@
         </div>
       </div>
       <div v-show="aceToolbarModal.toLine">
-        <label>行号(1-{{ allLine }})</label>
+        <label>行号(1-{{ aceToolbarModal.data.allLine }})</label>
         <at-input v-model="aceToolbarModal.data.line" placeholder="请输入行号" icon="info" autofocus></at-input>
       </div>
       <div v-show="aceToolbarModal.table">
@@ -139,136 +139,170 @@ export default {
     return {
       aceEditor: null,
       isMarkdownMode: true,
-      isShowModal: false,
-      allLine: 1,
       aceToolbarShow: true,
       aceToolbarModal: {
-        data: {},
+        base: {
+          isShowModal: false,
+        },
+        data: {
+          modalTitle: '',
+          allLine: 1,
+        },
         link: false,
         image: false,
         video: false,
         toLine: false,
         search: false
       },
-      button_list: [
+      aceToolbarButtons: [
         {
-          info: "",
+          title: "",
+          operate: "|",
           icon: "|"
         },
         {
-          info: "粗体",
+          title: "粗体",
+          operate: "bold",
           icon: "bold"
         },
         {
-          info: "斜体",
+          title: "斜体",
+          operate: "italic",
           icon: "italic"
         },
         {
-          info: "下划线",
+          title: "下划线",
+          operate: "underline",
           icon: "underline"
         },
         {
-          info: "删除线",
+          title: "删除线",
+          operate: "strikethrough",
           icon: "strikethrough"
         },
         {
-          info: "引用",
+          title: "引用",
+          operate: "quote",
           icon: "quote-left"
         },
         {
-          info: "标记块",
+          title: "标记块",
+          operate: "mark",
           icon: "code"
         },
         {
-          info: "代码块",
+          title: "代码块",
+          operate: "code",
           icon: "terminal"
         },
         {
-          info: "",
+          title: "",
+          operate: "|",
           icon: "|"
         },
         {
-          info: "无序列表",
+          title: "无序列表",
+          operate: "ul",
           icon: "list-ul"
         },
         {
-          info: "有序列表",
+          title: "有序列表",
+          operate: "ol",
           icon: "list-ol"
         },
         {
-          info: "分割线",
+          title: "分割线",
+          operate: "minus",
           icon: "minus"
         },
         {
-          info: "表格",
+          title: "表格",
+          operate: "table",
           icon: "table"
         },
         {
-          info: "时间",
+          title: "时间",
+          operate: "time",
           icon: "clock"
         },
         {
-          info: "",
+          title: "",
+          operate: "|",
           icon: "|"
         },
         {
-          info: "链接",
+          title: "链接",
+          operate: "link",
           icon: "link"
         },
         {
-          info: "图片",
+          title: "图片",
+          operate: "image",
           icon: "image"
         },
         {
-          info: "媒体",
+          title: "媒体",
+          operate: "video",
           icon: "video"
         },
         {
-          info: "",
+          title: "",
+          operate: "|",
           icon: "|"
         },
         {
-          info: "跳转到指定行",
+          title: "跳转到指定行",
+          operate: "toLine",
           icon: "level-down-alt"
         },
         {
-          info: "搜索",
+          title: "搜索",
+          operate: "search",
           icon: "search"
         },
         {
-          info: "关闭实时预览",
+          title: "关闭实时预览",
+          operate: "closePreview",
           icon: "eye-slash"
         },
         {
-          info: "全窗口预览",
+          title: "全窗口预览",
+          operate: "fullPreview",
           icon: "tv"
         },
         {
-          info: "全屏",
+          title: "全屏",
+          operate: "fullScreen",
           icon: "arrows-alt"
         },
         {
-          info: "转换为HTML编辑",
+          title: "转换为HTML编辑",
+          operate: "toHtmlEditor",
           icon: "file-code"
         },
         {
-          info: "清空",
+          title: "清空",
+          operate: "empty",
           icon: "eraser"
         },
         {
-          info: "设置",
+          title: "设置",
+          operate: "setting",
           icon: "cog"
         },
         {
-          info: "",
+          title: "",
+          operate: "|",
           icon: "|"
         },
         {
-          info: "帮助",
+          title: "帮助",
+          operate: "help",
           icon: "question-circle"
         },
         {
-          info: "关于",
+          title: "关于",
+          operate: "about",
           icon: "info-circle"
         }
       ]
@@ -313,66 +347,69 @@ export default {
         str = "*" + selectText + "*";
         toLeft = 1;
       } else if (operate === "underline") {
-        str =
-          '<span style="text-decoration: underline;">' + selectText + "</span>";
+        str = '<span style="text-decoration: underline;">' + selectText + "</span>";
         toLeft = 7;
       } else if (operate === "strikethrough") {
         str = "~" + selectText + "~";
         toLeft = 1;
-      } else if (operate === "quote-left") {
+      } else if (operate === "quote") {
         str = "> ";
         isStart = true;
-      } else if (operate === "code") {
+      } else if (operate === "mark") {
         str = "`" + selectText + "`";
         toLeft = 1;
-      } else if (operate === "terminal") {
+      } else if (operate === "code") {
         str = "```\n```";
         toLeft = 4;
-      } else if (operate === "list-ul") {
+      } else if (operate === "ul") {
         str = "- ";
         isStart = true;
-      } else if (operate === "list-ol") {
+      } else if (operate === "ol") {
         str = "1. ";
         isStart = true;
       } else if (operate === "minus") {
         str = "\n---\n\n";
         isStart = true;
       } else if (operate === "table") {
-        this.aceToolbarModal.table = true;
-        this.isShowModal = true;
+        this.operateModal(operate, true, '添加表格')
         return;
-      } else if (operate === "clock") {
+      } else if (operate === "time") {
         str = new Date().toLocaleString();
       } else if (operate === "link") {
-        this.aceToolbarModal.link = true;
-        this.isShowModal = true;
+        this.operateModal(operate, true, '添加链接')
         return;
       } else if (operate === "image") {
-        this.aceToolbarModal.image = true;
-        this.isShowModal = true;
+        this.operateModal(operate, true, '添加图片')
         return;
       } else if (operate === "video") {
-        this.aceToolbarModal.video = true;
-        this.isShowModal = true;
+        this.operateModal(operate, true, '添加视频')
         return;
-      } else if (operate === "level-down-alt") {
-        this.aceToolbarModal.toLine = true;
-        this.allLine = this.aceEditor.session.getLength();
-        this.isShowModal = true;
+      } else if (operate === "toLine") {
+        this.aceToolbarModal.data.allLine = this.aceEditor.session.getLength();
+        this.operateModal(operate, true, '跳转到指定行')
         return;
       } else if (operate === "search") {
         this.aceEditor.commands.commands.find.exec(this.aceEditor);
-      } else if (operate === "file-code") {
+      } else if (operate === "toHtmlEditor") {
         this.switch_html();
         this.aceToolbarShow = false;
         return;
-      } else if (operate === "eraser") {
+      } else if (operate === "empty") {
         this.aceEditor.setValue("");
         return;
-      } else if (operate === "cog") {
+      } else if (operate === "setting") {
         this.aceEditor.commands.commands.showSettingsMenu.exec(this.aceEditor);
       }
       this.operateAceContent(isStart, toLeft, str)
+    },
+    operateModal: function(operate, isShow, title = '') {
+      if(!isShow) {
+        this.aceToolbarModal[operate] = false
+        return;
+      }
+      this.aceToolbarModal[operate] = true;
+      this.modalTitle = title
+      this.aceToolbarModal.base.isShowModal = true;
     },
     operateAceContent: function(isStart, toLeft, str) {
       let range = this.aceEditor.getSelectionRange();
@@ -416,13 +453,19 @@ export default {
       } else if(data.operate === 'image') {
         str = '![' + data.art + '](' + data.src + ')'
       } else if(data.operate === 'video') {
+        if(!/\w+\.(\w+)$/.test(data.src)) {
+          this.$Message.error('地址输入有误！请重新输入(无法识别扩展名)')
+          return
+        }
         let type = data.src.match(/\w+\.(\w+)$/)
         str = '<video controls="controls" width="' + data.width + '" height="' + data.height + '"><source src="' + data.src + '" type="video/' + type[1] + '" /></video>'
-      } else if(data.operate === 'level-down-alt') {
+      } else if(data.operate === 'toLine') {
         this.aceEditor.gotoLine(data.line)
         this.aceEditor.focus()
+        this.operateModal(data.operate, false)
         return;
       }
+      this.operateModal(data.operate, false)
       this.operateAceContent(false, 0, str)
     }
   }
