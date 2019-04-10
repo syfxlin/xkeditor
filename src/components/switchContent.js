@@ -1,9 +1,16 @@
 import marked from "marked"
 import turndown from "turndown"
+var mymarked = require("marked")
 var turndownGfm = require("turndown-plugin-gfm")
 import katex from "katex"
 import "katex/dist/katex.min.css"
 
+export function toHtmlNoFull(markdownVal) {
+  mymarked.setOptions({
+    langPrefix: "line-numbers language-"
+  });
+  return mymarked(markdownVal);
+}
 export function toHtml(markdownVal) {
   var markedRenderer = new marked.Renderer()
   markedRenderer.paragraph = function(text) {
