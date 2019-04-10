@@ -1,54 +1,91 @@
 <template>
 <div>
   <div class="row">
-    <div class="col-md-12"><tinymce v-model="html_editor_content" ref="tinymce"></tinymce></div>
-    <div class="col-md-12"><ace v-model="md_content" ref="ace"></ace></div>
-    <div class="col-md-24" v-html="html_content" id="previewHtml"></div>
-    <button @click="$refs.ace.setValue(md_content)">switchToAce</button>
-    <button @click="$refs.tinymce.setValue(html_editor_content)">switchToTinymce</button>
+    <div class="col-md-12"><tinymce v-model="htmlContent" ref="tinymce"></tinymce></div>
+    <div class="col-md-12"><ace v-model="markdownContent" ref="ace"></ace></div>
+    <div class="col-md-12" v-html="htmlContent" id="previewHtml" ref="htmlView"></div>
+    <div id="toc"></div>
+    <button @click="getToc">out</button>
+    <button @click="$refs.ace.setValue(markdownContent)">switchToAce</button>
+    <button @click="$refs.tinymce.setValue(htmlContent)">switchToTinymce</button>
   </div>
 </div>
 </template>
 
 <script>
 //HTML和Markdown互转
-import { toHtml, toMarkdown, toHtmlNoFull } from './switchContent.js'
+import { toHtml, toMarkdown, getTocHtml } from './switchContent.js'
+
+import katex from "katex"
+import "katex/dist/katex.min.css"
+import renderMathInElement from "katex/dist/contrib/auto-render"
+import mermaid from "mermaid"
 
 export default {
   name: 'Editor',
   data () {
     return {
-      md_content: '# Welcome to Your Vue.js App',
-      html_content: "wsg",
-    }
-  },
-  computed:{
-    html_editor_content: {
-      get: function() {
-        console.log(toHtmlNoFull(this.md_content))
-        return toHtmlNoFull(this.md_content)
-      },
-      set: function(val) {
-        this.html_content = val
-      }
+      markdownContent: '# Welcome to Your Vue.js App',
+      htmlContent: "wsg",
+      toc: ''
     }
   },
   watch: {
-    md_content: function (val) {
-      this.html_content = toHtml(val)
+    markdownContent: function (val) {
+      this.htmlContent = toHtml(val)
       this.$nextTick(function() {
         Prism.highlightAll()
       })
+      this.renderNextTick()
     },
-    //html_content: function(val) {
-    //  this.md_content = toMarkdown(val)
-    //  this.$nextTick(function() {
-    //    Prism.highlightAll()
-    //  })
-    //}
-  }
+    // htmlContent: function(val) {
+    //   this.markdownContent = toMarkdown(val)
+    //   this.$nextTick(function() {
+    //     Prism.highlightAll()
+    //   })
+    //   this.renderNextTick()
+    // }
+  },
+  methods: {
+    renderNextTick: function() {
+      this.$nextTick(function() {
+        //转换Tex公式
+        renderMathInElement(document.getElementById('previewHtml'), {
+          delimiters: [
+            {left: "$$", right: "$$"},
+            {left: "```tex", right: "```", display: true},
+            {left: "```math", right: "```", display: true},
+          ]
+        });
+        try {
+          mermaid.init({noteMargin: 10}, ".mermaid");
+        } catch (error) {
+          console.log("May have errors")
+        }
+      })
+    },
+    getToc: function() {
+      var html = getTocHtml()
+      document.getElementById('toc').innerHTML = html;
+    },
+    scrollToAnchor: function(anchorName) {
+      if (anchorName) {
+          let anchorElement = document.getElementById(anchorName);
+          if(anchorElement) {
+            anchorElement.scrollIntoView(true);
+          }
+      }
+    }
+  },
+  mounted() {
+    mermaid.initialize({startOnLoad:true})
+    window.scrollToAnchor = this.scrollToAnchor
+  },
 }
 </script>
 
-<style scoped>
+<style>
+.toc ul {
+  margin-left: 20px;
+}
 </style>
