@@ -27,27 +27,28 @@ function getTocHtmlTree(index, str) {
 export function toHtml(markdownVal) {
   tocContent = [];
   var markedRenderer = new marked.Renderer()
-  // markedRenderer.paragraph = function(text) {
-  //   //Tex替换
-  //   if(/\$\$(.*)\$\$/g.test(text)) {
-  //     //eslint-disable-next-line
-  //     text = text.replace(/(\$\$([^\$]*)\$\$)/g, function($1, $2) {
-  //       let data = $2.replace(/\$/g, "")
-  //       var html = katex.renderToString(data, {
-  //         throwOnError: false
-  //       })
-  //       return html
-  //     })
-  //   }
-  //   return text
-  // }
+  markedRenderer.paragraph = function(text) {
+    if(/\[(.*)]{(.*)}/g.test(text)) {
+      //eslint-disable-next-line
+      text = text.replace(/(\[([^\[\]]*)]{([^{}|]*)(\|span|\|p|\|font|)})/g, function($1, $2, $3, $4, $5) {
+        if($5 == '' || $5 == null) {
+          $5 = 'p'
+        } else {
+          $5 = $5.substring(1)
+        }
+        return '<' + $5 + ' style="' + $4 + '">' + $3 + '</' + $5 + '>'
+      })
+      return text
+    }
+    return marked.Renderer.prototype.paragraph.apply(this, arguments)
+  }
   markedRenderer.heading = function(title, level) {
     tocContent.push({title: title, level: level})
     return marked.Renderer.prototype.heading.apply(this, arguments)
   }
   markedRenderer.code = function(code, language) {
     if(language === 'math' || language === "tex") {
-      return '<pre class="xkeditor-tex">$$\n' + code + '\n$$</pre>\n'
+      return '<pre class="xkeditor-tex">```' + language +'\n' + code + '\n```</pre>\n'
     }
     if(/flow(TB|BT|RL|LR|TD)$/.test(language)) {
       return '<pre class="xkeditor-mermaid">graph ' + language.substring(language.length-2) + '\n' + code + '</pre>'
@@ -83,13 +84,11 @@ export function toMarkdown(htmlVal) {
     "style",
     "script",
     "title",
-    "span",
-    "font"
   ]);
   turndownService.use(turndownGfm.gfm);
   turndownService.addRule('mermaid', {
     filter:  function (node) {
-      return (node.nodeName == 'PRE')&&(node.classList.contains('xkeditor-mermaid'))
+      return (node.nodeName === 'PRE')&&(node.classList.contains('xkeditor-mermaid'))
     },
     replacement: function (content, node) {
       return '\n\n```mermaid\n' + node.textContent + '\n```\n'
@@ -97,12 +96,60 @@ export function toMarkdown(htmlVal) {
   })
   turndownService.addRule('math', {
     filter:  function (node) {
-      return (node.nodeName == 'PRE')&&(node.classList.contains('xkeditor-tex'))
+      return (node.nodeName === 'PRE')&&(node.classList.contains('xkeditor-tex'))
     },
     replacement: function (content, node) {
-      console.log('out')
-      console.dir(node)
       return node.textContent
+    }
+  })
+  turndownService.addRule('sup', {
+    filter:  function (node) {
+      return (node.nodeName === 'SUP')
+    },
+    replacement: function (content, node) {
+      return '<sup>' + content + '</sup>'
+    }
+  })
+  turndownService.addRule('sub', {
+    filter:  function (node) {
+      return (node.nodeName === 'SUB')
+    },
+    replacement: function (content, node) {
+      return '<sub>' + content + '</sub>'
+    }
+  })
+  turndownService.addRule('havaStyle', {
+    filter:  function (node) {
+      return (node.nodeName === 'FONT' || node.nodeName === 'P' || node.nodeName === 'SPAN')&&(node.getAttribute('style') !== null)
+    },
+    replacement: function (content, node) {
+      var parseStyle = [
+        'color',
+        'font-size',
+        'padding-left',
+        'background-color',
+        'text-align',
+        'font-family'
+      ]
+      var out = node.outerHTML
+      if(node.style.textDecoration === 'underline') {
+        out = '<u>' + content + '</u>'
+      } else if(node.style.textDecoration === 'line-through') {
+        out = '~' + content + '~'
+      } else {
+        out = '[' + content + ']{'
+        for(let i = 0; i < parseStyle.length; i++) {
+          if(node.style[parseStyle[i]] !== '') {
+            out += parseStyle[i] + ':' + node.style[parseStyle[i]] + ';'
+          }
+        }
+        if(node.localName === 'p') {
+          out += '}'
+        } else {
+          out += '|' + node.localName + '}'
+        }
+      }
+      return out
     }
   })
   return turndownService.turndown(htmlVal)

@@ -63,7 +63,9 @@ export default {
         //转换Tex公式
         renderMathInElement(document.getElementById('previewHtml'), {
           delimiters: [
-            {left: "$$", right: "$$"}
+            {left: "$$", right: "$$"},
+            {left: "```math", right: "```"},
+            {left: "```tex", right: "```"}
           ],
           ignoredTags: ["script", "noscript", "style", "textarea", "code"]
         });
@@ -97,8 +99,5 @@ export default {
 <style>
 .toc ul {
   margin-left: 20px;
-}
-.math {
-  white-space: pre;
 }
 </style>
