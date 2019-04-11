@@ -216,6 +216,56 @@ export default {
           icon: "|"
         },
         {
+          title: "上标",
+          operate: "sup",
+          icon: "superscript"
+        },
+        {
+          title: "下标",
+          operate: "sub",
+          icon: "subscript"
+        },
+        {
+          title: "添加行内公式",
+          operate: "tex-$",
+          icon: "dollar-sign"
+        },
+        {
+          title: "添加块公式",
+          operate: "tex-math",
+          icon: "divide"
+        },
+        {
+          title: "",
+          operate: "|",
+          icon: "|"
+        },
+        {
+          title: "添加流程图",
+          operate: "flow",
+          icon: "ellipsis-h"
+        },
+        {
+          title: "添加时序图",
+          operate: "seq",
+          icon: "circle"
+        },
+        {
+          title: "添加甘特图",
+          operate: "gantt",
+          icon: "square"
+        },
+        {
+          title: "",
+          operate: "mermaid",
+          icon: "cubes"
+        },
+        {
+          title: "",
+          operate: "|",
+          icon: "|"
+        },
+        {
           title: "无序列表",
           operate: "ul",
           icon: "list-ul"
@@ -374,6 +424,30 @@ export default {
       } else if (operate === "code") {
         str = "```\n```";
         toLeft = 4;
+      } else if(operate === "sup") {
+        str = "<sup>" + selectText + "</sup>"
+        toLeft = 6
+      } else if(operate === "sub") {
+        str = "<sub>" + selectText + "</sub>"
+        toLeft = 6
+      } else if(operate === "tex-$") {
+        str = "$$" + selectText + "$$"
+        toLeft = 2
+      } else if(operate === "tex-math") {
+        str = "```math\n\n```"
+        toLeft = 4
+      } else if(operate === "flow") {
+        str = "```flow\n```"
+        toLeft = 4
+      } else if(operate === "seq") {
+        str = "```seq\n\n```"
+        toLeft = 4
+      } else if(operate === "gantt") {
+        str = "```gantt\n\n```"
+        toLeft = 4
+      } else if(operate === "mermaid") {
+        str = "```mermaid\n\n```"
+        toLeft = 4
       } else if (operate === "ul") {
         str = "- ";
         isStart = true;
