@@ -3,11 +3,11 @@
   <div class="row">
     <div class="col-md-12"><tinymce v-model="htmlContent" ref="tinymce"></tinymce></div>
     <div class="col-md-12"><ace v-model="markdownContent" ref="ace"></ace></div>
-    <div class="col-md-12" v-html="htmlContent" id="previewHtml" ref="htmlView"></div>
+    <div class="col-md-12" v-html="htmlViewContent" id="previewHtml" ref="htmlView"></div>
     <div id="toc"></div>
     <button @click="getToc">out</button>
-    <button @click="$refs.ace.setValue(markdownContent)">switchToAce</button>
-    <button @click="$refs.tinymce.setValue(htmlContent)">switchToTinymce</button>
+    <button @click="switchEditor('ace')">switchToAce</button>
+    <button @click="switchEditor('tinymce')">switchToTinymce</button>
   </div>
 </div>
 </template>
@@ -27,38 +27,48 @@ export default {
     return {
       markdownContent: '# Welcome to Your Vue.js App',
       htmlContent: "wsg",
+      htmlViewContent: "",
       toc: ''
     }
   },
   watch: {
     markdownContent: function (val) {
-      this.htmlContent = toHtml(val)
+      this.htmlViewContent = toHtml(val)
       this.$nextTick(function() {
         Prism.highlightAll()
       })
       this.renderNextTick()
     },
-    // htmlContent: function(val) {
-    //   this.markdownContent = toMarkdown(val)
-    //   this.$nextTick(function() {
-    //     Prism.highlightAll()
-    //   })
-    //   this.renderNextTick()
-    // }
+    htmlContent: function(val) {
+      // this.markdownContent = toMarkdown(val)
+      this.htmlViewContent = val
+      this.$nextTick(function() {
+        Prism.highlightAll()
+      })
+      this.renderNextTick()
+    }
   },
   methods: {
+    switchEditor: function(to) {
+      if(to === 'ace') {
+        this.markdownContent = toMarkdown(this.htmlContent)
+        this.$refs.ace.setValue(this.markdownContent)
+      } else if(to === 'tinymce') {
+        this.htmlContent = toHtml(this.markdownContent)
+        this.$refs.tinymce.setValue(this.htmlContent)
+      }
+    },
     renderNextTick: function() {
       this.$nextTick(function() {
         //转换Tex公式
         renderMathInElement(document.getElementById('previewHtml'), {
           delimiters: [
-            {left: "$$", right: "$$"},
-            {left: "```tex", right: "```", display: true},
-            {left: "```math", right: "```", display: true},
-          ]
+            {left: "$$", right: "$$"}
+          ],
+          ignoredTags: ["script", "noscript", "style", "textarea", "code"]
         });
         try {
-          mermaid.init({noteMargin: 10}, ".mermaid");
+          mermaid.init({noteMargin: 10}, ".xkeditor-mermaid");
         } catch (error) {
           console.log("May have errors")
         }
@@ -70,10 +80,10 @@ export default {
     },
     scrollToAnchor: function(anchorName) {
       if (anchorName) {
-          let anchorElement = document.getElementById(anchorName);
-          if(anchorElement) {
-            anchorElement.scrollIntoView(true);
-          }
+        let anchorElement = document.getElementById(anchorName);
+        if(anchorElement) {
+          anchorElement.scrollIntoView(true);
+        }
       }
     }
   },
@@ -87,5 +97,8 @@ export default {
 <style>
 .toc ul {
   margin-left: 20px;
+}
+.math {
+  white-space: pre;
 }
 </style>

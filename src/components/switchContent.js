@@ -47,19 +47,19 @@ export function toHtml(markdownVal) {
   }
   markedRenderer.code = function(code, language) {
     if(language === 'math' || language === "tex") {
-      return '```' + language + '\n' + code + '\n```'
+      return '<pre class="xkeditor-tex">$$\n' + code + '\n$$</pre>\n'
     }
     if(/flow(TB|BT|RL|LR|TD)$/.test(language)) {
-      return '<div class="mermaid">graph ' + language.substring(language.length-2) + '\n' + code + '</div><div class="mermaid-text" style="display:none">graph ' + language.substring(language.length-2) + '\n' + code + '</div>'
+      return '<pre class="xkeditor-mermaid">graph ' + language.substring(language.length-2) + '\n' + code + '</pre>'
     }
     if(language === 'seq') {
-      return '<div class="mermaid">sequenceDiagram\n' + code + '</div><div class="mermaid-text" style="display:none">sequenceDiagram' + code + '</div>'
+      return '<pre class="xkeditor-mermaid">sequenceDiagram\n' + code + '</pre>'
     }
     if(language === 'gantt') {
-      return '<div class="mermaid">gantt\n' + code + '</div><div class="mermaid-text" style="display:none">gantt' + code + '</div>'
+      return '<pre class="xkeditor-mermaid">gantt\n' + code + '</pre>'
     }
     if(language === 'mermaid') {
-      return '<div class="mermaid">' + code + '</div><div class="mermaid-text" style="display:none">' + code + '</div>'
+      return '<pre class="xkeditor-mermaid">' + code + '</pre>'
     }
     return marked.Renderer.prototype.code.apply(this, arguments)
   }
@@ -87,5 +87,23 @@ export function toMarkdown(htmlVal) {
     "font"
   ]);
   turndownService.use(turndownGfm.gfm);
+  turndownService.addRule('mermaid', {
+    filter:  function (node) {
+      return (node.nodeName == 'PRE')&&(node.classList.contains('xkeditor-mermaid'))
+    },
+    replacement: function (content, node) {
+      return '\n\n```mermaid\n' + node.textContent + '\n```\n'
+    }
+  })
+  turndownService.addRule('math', {
+    filter:  function (node) {
+      return (node.nodeName == 'PRE')&&(node.classList.contains('xkeditor-tex'))
+    },
+    replacement: function (content, node) {
+      console.log('out')
+      console.dir(node)
+      return node.textContent
+    }
+  })
   return turndownService.turndown(htmlVal)
 }
