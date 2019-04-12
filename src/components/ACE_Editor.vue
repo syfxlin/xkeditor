@@ -256,7 +256,7 @@ export default {
           icon: "square"
         },
         {
-          title: "",
+          title: "添加图",
           operate: "mermaid",
           icon: "cubes"
         },
