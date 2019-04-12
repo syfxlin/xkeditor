@@ -42,8 +42,6 @@
       <at-button type="text" title="转换为Markdown模式" @click="function(){aceToolbarShow = true;switchEditorMode()}"><fa-icon icon="file-code"/> 转换为Markdown模式</at-button>
     </div>
     <div class="ace-editor" ref="ace"></div>
-    <button v-on:click="switchToHtml">switch-html</button>
-    <button v-on:click="switchToMarkdown">switch-md</button>
 
     <at-modal v-model="aceToolbarModal.base.isShowModal" @on-confirm="aceToolbarSubmit" class="ace-toolbar-modal" :title="aceToolbarModal.data.modalTitle" v-dialogDrag>
       <div v-show="aceToolbarModal.link">
@@ -136,12 +134,11 @@ export default {
   },
   mounted() {
     (this.aceEditor = ace.edit(this.$refs.ace, {
-      maxLines: 20, // 最大行数，超过会自动出现滚动条
-      minLines: 10, // 最小行数，还未到最大行数时，编辑器会自动伸缩大小
-      fontSize: 14, // 编辑器内字体大小
-      theme: "ace/theme/solarized_light", // 默认设置的主题
-      mode: "ace/mode/markdown", // 默认设置的语言模式
-      tabSize: 4, // 制表符设置为 4 个空格大小
+      minLines: 10,
+      fontSize: 14,
+      theme: "ace/theme/solarized_light",
+      mode: "ace/mode/markdown",
+      tabSize: 4,
       value: this.value ? this.value : "",
       fontSize: "17px",
       wrap: true
@@ -487,9 +484,17 @@ export default {
         return;
       } else if (operate === "search") {
         this.aceEditor.commands.commands.find.exec(this.aceEditor);
-      } else if(operate === 'switchPreview') {
+      } else if(operate === "switchPreview") {
         this.$parent.switchPreviewShow()
+        this.$nextTick(function() {
+          this.aceEditor.resize(this.aceEditor)
+        })
         return;
+      } else if(operate === "fullPreview") {
+        this.$parent.switchPreviewFull()
+        this.$nextTick(function() {
+          this.aceEditor.resize(this.aceEditor)
+        })
       } else if (operate === "toHtmlEditor") {
         this.switchEditorMode()
         this.aceToolbarShow = false;
@@ -575,6 +580,9 @@ export default {
 <style scoped>
 .ace-container {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 .ace-container .bookmarklet {
   position: absolute;
@@ -604,5 +612,8 @@ export default {
 .ace-toolbar-modal .at-input {
   margin-top: 5px;
   margin-bottom: 10px;
+}
+.ace-editor {
+  flex: 1;
 }
 </style>

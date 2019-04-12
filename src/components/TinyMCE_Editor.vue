@@ -67,7 +67,7 @@ export default {
         toolbar: 'formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat code | undo redo',
         image_advtab: true,
         importcss_append: true,
-        height: 400,
+        height: '100%',
         template_cdate_format: '[CDATE: %m/%d/%Y : %H:%M:%S]',
         template_mdate_format: '[MDATE: %m/%d/%Y : %H:%M:%S]',
         image_caption: true,
@@ -102,3 +102,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.tinymce {
+  height: 100%;
+}
+</style>

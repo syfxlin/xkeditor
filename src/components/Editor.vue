@@ -1,11 +1,16 @@
 <template>
-<div>
+<div class="xkeditor">
   <div class="row">
-    <div :class="aceDivClass"><ace v-model="markdownContent" ref="ace" v-show="EditorModeShow"></ace></div>
-    <div class="col-md-12" v-html="htmlViewContent" id="previewHtml" ref="htmlView" v-show="EditorModeShow&&previewShow"></div>
-    <div id="toc"></div>
-    <div class="col-md-24"><tinymce v-model="htmlContent" ref="tinymce" v-show="!EditorModeShow"></tinymce></div>
-    <button @click="getToc">toc</button>
+    <div :class="aceDivClass" v-show="EditorModeShow&&previewShow!='full'"><ace v-model="markdownContent" ref="ace"></ace></div>
+    <div :class="aceDivClass" v-html="htmlViewContent" id="previewHtml" ref="htmlView" v-show="EditorModeShow&&previewShow!='hide'"></div>
+    <div class="col-md-24" v-show="!EditorModeShow"><tinymce v-model="htmlContent" ref="tinymce"></tinymce></div>
+    <at-button icon="icon-x" circle class="close-preview-full" @click="switchPreviewFull()" v-show="EditorModeShow&&previewShow=='full'"></at-button>
+    <transition name="slide-fade">
+      <div id="toc" v-show="showToc"></div>
+    </transition>
+  </div>
+  <div class="fixed-button">
+    <button @click="switchToc">toc</button>
     <button @click="switchEditor()">switchEditor</button>
   </div>
 </div>
@@ -28,8 +33,9 @@ export default {
       htmlContent: '',
       htmlViewContent: '',
       toc: '',
+      showToc: false,
       EditorMode: "ace",
-      previewShow: true,
+      previewShow: 'show',
       aceDivClass: "col-md-12"
     }
   },
@@ -49,16 +55,10 @@ export default {
   watch: {
     markdownContent: function (val) {
       this.htmlViewContent = toHtml(val)
-      this.$nextTick(function() {
-        Prism.highlightAll()
-      })
       this.renderNextTick()
     },
     htmlContent: function(val) {
       this.htmlViewContent = val
-      this.$nextTick(function() {
-        Prism.highlightAll()
-      })
       this.renderNextTick()
     }
   },
@@ -75,16 +75,29 @@ export default {
       }
     },
     switchPreviewShow: function() {
-      if(this.previewShow) {
-        this.previewShow = false
+      if(this.previewShow == 'show') {
+        this.previewShow = 'hide'
         this.aceDivClass = "col-md-24"
       } else {
-        this.previewShow = true
+        this.previewShow = 'show'
         this.aceDivClass = "col-md-12"
+      }
+    },
+    switchPreviewFull: function() {
+      if(this.previewShow == 'full') {
+        this.previewShow = 'show'
+        this.aceDivClass = "col-md-12"
+      } else {
+        this.previewShow = 'full'
+        this.aceDivClass = "col-md-24"
       }
     },
     renderNextTick: function() {
       this.$nextTick(function() {
+        //制作TOC
+        document.getElementById('toc').innerHTML = getTocHtml();
+        //代码高亮
+        Prism.highlightAll()
         //转换Tex公式
         renderMathInElement(document.getElementById('previewHtml'), {
           delimiters: [
@@ -94,6 +107,7 @@ export default {
           ],
           ignoredTags: ["script", "noscript", "style", "textarea", "code"]
         });
+        //转换Mermaid图
         try {
           mermaid.init({noteMargin: 10}, ".xkeditor-mermaid");
         } catch (error) {
@@ -101,9 +115,8 @@ export default {
         }
       })
     },
-    getToc: function() {
-      var html = getTocHtml()
-      document.getElementById('toc').innerHTML = html;
+    switchToc: function() {
+      this.showToc = (!this.showToc)
     },
     scrollToAnchor: function(anchorName) {
       if (anchorName) {
@@ -122,7 +135,66 @@ export default {
 </script>
 
 <style>
+.xkeditor {
+  height: 100%;
+  overflow-x: hidden;
+}
+.xkeditor .row {
+  height: 100%;
+  transform:translate(0,0);
+}
+.xkeditor .row .col-md-12 {
+  height: 100%;
+}
+#previewHtml {
+  overflow: auto;
+  max-height: 100%;
+  padding: 15px;
+  word-break: break-all;
+  white-space: normal;
+}
 .toc ul {
   margin-left: 20px;
+}
+.row {
+  margin: 0px;
+}
+.col-md-24 {
+  padding: 0px;
+}
+.col-md-12 {
+  padding: 0px;
+}
+.fixed-button {
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  z-index: 1000;
+}
+.close-preview-full {
+  position: fixed;
+  right: 10px;
+  top: 10px;
+}
+#toc {
+  position: fixed;
+  right: 0px;
+  width: 30%;
+  height: 100%;
+  background: #fff;
+}
+
+/* 可以设置不同的进入和离开动画 */
+/* 设置持续时间和动画函数 */
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .5s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active for below version 2.1.8 */ {
+  transform: translateX(10px);
+  opacity: 0;
 }
 </style>
