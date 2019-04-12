@@ -8,7 +8,7 @@
   * @param {String} [value]  - 初始数据
   * @example 调用示例
   *  <tinymce v-model="html_content" ref="tinymce"></tinymce>
-  *  <button @click="$refs.tinymce.setValue(html_content)">switchToTinymce</button>
+  *  <button @click="switchEditor('tinymce')">switchToTinymce</button>
   * @import 导入
   *  import TinyMCE from './components/TinyMCE_Editor.vue'
   *  Vue.component('tinymce', TinyMCE)
