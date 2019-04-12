@@ -20,7 +20,6 @@ function getTocHtmlTree(index, str) {
       str += '</ul>'
     }
   }
-  //eslint-disable-next-line
   str += '<li><a href="javascript:scrollToAnchor(\'' + tocContent[index].title.toLowerCase().replace(/ /g, "-").replace(/[^\u4e00-\u9fa5a-zA-Z0-9-]/g, "") + '\');">' + tocContent[index].title + '</a></li>'
   return getTocHtmlTree(index+1, str)
 }
@@ -29,7 +28,6 @@ export function toHtml(markdownVal) {
   var markedRenderer = new marked.Renderer()
   markedRenderer.paragraph = function(text) {
     if(/\[(.*)]{(.*)}/g.test(text)) {
-      //eslint-disable-next-line
       text = text.replace(/(\[([^\[\]]*)]{([^{}|]*)(\|span|\|p|\|font|)})/g, function($1, $2, $3, $4, $5) {
         if($5 == '' || $5 == null) {
           $5 = 'p'
