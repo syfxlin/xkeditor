@@ -1,13 +1,12 @@
 <template>
 <div>
   <div class="row">
-    <div class="col-md-12"><tinymce v-model="htmlContent" ref="tinymce"></tinymce></div>
-    <div class="col-md-12"><ace v-model="markdownContent" ref="ace"></ace></div>
-    <div class="col-md-12" v-html="htmlViewContent" id="previewHtml" ref="htmlView"></div>
+    <div :class="aceDivClass"><ace v-model="markdownContent" ref="ace" v-show="EditorModeShow"></ace></div>
+    <div class="col-md-12" v-html="htmlViewContent" id="previewHtml" ref="htmlView" v-show="EditorModeShow&&previewShow"></div>
     <div id="toc"></div>
-    <button @click="getToc">out</button>
-    <button @click="switchEditor('ace')">switchToAce</button>
-    <button @click="switchEditor('tinymce')">switchToTinymce</button>
+    <div class="col-md-24"><tinymce v-model="htmlContent" ref="tinymce" v-show="!EditorModeShow"></tinymce></div>
+    <button @click="getToc">toc</button>
+    <button @click="switchEditor()">switchEditor</button>
   </div>
 </div>
 </template>
@@ -25,10 +24,26 @@ export default {
   name: 'Editor',
   data () {
     return {
-      markdownContent: '# Welcome to Your Vue.js App',
-      htmlContent: "wsg",
-      htmlViewContent: "",
-      toc: ''
+      markdownContent: '',
+      htmlContent: '',
+      htmlViewContent: '',
+      toc: '',
+      EditorMode: "ace",
+      previewShow: true,
+      aceDivClass: "col-md-12"
+    }
+  },
+  created:function(){
+    this.markdownContent = '# XK-Editor'
+    this.htmlViewContent = toHtml(this.markdownContent)
+  },
+  computed: {
+    EditorModeShow: function() {
+      if(this.EditorMode === 'ace') {
+        return true
+      } else if(this.EditorMode === 'tinymce') {
+        return false
+      }
     }
   },
   watch: {
@@ -40,7 +55,6 @@ export default {
       this.renderNextTick()
     },
     htmlContent: function(val) {
-      // this.markdownContent = toMarkdown(val)
       this.htmlViewContent = val
       this.$nextTick(function() {
         Prism.highlightAll()
@@ -49,13 +63,24 @@ export default {
     }
   },
   methods: {
-    switchEditor: function(to) {
-      if(to === 'ace') {
+    switchEditor: function() {
+      if(this.EditorMode !== 'ace') {
         this.markdownContent = toMarkdown(this.htmlContent)
         this.$refs.ace.setValue(this.markdownContent)
-      } else if(to === 'tinymce') {
+        this.EditorMode = 'ace'
+      } else if(this.EditorMode !== 'tinymce') {
         this.htmlContent = toHtml(this.markdownContent)
         this.$refs.tinymce.setValue(this.htmlContent)
+        this.EditorMode = 'tinymce'
+      }
+    },
+    switchPreviewShow: function() {
+      if(this.previewShow) {
+        this.previewShow = false
+        this.aceDivClass = "col-md-24"
+      } else {
+        this.previewShow = true
+        this.aceDivClass = "col-md-12"
       }
     },
     renderNextTick: function() {

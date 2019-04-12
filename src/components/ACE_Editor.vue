@@ -8,7 +8,7 @@
   * @param {String} [value]  - 初始数据
   * @example 调用示例
   *  <ace v-model="md_content" ref="ace"></ace>
-  *  <button @click="$refs.ace.setValue(md_content)">switchToAce</button>
+  *  <button @click="switchEditor('ace')">switchToAce</button>
   * @import 导入
   *  import ACE from './components/ACE_Editor.vue'
   *  Vue.component('ace', ACE)
@@ -37,6 +37,9 @@
           </at-button>
         </template>
       </template>
+    </div>
+    <div class="ace-toolbar-html ace-toolbar" v-show="!aceToolbarShow">
+      <at-button type="text" title="转换为Markdown模式" @click="function(){aceToolbarShow = true;switchEditorMode()}"><fa-icon icon="file-code"/> 转换为Markdown模式</at-button>
     </div>
     <div class="ace-editor" ref="ace"></div>
     <button v-on:click="switchToHtml">switch-html</button>
@@ -326,9 +329,9 @@ export default {
           icon: "search"
         },
         {
-          title: "关闭实时预览",
-          operate: "closePreview",
-          icon: "eye-slash"
+          title: "切换实时预览",
+          operate: "switchPreview",
+          icon: "eye"
         },
         {
           title: "全窗口预览",
@@ -380,14 +383,21 @@ export default {
     updateValue: function() {
       this.$emit("input", this.aceEditor.getSession().getValue());
     },
-    switchToHtml: function(markdownValue) {
+    switchEditorMode: function() {
+      if(this.isMarkdownMode) {
+        this.switchToHtml()
+      } else {
+        this.switchToMarkdown()
+      }
+    },
+    switchToHtml: function() {
       if (this.isMarkdownMode) {
         this.aceEditor.session.setMode("ace/mode/html");
         this.aceEditor.setValue(toHtml(this.aceEditor.getSession().getValue()))
         this.isMarkdownMode = false;
       }
     },
-    switchToMarkdown: function(htmlValue) {
+    switchToMarkdown: function() {
       if (!this.isMarkdownMode) {
         this.aceEditor.session.setMode("ace/mode/markdown");
         this.aceEditor.setValue(toMarkdown(this.aceEditor.getSession().getValue()));
@@ -477,8 +487,11 @@ export default {
         return;
       } else if (operate === "search") {
         this.aceEditor.commands.commands.find.exec(this.aceEditor);
+      } else if(operate === 'switchPreview') {
+        this.$parent.switchPreviewShow()
+        return;
       } else if (operate === "toHtmlEditor") {
-        this.switch_html();
+        this.switchEditorMode()
         this.aceToolbarShow = false;
         return;
       } else if (operate === "empty") {

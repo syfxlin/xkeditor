@@ -30,8 +30,8 @@ export function toHtml(markdownVal) {
   markedRenderer.paragraph = function(text) {
     if(/\[(.*)]{(.*)}/g.test(text)) {
       //eslint-disable-next-line
-      text = text.replace(/(\[([^\[\]]*)]{([^{}|]*)(\|span|\|p|\|font|)})/g, function($1, $2, $3, $4, $5) {
-        if($5 == '' || $5 == null) {
+      text = text.replace(/(\[([^\[\]]*)]{([^{}|]*)(\|span|\|p|\|font|\||)})/g, function($1, $2, $3, $4, $5) {
+        if($5 == '|' || $5 == '' || $5 == null) {
           $5 = 'p'
         } else {
           $5 = $5.substring(1)
@@ -91,7 +91,7 @@ export function toMarkdown(htmlVal) {
       return (node.nodeName === 'PRE')&&(node.classList.contains('xkeditor-mermaid'))
     },
     replacement: function (content, node) {
-      return '\n\n```mermaid\n' + node.textContent + '\n```\n'
+      return '\n\n```mermaid\n' + node.innerHTML.replace(/(<br \/>|<br>)/g, '\n') + '\n```\n'
     }
   })
   turndownService.addRule('math', {
@@ -99,7 +99,7 @@ export function toMarkdown(htmlVal) {
       return (node.nodeName === 'PRE')&&(node.classList.contains('xkeditor-tex'))
     },
     replacement: function (content, node) {
-      return node.textContent
+      return node.innerHTML.replace(/(<br \/>|<br>)/g, '\n')
     }
   })
   turndownService.addRule('sup', {
