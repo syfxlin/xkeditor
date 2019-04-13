@@ -11,14 +11,6 @@ import marked from 'marked'
 //导入js，随处可用
 Object.defineProperty(Vue.prototype, '$marked', { value: marked })
 
-import 'prismjs'
-import 'prismjs/themes/prism-okaidia.css'
-import 'prismjs/plugins/line-numbers/prism-line-numbers.min'
-import 'prismjs/plugins/line-numbers/prism-line-numbers.css'
-import 'prismjs/plugins/toolbar/prism-toolbar.min'
-import 'prismjs/plugins/toolbar/prism-toolbar.css'
-import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.min'
-import 'prismjs/plugins/show-language/prism-show-language.min'
 import ACE from './components/ACE_Editor.vue'
 Vue.component('ace', ACE)
 import TinyMCE from './components/TinyMCE_Editor.vue'

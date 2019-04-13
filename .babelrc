@@ -10,7 +10,7 @@
   ],
   "plugins": [
     "transform-vue-jsx",
-    "transform-runtime"
+    "transform-runtime",
   ],
   "env": {
     "test": {

@@ -2,7 +2,22 @@ import marked from "marked"
 import turndown from "turndown"
 var turndownGfm = require("turndown-plugin-gfm")
 
-import prismjs from 'prismjs'
+import Prism from 'prismjs'
+import 'prismjs/themes/prism-okaidia.css'
+import 'prismjs/plugins/line-numbers/prism-line-numbers.css'
+import 'prismjs/plugins/toolbar/prism-toolbar.css'
+import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.min'
+var prismComponents = [
+  'markup-templating', 'markup',
+  'apacheconf', 'bash', 'clike', 'css', 'git', 'ini', 'javascript',
+  'jsx', 'json', 'makefile', 'nginx', 'php', 'python', 'sass', 'scss',
+  'sql', 'aspnet', 'c', 'cpp', 'csharp', 'django', 'docker', 'go',
+  'java', 'kotlin', 'latex', 'less', 'objectivec', 'ruby',
+  'rust', 'tsx', 'typescript', 'yaml'
+]
+for (var item in prismComponents) {
+  require('prismjs/components/prism-' + prismComponents[item] + '.js')
+}
 
 var tocContent = [];
 export function getTocHtml() {
@@ -110,7 +125,129 @@ export function toHtmlFull(markdownVal) {
       return '<pre class="xkeditor-mermaid">' + code + '</pre>'
     }
     if(language !== '') {
-      return '<pre class="line-numbers language-' + language + '"><code class="language-' + language + '">' + prismjs.highlight(code, prismjs.languages[language], prismjs.languages.markup) + '</code></pre>'
+      var Languages = {
+        "html":"HTML",
+        "xml":"XML",
+        "svg":"SVG",
+        "mathml":"MathML",
+        "css":"CSS",
+        "clike":"C-like",
+        "js":"JavaScript",
+        "abap":"ABAP",
+        "abnf":"Augmented Backus–Naur form",
+        "apacheconf":"Apache Configuration",
+        "apl":"APL",
+        "arff":"ARFF",
+        "asciidoc":"AsciiDoc",
+        "adoc":"AsciiDoc",
+        "asm6502":"6502 Assembly",
+        "aspnet":"ASP.NET (C#)",
+        "autohotkey":"AutoHotkey",
+        "autoit":"AutoIt",
+        "shell":"Bash",
+        "basic":"BASIC",
+        "bnf":"Backus–Naur form",
+        "rbnf":"Routing Backus–Naur form",
+        "csharp":"C#",
+        "dotnet":"C#",
+        "cpp":"C++",
+        "cil":"CIL",
+        "coffee":"CoffeeScript",
+        "cmake":"CMake",
+        "csp":"Content-Security-Policy",
+        "css-extras":"CSS Extras",
+        "django":"Django/Jinja2",
+        "jinja2":"Django/Jinja2",
+        "dockerfile":"Docker",
+        "ebnf":"Extended Backus–Naur form",
+        "ejs":"EJS",
+        "erb":"ERB",
+        "fsharp":"F#",
+        "gcode":"G-code",
+        "gedcom":"GEDCOM",
+        "glsl":"GLSL",
+        "gml":"GameMaker Language",
+        "gamemakerlanguage":"GameMaker Language",
+        "graphql":"GraphQL",
+        "hs":"Haskell",
+        "hcl":"HCL",
+        "http":"HTTP",
+        "hpkp":"HTTP Public-Key-Pins",
+        "hsts":"HTTP Strict-Transport-Security",
+        "ichigojam":"IchigoJam",
+        "inform7":"Inform 7",
+        "javadoc":"JavaDoc",
+        "javadoclike":"JavaDoc-like",
+        "javastacktrace":"Java stack trace",
+        "jsdoc":"JSDoc",
+        "js-extras":"JS Extras",
+        "json":"JSON",
+        "jsonp":"JSONP",
+        "json5":"JSON5",
+        "latex":"LaTeX",
+        "emacs":"Lisp",
+        "elisp":"Lisp",
+        "emacs-lisp":"Lisp",
+        "lolcode":"LOLCODE",
+        "md":"Markdown",
+        "markup-templating":"Markup templating",
+        "matlab":"MATLAB",
+        "mel":"MEL",
+        "n1ql":"N1QL",
+        "n4js":"N4JS",
+        "n4jsd":"N4JS",
+        "nand2tetris-hdl":"Nand To Tetris HDL",
+        "nasm":"NASM",
+        "nginx":"nginx",
+        "nsis":"NSIS",
+        "objectivec":"Objective-C",
+        "ocaml":"OCaml",
+        "opencl":"OpenCL",
+        "parigp":"PARI/GP",
+        "objectpascal":"Object Pascal",
+        "php":"PHP",
+        "phpdoc":"PHPDoc",
+        "php-extras":"PHP Extras",
+        "plsql":"PL/SQL",
+        "powershell":"PowerShell",
+        "properties":".properties",
+        "protobuf":"Protocol Buffers",
+        "py":"Python",
+        "q":"Q (kdb+ database)",
+        "jsx":"React JSX",
+        "tsx":"React TSX",
+        "renpy":"Ren'py",
+        "rest":"reST (reStructuredText)",
+        "rb":"Ruby",
+        "sas":"SAS",
+        "sass":"Sass (Sass)",
+        "scss":"Sass (Scss)",
+        "sql":"SQL",
+        "soy":"Soy (Closure Template)",
+        "tap":"TAP",
+        "toml":"TOML",
+        "tt2":"Template Toolkit 2",
+        "ts":"TypeScript",
+        "t4-cs":"T4 Text Templates (C#)",
+        "t4":"T4 Text Templates (C#)",
+        "t4-vb":"T4 Text Templates (VB)",
+        "t4-templating":"T4 templating",
+        "vbnet":"VB.Net",
+        "vhdl":"VHDL",
+        "vim":"vim",
+        "visual-basic":"Visual Basic",
+        "vb":"Visual Basic",
+        "wasm":"WebAssembly",
+        "wiki":"Wiki markup",
+        "xeoracube":"XeoraCube",
+        "xojo":"Xojo (REALbasic)",
+        "xquery":"XQuery",
+        "yaml":"YAML",
+        "yml":"YAML"
+      }
+      var langTitle = Languages[language] || (language.substring(0, 1).toUpperCase() + language.substring(1)).replace(/s(?=cript)/, 'S')
+      var len = code.split('\n').length
+      return '<div class="code-toolbar"><pre class="line-numbers language-' + language + '"><code class="language-' + language + '">' + Prism.highlight(code, Prism.languages[language], Prism.languages[language]) + '<span aria-hidden="true" class="line-numbers-rows">' + '<span></span>'.repeat(len) + '</code></pre><div class="toolbar"><div class="toolbar-item"><a>Copy</a></div><div class="toolbar-item"><span>' + langTitle + '</span></div></div></div>'
     }
     return marked.Renderer.prototype.code.apply(this, arguments)
   }
