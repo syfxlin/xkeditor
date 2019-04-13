@@ -2,6 +2,8 @@ import marked from "marked"
 import turndown from "turndown"
 var turndownGfm = require("turndown-plugin-gfm")
 
+import prismjs from 'prismjs'
+
 var tocContent = [];
 export function getTocHtml() {
   var html = '<ul class="toc">' + getTocHtmlTree(0, '') + '</ul>'
@@ -69,6 +71,57 @@ export function toHtml(markdownVal) {
   });
   return marked(markdownVal);
 }
+
+export function toHtmlFull(markdownVal) {
+  tocContent = [];
+  var markedRenderer = new marked.Renderer()
+  markedRenderer.paragraph = function(text) {
+    if(/\[(.*)]{(.*)}/g.test(text)) {
+      text = text.replace(/(\[([^\[\]]*)]{([^{}|]*)(\|span|\|p|\|font|\||)})/g, function($1, $2, $3, $4, $5) {
+        if($5 == '|' || $5 == '' || $5 == null) {
+          $5 = 'p'
+        } else {
+          $5 = $5.substring(1)
+        }
+        return '<' + $5 + ' style="' + $4 + '">' + $3 + '</' + $5 + '>'
+      })
+      return text
+    }
+    return marked.Renderer.prototype.paragraph.apply(this, arguments)
+  }
+  markedRenderer.heading = function(title, level) {
+    tocContent.push({title: title, level: level})
+    return marked.Renderer.prototype.heading.apply(this, arguments)
+  }
+  markedRenderer.code = function(code, language) {
+    if(language === 'math' || language === "tex") {
+      return '<pre class="xkeditor-tex">```' + language +'\n' + code + '\n```</pre>\n'
+    }
+    if(/flow(TB|BT|RL|LR|TD)$/.test(language)) {
+      return '<pre class="xkeditor-mermaid">graph ' + language.substring(language.length-2) + '\n' + code + '</pre>'
+    }
+    if(language === 'seq') {
+      return '<pre class="xkeditor-mermaid">sequenceDiagram\n' + code + '</pre>'
+    }
+    if(language === 'gantt') {
+      return '<pre class="xkeditor-mermaid">gantt\n' + code + '</pre>'
+    }
+    if(language === 'mermaid') {
+      return '<pre class="xkeditor-mermaid">' + code + '</pre>'
+    }
+    if(language !== '') {
+      return '<pre class="line-numbers language-' + language + '"><code class="language-' + language + '">' + prismjs.highlight(code, prismjs.languages[language], prismjs.languages.markup) + '</code></pre>'
+    }
+    return marked.Renderer.prototype.code.apply(this, arguments)
+  }
+
+  marked.setOptions({
+    langPrefix: "line-numbers language-",
+    renderer: markedRenderer
+  });
+  return marked(markdownVal);
+}
+
 export function toMarkdown(htmlVal) {
   var turndownService = new turndown({
     headingStyle: "atx",

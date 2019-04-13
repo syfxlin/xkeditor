@@ -378,7 +378,7 @@ export default {
       this.aceEditor.setValue(val);
     },
     updateValue: function() {
-      this.$emit("input", this.aceEditor.getSession().getValue());
+      this.$emit("input", this.aceEditor.getSession().getValue())
     },
     switchEditorMode: function() {
       if(this.isMarkdownMode) {

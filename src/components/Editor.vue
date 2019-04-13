@@ -1,3 +1,29 @@
+<!--
+  /**
+
+  当前架构
+  ACE_Editor -> Editor(markdownContent)
+  TinyMCE_Editor -> Editor(htmlContent)
+  预览的HTML == htmlViewContent
+  markdownContent.toHtmlFull -> htmlViewContent
+  htmlContent -> htmlViewContent
+  
+  Set:
+  switch时
+  htmlContent.toMarkdown -> markdownContent => ACE_Editor
+  markdownContent.toHtml -> htmlContent => TinyMCE_Editor
+  
+  Render:
+  Prism.js 在转换时就渲染
+  Mermaid  在转换后推送到DOM后渲染
+  KaTex    在转换后推送到DOM后渲染
+  TOC      在转换后推送到DOM后渲染
+  
+  滚动绑定 在每次输入推送到DOM后进行重新计算
+  
+  */
+-->
+
 <template>
 <div class="xkeditor">
   <div class="row">
@@ -18,7 +44,7 @@
 
 <script>
 //HTML和Markdown互转
-import { toHtml, toMarkdown, getTocHtml } from './switchContent.js'
+import { toHtml, toMarkdown, getTocHtml, toHtmlFull } from './switchContent.js'
 
 import katex from "katex"
 import "katex/dist/katex.min.css"
@@ -36,12 +62,13 @@ export default {
       showToc: false,
       EditorMode: "ace",
       previewShow: 'show',
-      aceDivClass: "col-md-12"
+      aceDivClass: "col-md-12",
+      delayTimer: 0
     }
   },
   created:function(){
     this.markdownContent = '# XK-Editor'
-    this.htmlViewContent = toHtml(this.markdownContent)
+    this.htmlViewContent = toHtmlFull(this.markdownContent)
   },
   computed: {
     EditorModeShow: function() {
@@ -54,7 +81,7 @@ export default {
   },
   watch: {
     markdownContent: function (val) {
-      this.htmlViewContent = toHtml(val)
+      this.htmlViewContent = toHtmlFull(val)
       this.renderNextTick()
     },
     htmlContent: function(val) {
@@ -69,6 +96,7 @@ export default {
         this.$refs.ace.setValue(this.markdownContent)
         this.EditorMode = 'ace'
       } else if(this.EditorMode !== 'tinymce') {
+        //TODO: TinyMCE在代码互转的情况下体验不佳
         this.htmlContent = toHtml(this.markdownContent)
         this.$refs.tinymce.setValue(this.htmlContent)
         this.EditorMode = 'tinymce'
@@ -97,7 +125,8 @@ export default {
         //制作TOC
         document.getElementById('toc').innerHTML = getTocHtml();
         //代码高亮
-        Prism.highlightAll()
+        //TODO: 性能消耗严重，导致卡顿出现，已经移至输出渲染（部分渲染部分更新）
+        // Prism.highlightAll()
         //转换Tex公式
         renderMathInElement(document.getElementById('previewHtml'), {
           delimiters: [
@@ -114,14 +143,30 @@ export default {
           console.log("May have errors")
         }
         //双向滚动绑定
-        var aceContentHeight = (this.$refs.ace.aceEditor.session.getLength()*this.$refs.ace.aceEditor.renderer.lineHeight)
+        var currentTab = 1
+        var editorDom = document.querySelector('.ace-editor')
         var previewHtmlDom = document.querySelector('#previewHtml')
+        var aceContentHeight =  this.$refs.ace.aceEditor.renderer.scrollBarV.scrollHeight - editorDom.offsetHeight
         var previewHtmlHeight = previewHtmlDom.scrollHeight - previewHtmlDom.offsetHeight
-        var scale = aceContentHeight/previewHtmlHeight
-        console.log(aceContentHeight)
+        var scale = previewHtmlHeight/aceContentHeight
+        editorDom.addEventListener('mouseover', function() {
+          // 1 表示表示当前鼠标位于 .left元素范围内
+          currentTab = 1
+        })
+        previewHtmlDom.addEventListener('mouseover', function() {
+          // 2 表示表示当前鼠标位于 .right元素范围内
+          currentTab = 2
+        })
         this.$refs.ace.aceEditor.session.on("changeScrollTop", function(data) {
-          previewHtmlDom.scrollTop = data * scale
+          if(currentTab === 1) {
+            previewHtmlDom.scrollTop = data * scale
+          }
         });
+        previewHtmlDom.addEventListener('scroll', function() {
+          if (currentTab === 2) {
+            window.$ace.session.setScrollTop(previewHtmlDom.scrollTop / scale)
+          }
+        })
       })
     },
     switchToc: function() {
@@ -134,7 +179,7 @@ export default {
           anchorElement.scrollIntoView(true);
         }
       }
-    }
+    },
   },
   mounted() {
     mermaid.initialize({startOnLoad:true})
