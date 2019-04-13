@@ -113,6 +113,15 @@ export default {
         } catch (error) {
           console.log("May have errors")
         }
+        //双向滚动绑定
+        var aceContentHeight = (this.$refs.ace.aceEditor.session.getLength()*this.$refs.ace.aceEditor.renderer.lineHeight)
+        var previewHtmlDom = document.querySelector('#previewHtml')
+        var previewHtmlHeight = previewHtmlDom.scrollHeight - previewHtmlDom.offsetHeight
+        var scale = aceContentHeight/previewHtmlHeight
+        console.log(aceContentHeight)
+        this.$refs.ace.aceEditor.session.on("changeScrollTop", function(data) {
+          previewHtmlDom.scrollTop = data * scale
+        });
       })
     },
     switchToc: function() {
@@ -130,13 +139,8 @@ export default {
   mounted() {
     mermaid.initialize({startOnLoad:true})
     window.scrollToAnchor = this.scrollToAnchor
+    //TODO: 删除
     window.$ace = this.$refs.ace.aceEditor
-    var l = document.querySelector('.ace-editor')
-    // var r = document.querySelector('#previewHtml')
-    l.addEventListener('scroll',function(){
-      // r.scrollTop = l.scrollTop
-      console.log('scroll')
-    })
   },
 }
 </script>
