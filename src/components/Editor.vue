@@ -130,6 +130,13 @@ export default {
   mounted() {
     mermaid.initialize({startOnLoad:true})
     window.scrollToAnchor = this.scrollToAnchor
+    window.$ace = this.$refs.ace.aceEditor
+    var l = document.querySelector('.ace-editor')
+    // var r = document.querySelector('#previewHtml')
+    l.addEventListener('scroll',function(){
+      // r.scrollTop = l.scrollTop
+      console.log('scroll')
+    })
   },
 }
 </script>
@@ -179,7 +186,7 @@ export default {
 #toc {
   position: fixed;
   right: 0px;
-  width: 30%;
+  width: 20%;
   height: 100%;
   background: #fff;
 }
