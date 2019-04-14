@@ -33,7 +33,7 @@
 <div class="xkeditor">
   <div class="row">
     <div :class="aceDivClass" v-show="EditorModeShow&&previewShow!='full'"><ace v-model="markdownContent" ref="ace"></ace></div>
-    <div :class="aceDivClass" v-html="htmlViewContent" id="previewHtml" ref="htmlView" v-show="EditorModeShow&&previewShow!='hide'"></div>
+    <div :class="aceDivClass + ' markdown-body'" v-html="htmlViewContent" id="previewHtml" ref="htmlView" v-show="EditorModeShow&&previewShow!='hide'"></div>
     <div class="col-md-24" v-show="!EditorModeShow"><tinymce v-model="htmlContent" ref="tinymce"></tinymce></div>
     <at-button icon="icon-x" circle class="close-preview-full" @click="switchPreviewFull()" v-show="EditorModeShow&&previewShow=='full'"></at-button>
     <transition name="slide-fade">

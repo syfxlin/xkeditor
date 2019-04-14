@@ -62,6 +62,7 @@ export function toHtml(val, isFull) {
     "aspnet":"ASP.NET (C#)",
     "autohotkey":"AutoHotkey",
     "autoit":"AutoIt",
+    "bash": "Bash",
     "shell":"Bash",
     "basic":"BASIC",
     "bnf":"Backus–Naur form",
@@ -198,10 +199,14 @@ export function toHtml(val, isFull) {
     if(language === 'mermaid') {
       return '<pre class="xkeditor-mermaid">' + code + '</pre>'
     }
-    if(isFull && language !== '') {
+    if(isFull) {
       var langTitle = Languages[language] || (language.substring(0, 1).toUpperCase() + language.substring(1)).replace(/s(?=cript)/, 'S')
-      var len = code.split('\n').length
-      return '<div class="code-toolbar"><pre class="line-numbers language-' + language + '"><code class="language-' + language + '">' + Prism.highlight(code, Prism.languages[language], Prism.languages[language]) + '<span aria-hidden="true" class="line-numbers-rows">' + '<span></span>'.repeat(len) + '</code></pre><div class="toolbar"><div class="toolbar-item"><a>Copy</a></div><div class="toolbar-item"><span>' + langTitle + '</span></div></div></div>'
+      var lineNums = '<span></span>'.repeat(code.split('\n').length)
+      if(Prism.languages[language] != null && Prism.languages[language] != undefined) {
+        return '<div class="code-toolbar"><pre class="line-numbers language-' + language + '"><code class="language-' + language + '">' + Prism.highlight(code, Prism.languages[language], Prism.languages[language]) + '<span aria-hidden="true" class="line-numbers-rows">' + lineNums + '</code></pre><div class="toolbar"><div class="toolbar-item"><a>Copy</a></div><div class="toolbar-item"><span>' + langTitle + '</span></div></div></div>'
+      } else {
+        return '<pre class="line-numbers language-' + language + '"><code class="language-' + language + '">' + code + '<span aria-hidden="true" class="line-numbers-rows">' + lineNums + '</code></pre>'
+      }
     }
     return marked.Renderer.prototype.code.apply(this, arguments)
   }
