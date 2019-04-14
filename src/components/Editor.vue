@@ -23,7 +23,7 @@
   
   TODO:
   优化界面
-  提升TinyMCE编辑体验，修改转换为View的规则
+  提升TinyMCE编辑体验
   重构，集中设置项
   添加设置面板，存放部分设置
   */
@@ -49,7 +49,7 @@
 
 <script>
 //HTML和Markdown互转
-import { toHtml, toMarkdown, getTocHtml, toHtmlFull } from './switchContent.js'
+import { toHtml, toMarkdown, getTocHtml } from './switchContent.js'
 
 import katex from "katex"
 import "katex/dist/katex.min.css"
@@ -73,7 +73,7 @@ export default {
   },
   created:function(){
     this.markdownContent = '# XK-Editor'
-    this.htmlViewContent = toHtmlFull(this.markdownContent)
+    this.htmlViewContent = toHtml(this.markdownContent, true, true)
   },
   computed: {
     EditorModeShow: function() {
@@ -86,12 +86,15 @@ export default {
   },
   watch: {
     markdownContent: function (val) {
-      this.htmlViewContent = toHtmlFull(val)
+      this.htmlViewContent = toHtml(val, true)
       this.renderNextTick()
     },
     htmlContent: function(val) {
       this.htmlViewContent = val
       this.renderNextTick()
+      this.$nextTick(function() {
+        Prism.highlightAll()
+      })
     }
   },
   methods: {
@@ -102,7 +105,7 @@ export default {
         this.EditorMode = 'ace'
       } else if(this.EditorMode !== 'tinymce') {
         //TODO: TinyMCE在代码互转的情况下体验不佳
-        this.htmlContent = toHtml(this.markdownContent)
+        this.htmlContent = toHtml(this.markdownContent, false)
         this.$refs.tinymce.setValue(this.htmlContent)
         this.EditorMode = 'tinymce'
       }
