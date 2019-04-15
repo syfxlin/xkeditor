@@ -63,6 +63,8 @@ export default {
         language_url: '/static/tinymce/langs/zh_CN.js',
         language: 'zh_CN',
         skin_url: '/static/tinymce/skins/ui/oxide',
+        body_class: 'markdown-body',
+        content_css: '/static/github-markdown.css',
         plugins: 'print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern',
         toolbar: 'formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat code | undo redo',
         image_advtab: true,
