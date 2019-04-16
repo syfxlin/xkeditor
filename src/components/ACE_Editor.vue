@@ -489,6 +489,9 @@ export default {
           this.aceEditor.resize(this.aceEditor)
         })
         return;
+      } else if(operate === "fullScreen") {
+        this.operateFullScreen()
+        return;
       } else if (operate === "toHtmlEditor") {
         this.switchEditorMode()
         this.aceToolbarShow = false;
@@ -567,6 +570,30 @@ export default {
       }
       this.operateModal(data.operate, false)
       this.operateAceContent(false, 0, str)
+    },
+    operateFullScreen: function() {
+      if(document.fullscreenElement || document.msFullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement) {
+        if(document.exitFullscreen) {
+          return document.exitFullscreen()
+        } else if(document.webkitExitFullscreen) {
+          return document.webkitExitFullscreen()
+        } else if(document.mozCancelFullScreen) {
+          return document.mozCancelFullScreen()
+        } else if(document.msExitFullscreen) {
+          return document.msExitFullscreen()
+        }
+      } else {
+        var root = document.documentElement
+        if(root.requestFullscreen) {
+          return root.requestFullscreen()
+        } else if(root.webkitRequestFullscreen) {
+          return root.webkitRequestFullscreen()
+        } else if(root.mozRequestFullScreen) {
+          return root.mozRequestFullScreen()
+        } else if(root.msRequestFullscreen) {
+          return root.msRequestFullscreen()
+        }
+      }
     }
   }
 };
