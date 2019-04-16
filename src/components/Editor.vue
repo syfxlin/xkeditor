@@ -181,31 +181,6 @@ export default {
         } catch (error) {
           console.log("May have errors")
         }
-        //双向滚动绑定
-        var currentTab = 1
-        var editorDom = document.querySelector('.ace-editor')
-        var previewHtmlDom = document.querySelector('#previewHtml')
-        var aceContentHeight =  this.$refs.ace.aceEditor.renderer.scrollBarV.scrollHeight - editorDom.offsetHeight
-        var previewHtmlHeight = previewHtmlDom.scrollHeight - previewHtmlDom.offsetHeight
-        var scale = previewHtmlHeight/aceContentHeight
-        editorDom.addEventListener('mouseover', function() {
-          // 1 表示表示当前鼠标位于 .left元素范围内
-          currentTab = 1
-        })
-        previewHtmlDom.addEventListener('mouseover', function() {
-          // 2 表示表示当前鼠标位于 .right元素范围内
-          currentTab = 2
-        })
-        this.$refs.ace.aceEditor.session.on("changeScrollTop", function(data) {
-          if(currentTab === 1) {
-            previewHtmlDom.scrollTop = data * scale
-          }
-        });
-        previewHtmlDom.addEventListener('scroll', function() {
-          if (currentTab === 2) {
-            window.$ace.session.setScrollTop(previewHtmlDom.scrollTop / scale)
-          }
-        })
       })
     },
     switchToc: function() {
@@ -222,9 +197,41 @@ export default {
   },
   mounted() {
     mermaid.initialize({startOnLoad:true})
+    //模拟锚点
     window.scrollToAnchor = this.scrollToAnchor
-    //TODO: 删除
     window.$ace = this.$refs.ace.aceEditor
+    window.scrollBind = function(operate = null) {
+      var currentTab = 1
+      var editorDom = document.querySelector('.ace-editor')
+      var previewHtmlDom = document.querySelector('#previewHtml')
+      var aceContentHeight =  window.$ace.renderer.scrollBarV.scrollHeight - editorDom.offsetHeight
+      var previewHtmlHeight = previewHtmlDom.scrollHeight - previewHtmlDom.offsetHeight
+      window.scale = previewHtmlHeight/aceContentHeight
+      if(operate === 'init') {
+        editorDom.addEventListener('mouseover', function() {
+          currentTab = 1
+        })
+        previewHtmlDom.addEventListener('mouseover', function() {
+          currentTab = 2
+        })
+        window.$ace.session.on("changeScrollTop", function(data) {
+          if(currentTab === 1) {
+            previewHtmlDom.scrollTop = data * window.scale
+          }
+        });
+        previewHtmlDom.addEventListener('scroll', function() {
+          if (currentTab === 2) {
+            window.$ace.session.setScrollTop(previewHtmlDom.scrollTop / window.scale)
+          }
+        })
+      }
+    }
+    //初始化滚动绑定
+    window.scrollBind('init')
+    //当编辑器内容更新时更新滚动比例
+    window.$ace.getSession().on('change', function() {
+      window.scrollBind()
+    })
   },
 }
 </script>
@@ -277,6 +284,7 @@ export default {
   width: 20%;
   height: 100%;
   background: #fff;
+  overflow-y: auto;
 }
 
 /* 可以设置不同的进入和离开动画 */
