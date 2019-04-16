@@ -35,7 +35,7 @@
     <div :class="aceDivClass" v-show="EditorModeShow&&previewShow!='full'"><ace v-model="markdownContent" :setting="aceSetting" ref="ace"></ace></div>
     <div :class="aceDivClass + ' markdown-body'" v-html="htmlViewContent" id="previewHtml" ref="htmlView" v-show="EditorModeShow&&previewShow!='hide'"></div>
     <div class="col-md-24" v-show="!EditorModeShow"><tinymce v-model="htmlContent" :setting="tinymceSetting" ref="tinymce"></tinymce></div>
-    <at-button icon="icon-x" circle class="close-preview-full" @click="switchPreviewFull()" v-show="EditorModeShow&&previewShow=='full'"></at-button>
+    <at-button icon="icon-x" circle class="close-preview-full" @click="switchPreviewFull()" v-show="EditorModeShow&&previewShow=='full'">Close</at-button>
     <transition name="slide-fade">
       <div id="toc" v-show="showToc"></div>
     </transition>

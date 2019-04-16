@@ -395,7 +395,7 @@ export default {
     },
     toolbarClick: function(operate) {
       this.aceToolbarModal.data.operate = operate
-      let str = null;
+      let str = '';
       let isStart = false;
       let toLeft = 0;
       let selectText = this.aceEditor.getSelectedText();
@@ -476,6 +476,7 @@ export default {
         return;
       } else if (operate === "search") {
         this.aceEditor.commands.commands.find.exec(this.aceEditor);
+        return;
       } else if(operate === "switchPreview") {
         this.$parent.switchPreviewShow()
         this.$nextTick(function() {
@@ -487,6 +488,7 @@ export default {
         this.$nextTick(function() {
           this.aceEditor.resize(this.aceEditor)
         })
+        return;
       } else if (operate === "toHtmlEditor") {
         this.switchEditorMode()
         this.aceToolbarShow = false;
@@ -496,6 +498,7 @@ export default {
         return;
       } else if (operate === "setting") {
         this.aceEditor.commands.commands.showSettingsMenu.exec(this.aceEditor);
+        return;
       }
       this.operateAceContent(isStart, toLeft, str)
     },
