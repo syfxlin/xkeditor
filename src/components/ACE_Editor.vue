@@ -123,6 +123,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 library.add(fas);
 
+//switch markdown and html
 import { toHtml, toMarkdown } from './switchContent'
 
 export default {
@@ -130,24 +131,15 @@ export default {
     "fa-icon": FontAwesomeIcon
   },
   props: {
-    value: String
+    value: String,
+    setting: Object
   },
   mounted() {
-    (this.aceEditor = ace.edit(this.$refs.ace, {
-      minLines: 10,
-      fontSize: 14,
-      theme: "ace/theme/solarized_light",
-      mode: "ace/mode/markdown",
-      tabSize: 4,
-      value: this.value ? this.value : "",
-      fontSize: "17px",
-      wrap: true
-    })),
-    this.aceEditor.setOptions({
-      enableSnippets: true,
-      enableLiveAutocompletion: true,
-      enableBasicAutocompletion: true
-    });
+    //初始化Value
+    this.setting.value = this.value ? this.value : ""
+    this.aceEditor = ace.edit(this.$refs.ace, 
+      this.setting
+    )
     this.aceEditor.getSession().on('change', this.updateValue)
   },
   data() {

@@ -16,7 +16,7 @@
 -->
 <template>
   <div class="tinymce">
-    <editor ref="tinymce" :init="init" v-model="tinymceHtml"></editor>
+    <editor ref="tinymce" :init="init" v-model="tinymceValue"></editor>
   </div>
 </template>
 
@@ -54,52 +54,34 @@ import 'tinymce/plugins/imagetools'
 import 'tinymce/plugins/textpattern'
 export default {
   props: {
-    value: String
+    value: String,
+    setting: Object
   },
   data() {
     return {
-      tinymceHtml: '',
-      init: {
-        language_url: '/static/tinymce/langs/zh_CN.js',
-        language: 'zh_CN',
-        skin_url: '/static/tinymce/skins/ui/oxide',
-        body_class: 'markdown-body',
-        content_css: '/static/github-markdown.css',
-        plugins: 'print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern',
-        toolbar: 'formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat code | undo redo',
-        image_advtab: true,
-        importcss_append: true,
-        height: '100%',
-        template_cdate_format: '[CDATE: %m/%d/%Y : %H:%M:%S]',
-        template_mdate_format: '[MDATE: %m/%d/%Y : %H:%M:%S]',
-        image_caption: true,
-        spellchecker_dialog: true,
-        spellchecker_whitelist: ['Ephox', 'Moxiecode'],
-        images_upload_handler: function(blobInfo, success, failure) {
-          console.log('Upload')
-        }
-      }
+      tinymceValue: '',
+      init: this.setting
     }
   },
   mounted () {
     tinymce.init({})
     //赋初值
-    this.tinymceHtml = this.value
+    this.tinymceValue = this.value
   },
   components: {
     'editor': Editor
   },
   watch: {
-    tinymceHtml: function() {
+    tinymceValue: function() {
       this.updateValue()
     }
   },
   methods: {
     setValue: function(val) {
-      this.tinymceHtml = val
+      this.tinymceValue = val
     },
     updateValue: function() {
-      this.$emit('input', this.tinymceHtml)
+      this.$emit('input', this.tinymceValue)
     }
   }
 }

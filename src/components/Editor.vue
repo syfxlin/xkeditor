@@ -32,9 +32,9 @@
 <template>
 <div class="xkeditor">
   <div class="row">
-    <div :class="aceDivClass" v-show="EditorModeShow&&previewShow!='full'"><ace v-model="markdownContent" ref="ace"></ace></div>
+    <div :class="aceDivClass" v-show="EditorModeShow&&previewShow!='full'"><ace v-model="markdownContent" :setting="aceSetting" ref="ace"></ace></div>
     <div :class="aceDivClass + ' markdown-body'" v-html="htmlViewContent" id="previewHtml" ref="htmlView" v-show="EditorModeShow&&previewShow!='hide'"></div>
-    <div class="col-md-24" v-show="!EditorModeShow"><tinymce v-model="htmlContent" ref="tinymce"></tinymce></div>
+    <div class="col-md-24" v-show="!EditorModeShow"><tinymce v-model="htmlContent" :setting="tinymceSetting" ref="tinymce"></tinymce></div>
     <at-button icon="icon-x" circle class="close-preview-full" @click="switchPreviewFull()" v-show="EditorModeShow&&previewShow=='full'"></at-button>
     <transition name="slide-fade">
       <div id="toc" v-show="showToc"></div>
@@ -68,7 +68,38 @@ export default {
       EditorMode: "ace",
       previewShow: 'show',
       aceDivClass: "col-md-12",
-      delayTimer: 0
+      tinymceSetting: {
+        language_url: '/static/tinymce/langs/zh_CN.js',
+        language: 'zh_CN',
+        skin_url: '/static/tinymce/skins/ui/oxide',
+        body_class: 'markdown-body',
+        content_css: '/static/github-markdown.css',
+        plugins: 'print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern',
+        toolbar: 'formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat code | undo redo',
+        image_advtab: true,
+        importcss_append: true,
+        height: '100%',
+        template_cdate_format: '[CDATE: %m/%d/%Y : %H:%M:%S]',
+        template_mdate_format: '[MDATE: %m/%d/%Y : %H:%M:%S]',
+        image_caption: true,
+        spellchecker_dialog: true,
+        spellchecker_whitelist: ['Ephox', 'Moxiecode'],
+        images_upload_handler: function(blobInfo, success, failure) {
+          console.log('Upload')
+        }
+      },
+      aceSetting: {
+        minLines: 10,
+        fontSize: 14,
+        theme: "ace/theme/solarized_light",
+        mode: "ace/mode/markdown",
+        tabSize: 4,
+        fontSize: "17px",
+        wrap: true,
+        enableSnippets: true,
+        enableLiveAutocompletion: true,
+        enableBasicAutocompletion: true
+      }
     }
   },
   created:function(){
