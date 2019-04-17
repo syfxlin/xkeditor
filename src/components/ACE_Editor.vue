@@ -18,92 +18,125 @@
   <div class="ace-container">
     <div class="ace-toolbar" v-show="aceToolbarShow">
       <template v-for="num in 6">
-        <at-button type="text" :key="num.id" :title="'标题' + num" @click="toolbarClick('h' + num)">
+        <button class="xk-button" type="text" :key="num.id" :title="'标题' + num" @click="toolbarClick('h' + num)">
           <b>H{{ num }}</b>
-        </at-button>
+        </button>
       </template>
       <template v-for="item in aceToolbarButtons">
         <template v-if="item.icon === '|'">
           <span :key="item.id">|</span>
         </template>
         <template v-else>
-          <at-button
+          <button
+            class="xk-button" 
             :key="item.id"
             type="text"
             :title="item.title"
             @click="toolbarClick(item.operate)"
           >
             <fa-icon :icon="item.icon"/>
-          </at-button>
+          </button>
         </template>
       </template>
     </div>
     <div class="ace-toolbar-html ace-toolbar" v-show="!aceToolbarShow">
-      <at-button type="text" title="转换为Markdown模式" @click="function(){aceToolbarShow = true;switchEditorMode()}"><fa-icon icon="file-code"/> 转换为Markdown模式</at-button>
+      <button class="xk-button" type="text" title="转换为Markdown模式" @click="function(){aceToolbarShow = true;switchEditorMode()}"><fa-icon icon="file-code"/> 转换为Markdown模式</button>
     </div>
     <div class="ace-editor" ref="ace"></div>
 
-    <at-modal v-model="aceToolbarModal.base.isShowModal" @on-confirm="aceToolbarSubmit" class="ace-toolbar-modal" :title="aceToolbarModal.data.modalTitle" v-dialogDrag>
-      <div v-show="aceToolbarModal.link">
-        <label>链接</label>
-        <at-input v-model="aceToolbarModal.data.href" placeholder="请输入链接" icon="link" autofocus></at-input>
-        <label>标题</label>
-        <at-input v-model="aceToolbarModal.data.title" placeholder="请输入标题" icon="file-text"></at-input>
-      </div>
-      <div v-show="aceToolbarModal.image">
-        <label>图片链接</label>
-        <at-input v-model="aceToolbarModal.data.src" placeholder="请输入图片链接" icon="link" autofocus></at-input>
-        <label>图片描述</label>
-        <at-input v-model="aceToolbarModal.data.art" placeholder="请输入图片描述" icon="info"></at-input>
-      </div>
-      <div v-show="aceToolbarModal.video">
-        <label>视频链接</label>
-        <at-input v-model="aceToolbarModal.data.src" placeholder="请输入视频链接" icon="link" autofocus></at-input>
-        <div class="row">
-          <at-input v-model="aceToolbarModal.data.width" placeholder="请输入宽" icon="link" class="col-md-12"></at-input>
-          <at-input v-model="aceToolbarModal.data.height" placeholder="请输入高" icon="link" class="col-md-12"></at-input>
+    <div class="ace-toolbar-modal" v-show="aceToolbarModal.base.isShowModal" v-dialogDrag>
+      <div class="xk-modal-wrapper">
+        <div class="xk-modal">
+          <div class="xk-modal-header">
+            <div class="xk-modal-title">
+              <p>{{ aceToolbarModal.data.modalTitle }}</p>
+            </div>
+          </div>
+          <div class="xk-modal-body">
+            <div v-show="aceToolbarModal.link">
+              <label>链接</label>
+              <div class="xk-input">
+                <input v-model="aceToolbarModal.data.href" placeholder="请输入链接" autofocus></input>
+              </div>
+              <label>标题</label>
+              <div class="xk-input">
+                <input v-model="aceToolbarModal.data.title" placeholder="请输入标题"></input>
+              </div>
+            </div>
+            <div v-show="aceToolbarModal.image">
+              <label>图片链接</label>
+              <div class="xk-input">
+                <input v-model="aceToolbarModal.data.src" placeholder="请输入图片链接" autofocus></input>
+              </div>
+              <label>图片描述</label>
+              <div class="xk-input">
+                <input v-model="aceToolbarModal.data.art" placeholder="请输入图片描述"></input>
+              </div>
+            </div>
+            <div v-show="aceToolbarModal.video">
+              <label>视频链接</label>
+              <div class="xk-input">
+                <input v-model="aceToolbarModal.data.src" placeholder="请输入视频链接" autofocus></input>
+              </div>
+              <div class="xk-row">
+                <div class="xk-input xk-col-12">
+                  <input v-model="aceToolbarModal.data.width" placeholder="请输入宽"></input>
+                </div>
+                <div class="xk-input xk-col-12">
+                  <input v-model="aceToolbarModal.data.height" placeholder="请输入高"></input>
+                </div>
+              </div>
+            </div>
+            <div v-show="aceToolbarModal.toLine">
+              <label>行号(1-{{ aceToolbarModal.data.allLine }})</label>
+              <div class="xk-input">
+                <input v-model="aceToolbarModal.data.line" placeholder="请输入行号" autofocus></input>
+              </div>
+            </div>
+            <div v-show="aceToolbarModal.table">
+              <label>单元格数</label>
+              <div class="xk-row">
+                <div class="xk-input xk-col-12">
+                  <input v-model="aceToolbarModal.data.row" placeholder="请输入行数" autofocus></input>
+                </div>
+                <div class="xk-input xk-col-12">
+                  <input v-model="aceToolbarModal.data.column" placeholder="请输入列数"></input>
+                </div>
+              </div>
+              <label>对齐方式</label>
+              <div>
+                <div class="xk-radio-group">
+                  <div class="xk-radio">
+                    <input type="radio" value="normal" v-model="aceToolbarModal.data.type" id="xk-type-normal" />
+                    <label for="xk-type-normal"><div class="advice"></div><fa-icon icon="align-justify"/></label>
+                  </div>
+                  <div class="xk-radio">
+                    <input type="radio" value="left" v-model="aceToolbarModal.data.type" id="xk-type-left" />
+                    <label for="xk-type-left"><div class="advice"></div><fa-icon icon="align-left"/></label>
+                  </div>
+                  <div class="xk-radio">
+                    <input type="radio" value="center" v-model="aceToolbarModal.data.type" id="xk-type-center" />
+                    <label for="xk-type-center"><div class="advice"></div><fa-icon icon="align-center"/></label>
+                  </div>
+                  <div class="xk-radio">
+                    <input type="radio" value="right" v-model="aceToolbarModal.data.type" id="xk-type-right" />
+                    <label for="xk-type-right"><div class="advice"></div><fa-icon icon="align-right"/></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="xk-clear"></div>
+          <div class="xk-modal-footer">
+            <button class="xk-button" @click="aceToolbarCancer">取消</button>
+            <button class="xk-button xk-button-primary" @click="aceToolbarSubmit">确定</button>
+          </div>
+          <span class="xk-modal-close" @click="aceToolbarCancer">
+            <fa-icon icon="times"/>
+          </span>
         </div>
       </div>
-      <div v-show="aceToolbarModal.toLine">
-        <label>行号(1-{{ aceToolbarModal.data.allLine }})</label>
-        <at-input v-model="aceToolbarModal.data.line" placeholder="请输入行号" icon="info" autofocus></at-input>
-      </div>
-      <div v-show="aceToolbarModal.table">
-        <label>单元格数</label>
-        <div class="row">
-          <at-input
-            class="col-md-12"
-            v-model="aceToolbarModal.data.row"
-            placeholder="请输入行数"
-            icon="row"
-            autofocus
-          ></at-input>
-          <at-input
-            class="col-md-12"
-            v-model="aceToolbarModal.data.column"
-            placeholder="请输入列数"
-            icon="column"
-          ></at-input>
-        </div>
-        <label>对齐方式</label>
-        <div>
-          <at-radio-group v-model="aceToolbarModal.data.type">
-            <at-radio label="normal">
-              <fa-icon icon="align-justify"/>
-            </at-radio>
-            <at-radio label="left">
-              <fa-icon icon="align-left"/>
-            </at-radio>
-            <at-radio label="center">
-              <fa-icon icon="align-center"/>
-            </at-radio>
-            <at-radio label="right">
-              <fa-icon icon="align-right"/>
-            </at-radio>
-          </at-radio-group>
-        </div>
-      </div>
-    </at-modal>
+    </div>
   </div>
 </template>
 
@@ -159,7 +192,8 @@ export default {
         image: false,
         video: false,
         toLine: false,
-        search: false
+        search: false,
+        table: false
       },
       aceToolbarButtons: [
         {
@@ -570,6 +604,16 @@ export default {
       }
       this.operateModal(data.operate, false)
       this.operateAceContent(false, 0, str)
+      this.aceToolbarCancer()
+    },
+    aceToolbarCancer: function() {
+      this.aceToolbarModal.base.isShowModal = false
+      this.aceToolbarModal.link =  false
+      this.aceToolbarModal.image = false
+      this.aceToolbarModal.video = false
+      this.aceToolbarModal.toLine = false
+      this.aceToolbarModal.search = false
+      this.aceToolbarModal.table = false
     },
     operateFullScreen: function() {
       if(document.fullscreenElement || document.msFullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement) {
@@ -600,6 +644,12 @@ export default {
 </script>
 
 <style scoped>
+.show {
+  display: block;
+}
+.hide {
+  display: none;
+}
 .ace-container {
   position: relative;
   display: flex;
@@ -622,20 +672,172 @@ export default {
 .ace-toolbar {
   background: #fff;
 }
-.ace-toolbar * {
-  font-size: 1.2em;
-}
-.ace-toolbar > * {
-  padding: 0.4em 0.6em;
-}
 .ace-toolbar span {
   padding: 0px;
 }
-.ace-toolbar-modal .at-input {
+.ace-toolbar-modal .xk-input {
   margin-top: 5px;
   margin-bottom: 10px;
 }
 .ace-editor {
   flex: 1;
+}
+.xk-button {
+  display: inline-block;
+  padding: 6px 16px;
+  outline: 0;
+  font-size: 0.85em;
+  line-height: 1.5;
+  text-align: center;
+  white-space: nowrap;
+  border: 1px solid #C5D9E8;
+  border-radius: 4px;
+  background-color: #FFF;
+  -webkit-transition: background 0.2s;
+  transition: background 0.2s;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: pointer;
+}
+.xk-button-primary {
+  color: #fff;
+  background: #6190e8;
+}
+.ace-toolbar .xk-button {
+  background: none;
+  color: #6190E8;
+  color: #3F536E;
+  border: none;
+  font-size: 1em;
+  padding: 0.6em;
+}
+.xk-input {
+  position: relative;
+  font-size: 0.85em;
+  line-height: 1.5;
+  outline: 0;
+}
+.xk-input input {
+  display: block;
+  width: 100%;
+  padding: 6px 32px 6px 12px;
+  color: #3F536E;
+  font-size: 12px;
+  background-color: #FFF;
+  border: 1px solid #C5D9E8;
+  border-radius: 4px;
+  -webkit-transition: border .2s;
+  transition: border .2s;
+  outline: none;
+}
+.xk-input input:hover {
+  border-color: #79A1EB;
+}
+.xk-input i {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0 6px 0 0;
+  width: 20px;
+  height: 100%;
+  color: #C5D9E8;
+  font-size: 15px;
+  text-align: center;
+}
+.xk-radio {
+  display: inline-block;
+  padding: 2px 5px;
+}
+.xk-radio input {
+  display: none;
+}
+.xk-radio input + label {
+  font-size: 1.1em;
+}
+.xk-radio input + label svg {
+  vertical-align: middle;
+}
+.xk-radio input[type="radio"] + label .advice {
+  width: 1.1em;
+  height: 1.1em;
+  border: 1px solid #c5d9e8;
+  border-radius: 50%;
+  background-color: #fff;
+  -webkit-transition: border .2s;
+  transition: border .2s;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 5px;
+}
+.xk-radio input[type="radio"]:checked + label .advice {
+  background: #79a1eb;
+}
+.xk-modal-wrapper {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  outline: 0;
+  z-index: 1000;
+}
+.xk-modal {
+  position: relative;
+  top: 100px;
+  width: 520px;
+  margin: 0 auto 0 100px;
+  border: none;
+  border-radius: 4px;
+  background-color: #FFF;
+  outline: none;
+}
+.xk-modal-header {
+  padding: 12px 16px;
+  color: #2C405A;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.5;
+  border-bottom: 1px solid #ECECEC;
+}
+.xk-modal-header p, .xk-modal-header .xk-modal-title {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-wrap: normal;
+  vertical-align: middle;
+}
+.xk-modal-body {
+  padding: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.xk-modal-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #ECECEC;
+  text-align: right;
+}
+.xk-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 13px;
+  line-height: 1;
+  overflow: hidden;
+  cursor: pointer;
+}
+.xk-row {
+  display: block;
+  width: 100%;
+}
+.xk-col-12 {
+  width: 50%;
+  float: left;
+}
+.xk-clear {
+  clear: both;
 }
 </style>

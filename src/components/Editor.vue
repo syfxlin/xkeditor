@@ -33,17 +33,17 @@
 <div class="xkeditor">
   <div class="row">
     <div :class="aceDivClass" v-show="EditorModeShow&&previewShow!='full'"><ace v-model="markdownContent" :setting="aceSetting" ref="ace"></ace></div>
-    <div :class="aceDivClass + ' markdown-body'" v-html="htmlViewContent" id="previewHtml" ref="htmlView" v-show="EditorModeShow&&previewShow!='hide'"></div>
-    <div class="col-md-24" v-show="!EditorModeShow"><tinymce v-model="htmlContent" :setting="tinymceSetting" ref="tinymce"></tinymce></div>
-    <at-button icon="icon-x" circle class="close-preview-full" @click="switchPreviewFull()" v-show="EditorModeShow&&previewShow=='full'"></at-button>
+    <div :class="aceDivClass" v-show="EditorModeShow&&previewShow!='hide'"><div class="markdown-body" v-html="htmlViewContent" id="previewHtml" ref="htmlView"></div></div>
+    <div class="xk-col-24" v-show="!EditorModeShow"><tinymce v-model="htmlContent" :setting="tinymceSetting" ref="tinymce"></tinymce></div>
+    <button class="xk-button close-preview-full" @click="switchPreviewFull()" v-show="EditorModeShow&&previewShow=='full'">关闭</button>
     <transition name="slide-fade">
       <div id="toc" v-show="showToc"></div>
     </transition>
   </div>
-  <at-button-group class="fixed-button">
-    <at-button @click="switchToc">toc</at-button>
-    <at-button @click="switchEditor">switchEditor</at-button>
-  </at-button-group>
+  <div class="xk-button-group fixed-button">
+    <button class="xk-button" @click="switchToc">toc</button>
+    <button class="xk-button" @click="switchEditor">switchEditor</button>
+  </div>
 </div>
 </template>
 
@@ -67,7 +67,7 @@ export default {
       showToc: false,
       EditorMode: "ace",
       previewShow: 'show',
-      aceDivClass: "col-md-12",
+      aceDivClass: "xk-col-12",
       tinymceSetting: {
         language_url: '/static/tinymce/langs/zh_CN.js',
         language: 'zh_CN',
@@ -144,19 +144,19 @@ export default {
     switchPreviewShow: function() {
       if(this.previewShow == 'show') {
         this.previewShow = 'hide'
-        this.aceDivClass = "col-md-24"
+        this.aceDivClass = "xk-col-24"
       } else {
         this.previewShow = 'show'
-        this.aceDivClass = "col-md-12"
+        this.aceDivClass = "xk-col-12"
       }
     },
     switchPreviewFull: function() {
       if(this.previewShow == 'full') {
         this.previewShow = 'show'
-        this.aceDivClass = "col-md-12"
+        this.aceDivClass = "xk-col-12"
       } else {
         this.previewShow = 'full'
-        this.aceDivClass = "col-md-24"
+        this.aceDivClass = "xk-col-24"
       }
     },
     renderNextTick: function() {
@@ -245,7 +245,7 @@ export default {
   height: 100%;
   transform:translate(0,0);
 }
-.xkeditor .row .col-md-12 {
+.xkeditor .row .xk-col-12 {
   height: 100%;
 }
 #previewHtml {
@@ -264,11 +264,18 @@ export default {
 .row {
   margin: 0px;
 }
-.col-md-24 {
-  padding: 0px;
+.row .xk-col-12 {
+  float: left;
 }
-.col-md-12 {
+.xk-col-24 {
   padding: 0px;
+  width: 100%;
+  height: 100%;
+}
+.xk-col-12 {
+  padding: 0px;
+  width: 50%;
+  height: 100%;
 }
 .fixed-button {
   position: fixed;
@@ -288,6 +295,34 @@ export default {
   height: 100%;
   background: #fff;
   overflow-y: auto;
+}
+.xk-button-group .xk-button:first-child {
+  border-radius: 4px 0 0 4px;
+}
+.xk-button-group .xk-button:not(:last-child) {
+  margin-right: -5px;
+}
+.xk-button-group .xk-button:last-child {
+  border-radius: 0 4px 4px 0;
+}
+.xk-button {
+  display: inline-block;
+  padding: 6px 16px;
+  outline: 0;
+  font-size: 0.85em;
+  line-height: 1.5;
+  text-align: center;
+  white-space: nowrap;
+  border: 1px solid #C5D9E8;
+  border-radius: 4px;
+  background-color: #FFF;
+  -webkit-transition: background 0.2s;
+  transition: background 0.2s;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: pointer;
 }
 
 /* 可以设置不同的进入和离开动画 */
