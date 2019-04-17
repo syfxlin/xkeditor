@@ -22,6 +22,7 @@ for (var item in prismComponents) {
 var tocContent = [];
 export function getTocHtml() {
   var html = getTocHtmlTree(0, '')
+  window.$toc = html
   return html;
 }
 function getTocHtmlTree(index, str) {
@@ -34,10 +35,12 @@ function getTocHtmlTree(index, str) {
     }
   } else if(tocContent[index].level < tocContent[index-1].level) {
     for(let i = tocContent[index].level; i < tocContent[index-1].level; i++) {
-      str += '</ul>'
+      str += '</ul></li>'
     }
+  } else {
+    str += '</li>'
   }
-  str += '<li><a href="javascript:scrollToAnchor(\'' + tocContent[index].title.toLowerCase().replace(/ /g, "-").replace(/[^\u4e00-\u9fa5a-zA-Z0-9-]/g, "") + '\');">' + tocContent[index].title + '</a></li>'
+  str += '<li><a href="javascript:scrollToAnchor(\'' + tocContent[index].title.toLowerCase().replace(/ /g, "-").replace(/[^\u4e00-\u9fa5a-zA-Z0-9-]/g, "") + '\');">' + tocContent[index].title + '</a>'
   return getTocHtmlTree(index+1, str)
 }
 
