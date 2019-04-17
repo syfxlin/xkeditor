@@ -27,6 +27,9 @@ html, body {
 body {
   margin: 0;
 }
+p {
+  margin: 0;
+}
 #app {
   width: 100%;
   height: 100%;

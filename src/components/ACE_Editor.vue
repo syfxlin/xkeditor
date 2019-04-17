@@ -731,6 +731,7 @@ export default {
   -webkit-transition: border .2s;
   transition: border .2s;
   outline: none;
+  box-sizing: border-box;
 }
 .xk-input input:hover {
   border-color: #79A1EB;
