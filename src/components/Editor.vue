@@ -35,15 +35,15 @@
     <div :class="aceDivClass" v-show="EditorModeShow&&previewShow!='full'"><ace v-model="markdownContent" :setting="aceSetting" ref="ace"></ace></div>
     <div :class="aceDivClass + ' markdown-body'" v-html="htmlViewContent" id="previewHtml" ref="htmlView" v-show="EditorModeShow&&previewShow!='hide'"></div>
     <div class="col-md-24" v-show="!EditorModeShow"><tinymce v-model="htmlContent" :setting="tinymceSetting" ref="tinymce"></tinymce></div>
-    <at-button icon="icon-x" circle class="close-preview-full" @click="switchPreviewFull()" v-show="EditorModeShow&&previewShow=='full'">Close</at-button>
+    <at-button icon="icon-x" circle class="close-preview-full" @click="switchPreviewFull()" v-show="EditorModeShow&&previewShow=='full'"></at-button>
     <transition name="slide-fade">
       <div id="toc" v-show="showToc"></div>
     </transition>
   </div>
-  <div class="fixed-button">
-    <button @click="switchToc">toc</button>
-    <button @click="switchEditor()">switchEditor</button>
-  </div>
+  <at-button-group class="fixed-button">
+    <at-button @click="switchToc">toc</at-button>
+    <at-button @click="switchEditor">switchEditor</at-button>
+  </at-button-group>
 </div>
 </template>
 
@@ -255,8 +255,11 @@ export default {
   word-break: break-all;
   white-space: normal;
 }
-.toc ul {
+#toc ul {
   margin-left: 20px;
+}
+#toc li {
+  list-style: none;
 }
 .row {
   margin: 0px;
@@ -269,8 +272,8 @@ export default {
 }
 .fixed-button {
   position: fixed;
-  left: 10px;
-  bottom: 10px;
+  right: 15px;
+  bottom: 15px;
   z-index: 1000;
 }
 .close-preview-full {

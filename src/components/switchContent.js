@@ -21,7 +21,7 @@ for (var item in prismComponents) {
 
 var tocContent = [];
 export function getTocHtml() {
-  var html = '<ul class="toc">' + getTocHtmlTree(0, '') + '</ul>'
+  var html = getTocHtmlTree(0, '')
   return html;
 }
 function getTocHtmlTree(index, str) {
