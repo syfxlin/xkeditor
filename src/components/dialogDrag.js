@@ -1,8 +1,8 @@
 import Vue from 'vue'
 Vue.directive("dialogDrag", {
   bind(el, binding, vnode, oldVnode) {
-    const dialogHeaderEl = el.querySelector(".at-modal__header");
-    const dragDom = el.querySelector(".at-modal");
+    const dialogHeaderEl = el.querySelector(".xk-modal-header");
+    const dragDom = el.querySelector(".xk-modal");
     //dialogHeaderEl.style.cursor = 'move';
     dialogHeaderEl.style.cssText += ";cursor:move;";
     dragDom.style.cssText += ";top:100px;";
