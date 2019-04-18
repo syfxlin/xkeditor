@@ -181,24 +181,43 @@ export default {
         } catch (error) {
           console.log("May have errors")
         }
+        //更新滚动绑定
+        window.scrollBind()
+        //更新TOC icon
+        this.initTocTree()
       })
     },
     switchToc: function() {
       this.showToc = (!this.showToc)
     },
-    scrollToAnchor: function(anchorName) {
-      if (anchorName) {
-        let anchorElement = document.getElementById(anchorName);
-        if(anchorElement) {
-          anchorElement.scrollIntoView(true);
-        }
+    // scrollToAnchor: function(anchorName) {
+    //   if (anchorName) {
+    //     let anchorElement = document.getElementById(anchorName);
+    //     if(anchorElement) {
+    //       anchorElement.scrollIntoView(true);
+    //     }
+    //   }
+    // },
+    initTocTree: function() {
+      var items = document.querySelectorAll('.toc-img ~ ul')
+      for (let i = 0; i < items.length; i++) {
+        items[i].parentNode.children[0].setAttribute('src', '/static/svg/minus-square.svg')
+        items[i].parentNode.children[0].setAttribute('onclick', 'toggleToc(this)')
       }
     },
+    toggleToc: function(ele) {
+      var display = ele.nextElementSibling.nextElementSibling.style.display
+      if(display === '' || display === 'block') {
+        ele.nextElementSibling.nextElementSibling.style.display = 'none'
+        ele.setAttribute('src', '/static/svg/plus-square.svg')
+      } else {
+        ele.nextElementSibling.nextElementSibling.style.display = 'block'
+        ele.setAttribute('src', '/static/svg/minus-square.svg')
+      }
+    }
   },
   mounted() {
     mermaid.initialize({startOnLoad:true})
-    //模拟锚点
-    window.scrollToAnchor = this.scrollToAnchor
     window.$ace = this.$refs.ace.aceEditor
     window.scrollBind = function(operate = null) {
       var currentTab = 1
@@ -228,10 +247,9 @@ export default {
     }
     //初始化滚动绑定
     window.scrollBind('init')
-    //当编辑器内容更新时更新滚动比例
-    window.$ace.getSession().on('change', function() {
-      window.scrollBind()
-    })
+    //初始化TOC
+    this.initTocTree()
+    window.toggleToc = this.toggleToc
   },
 }
 </script>
@@ -251,15 +269,23 @@ export default {
 #previewHtml {
   overflow: auto;
   max-height: 100%;
-  padding: 15px;
+  padding: 0px 15px;
   word-break: break-all;
   white-space: normal;
 }
 #toc ul {
-  margin-left: 20px;
+  margin: 0px;
+  padding-left: 20px;
 }
 #toc li {
   list-style: none;
+  padding-left: 5px;
+}
+#toc li img {
+  display: inline-block;
+  width: 14px;
+  vertical-align: middle;
+  padding-right: 5px;
 }
 .row {
   margin: 0px;

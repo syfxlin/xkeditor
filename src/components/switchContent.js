@@ -40,7 +40,7 @@ function getTocHtmlTree(index, str) {
   } else {
     str += '</li>'
   }
-  str += '<li><a href="javascript:scrollToAnchor(\'' + tocContent[index].title.toLowerCase().replace(/ /g, "-").replace(/[^\u4e00-\u9fa5a-zA-Z0-9-]/g, "") + '\');">' + tocContent[index].title + '</a>'
+  str += '<li><img class="toc-img" src="/static/svg/disc.svg"><a href="#' + tocContent[index].title.toLowerCase().replace(/ /g, "-").replace(/[^\u4e00-\u9fa5a-zA-Z0-9-]/g, "") + '">' + tocContent[index].title + '</a>'
   return getTocHtmlTree(index+1, str)
 }
 
