@@ -352,6 +352,11 @@ export default {
           icon: "search"
         },
         {
+          title: "显示/隐藏目录",
+          operate: "toc",
+          icon: "bars"
+        },
+        {
           title: "切换实时预览",
           operate: "switchPreview",
           icon: "eye"
@@ -372,6 +377,11 @@ export default {
           icon: "file-code"
         },
         {
+          title: "转换为TinyMCE编辑器",
+          operate: "toTinyMCE",
+          icon: "sync-alt"
+        },
+        {
           title: "清空",
           operate: "empty",
           icon: "eraser"
@@ -380,6 +390,21 @@ export default {
           title: "设置",
           operate: "setting",
           icon: "cog"
+        },
+        {
+          title: "",
+          operate: "|",
+          icon: "|"
+        },
+        {
+          title: "撤销",
+          operate: "undo",
+          icon: "undo"
+        },
+        {
+          title: "重做",
+          operate: "redo",
+          icon: "redo"
         },
         {
           title: "",
@@ -511,6 +536,9 @@ export default {
       } else if (operate === "search") {
         this.aceEditor.commands.commands.find.exec(this.aceEditor);
         return;
+      } else if(operate === "toc") {
+        this.$parent.switchToc()
+        return;
       } else if(operate === "switchPreview") {
         this.$parent.switchPreviewShow()
         this.$nextTick(function() {
@@ -530,11 +558,20 @@ export default {
         this.switchEditorMode()
         this.aceToolbarShow = false;
         return;
+      } else if(operate === "toTinyMCE") {
+        this.$parent.switchEditor()
+        return;
       } else if (operate === "empty") {
         this.aceEditor.setValue("");
         return;
       } else if (operate === "setting") {
         this.aceEditor.commands.commands.showSettingsMenu.exec(this.aceEditor);
+        return;
+      } else if(operate === "undo") {
+        this.aceEditor.undo()
+        return;
+      } else if(operate === "redo") {
+        this.aceEditor.redo()
         return;
       }
       this.operateAceContent(isStart, toLeft, str)

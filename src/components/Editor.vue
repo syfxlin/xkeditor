@@ -299,6 +299,9 @@ export default {
 }
 .row .xk-col-12 {
   float: left;
+  border-left: 1px solid #ddd;
+  box-sizing: border-box;
+  
 }
 .xk-col-24 {
   padding: 0px;
@@ -326,8 +329,9 @@ export default {
   right: 0px;
   width: 20%;
   height: 100%;
-  background: #fff;
+  background: #f5f5f5;
   overflow-y: auto;
+  border-left: 1px solid #ddd;
 }
 .xk-button-group .xk-button:first-child {
   border-radius: 4px 0 0 4px;
