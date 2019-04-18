@@ -180,6 +180,9 @@ export function toHtml(val, isFull) {
       })
       return text
     }
+    if(/\[TOC\]/g.test(text)) {
+      return '<div class="toc"></div>'
+    }
     return marked.Renderer.prototype.paragraph.apply(this, arguments)
   }
   markedRenderer.heading = function(title, level) {

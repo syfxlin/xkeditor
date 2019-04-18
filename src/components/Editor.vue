@@ -162,7 +162,13 @@ export default {
     renderNextTick: function() {
       this.$nextTick(function() {
         //制作TOC
-        document.getElementById('toc').innerHTML = getTocHtml();
+        document.getElementById('toc').innerHTML = getTocHtml()
+        //更新TOC icon
+        this.initTocTree()
+        //制作文章内TOC
+        if(document.getElementsByClassName('toc').length > 0) {
+          document.getElementsByClassName('toc')[0].innerHTML = getTocHtml()
+        }
         //代码高亮
         //TODO: 性能消耗严重，导致卡顿出现，已经移至输出渲染（部分渲染部分更新）
         // Prism.highlightAll()
@@ -183,8 +189,6 @@ export default {
         }
         //更新滚动绑定
         window.scrollBind()
-        //更新TOC icon
-        this.initTocTree()
       })
     },
     switchToc: function() {
@@ -199,7 +203,7 @@ export default {
     //   }
     // },
     initTocTree: function() {
-      var items = document.querySelectorAll('.toc-img ~ ul')
+      var items = document.querySelectorAll('#toc .toc-img ~ ul')
       for (let i = 0; i < items.length; i++) {
         items[i].parentNode.children[0].setAttribute('src', '/static/svg/minus-square.svg')
         items[i].parentNode.children[0].setAttribute('onclick', 'toggleToc(this)')
@@ -273,14 +277,17 @@ export default {
   word-break: break-all;
   white-space: normal;
 }
+.toc ul,
 #toc ul {
   margin: 0px;
   padding-left: 20px;
 }
+.toc li,
 #toc li {
   list-style: none;
   padding-left: 5px;
 }
+.toc li img,
 #toc li img {
   display: inline-block;
   width: 14px;
