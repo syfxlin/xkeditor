@@ -255,6 +255,15 @@ export function toMarkdown(htmlVal) {
       return node.innerHTML.replace(/(<br \/>|<br>)/g, '\n')
     }
   })
+  turndownService.addRule('prismjs', {
+    filter:  function (node) {
+      return (node.nodeName === 'PRE')&&(node.children.length > 0)&&(node.children[0].nodeName === 'CODE')&&(node.children[0].classList.length > 0)
+    },
+    replacement: function (content, node) {
+      var lang = node.children[0].classList[1].substring(9)
+      return '\n```' + lang + '\n' + content.replace(/(<br \/>|<br>)/g, '\n') + '\n```\n\n'
+    }
+  })
   turndownService.addRule('sup', {
     filter:  function (node) {
       return (node.nodeName === 'SUP')

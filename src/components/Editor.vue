@@ -75,7 +75,7 @@ export default {
         body_class: 'markdown-body',
         content_css: '/static/github-markdown.css',
         plugins: 'print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern',
-        toolbar: 'formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat code | undo redo',
+        toolbar: 'formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor prismjs | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | tex-$ tex-math flow seq gantt mermaid | removeformat code | undo redo',
         image_advtab: true,
         importcss_append: true,
         height: '100%',

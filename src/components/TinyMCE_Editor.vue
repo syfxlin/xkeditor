@@ -64,6 +64,52 @@ export default {
     }
   },
   mounted () {
+    //添加自定义按钮
+    this.setting.setup = function (editor) {
+      editor.ui.registry.addButton('tex-$', {
+        text: '行内公式',
+        onAction: function (_) {
+          editor.insertContent('<p>$$$$</p>');
+        }
+      });
+      editor.ui.registry.addButton('tex-math', {
+        text: '块公式',
+        onAction: function (_) {
+          editor.insertContent('<pre>&nbsp;```math&nbsp;```&nbsp;</pre>');
+        }
+      });
+      editor.ui.registry.addButton('flow', {
+        text: '流程图',
+        onAction: function (_) {
+          editor.insertContent('<pre class="xkeditor-mermaid">graph </pre>');
+        }
+      });
+      editor.ui.registry.addButton('seq', {
+        text: '时序图',
+        onAction: function (_) {
+          editor.insertContent('<pre class="xkeditor-mermaid">sequenceDiagram&nbsp;</pre>');
+        }
+      });
+      editor.ui.registry.addButton('gantt', {
+        text: '甘特图',
+        onAction: function (_) {
+          editor.insertContent('<pre class="xkeditor-mermaid">gantt&nbsp;</pre>');
+        }
+      });
+      editor.ui.registry.addButton('mermaid', {
+        text: '添加图',
+        onAction: function (_) {
+          editor.insertContent('<pre class="xkeditor-mermaid">&nbsp;</pre>');
+        }
+      });
+      editor.ui.registry.addButton('prismjs', {
+        text: '代码块',
+        onAction: function (_) {
+          editor.insertContent('<pre><code class="line-numbers language-javascript">&nbsp;</code></pre>');
+        }
+      });
+    }
+    //初始化tinymce编辑器
     tinymce.init({})
     //赋初值
     this.tinymceValue = this.value
