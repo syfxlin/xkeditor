@@ -559,7 +559,7 @@ export default {
         this.aceToolbarShow = false;
         return;
       } else if(operate === "toTinyMCE") {
-        this.$parent.switchEditor()
+        window.$switchEditor()
         return;
       } else if (operate === "empty") {
         this.aceEditor.setValue("");

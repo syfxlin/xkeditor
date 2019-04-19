@@ -40,10 +40,6 @@
       <div id="toc" v-show="showToc"></div>
     </transition>
   </div>
-  <div class="xk-button-group fixed-button">
-    <button class="xk-button" @click="switchToc">toc</button>
-    <button class="xk-button" @click="switchEditor">switchEditor</button>
-  </div>
 </div>
 </template>
 
@@ -75,7 +71,7 @@ export default {
         body_class: 'markdown-body',
         content_css: '/static/github-markdown.css',
         plugins: 'print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern',
-        toolbar: 'formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor prismjs | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | tex-$ tex-math flow seq gantt mermaid | removeformat code | undo redo',
+        toolbar: 'formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor prismjs | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | tex-$ tex-math flow seq gantt mermaid | removeformat code toMarkdownEditor | undo redo',
         image_advtab: true,
         importcss_append: true,
         height: '100%',
@@ -223,6 +219,7 @@ export default {
   mounted() {
     mermaid.initialize({startOnLoad:true})
     window.$ace = this.$refs.ace.aceEditor
+    window.$switchEditor = this.switchEditor
     window.scrollBind = function(operate = null) {
       var currentTab = 1
       var editorDom = document.querySelector('.ace-editor')
@@ -313,12 +310,6 @@ export default {
   width: 50%;
   height: 100%;
 }
-.fixed-button {
-  position: fixed;
-  right: 15px;
-  bottom: 15px;
-  z-index: 1000;
-}
 .close-preview-full {
   position: fixed;
   right: 10px;
@@ -332,15 +323,6 @@ export default {
   background: #f5f5f5;
   overflow-y: auto;
   border-left: 1px solid #ddd;
-}
-.xk-button-group .xk-button:first-child {
-  border-radius: 4px 0 0 4px;
-}
-.xk-button-group .xk-button:not(:last-child) {
-  margin-right: -5px;
-}
-.xk-button-group .xk-button:last-child {
-  border-radius: 0 4px 4px 0;
 }
 .xk-button {
   display: inline-block;

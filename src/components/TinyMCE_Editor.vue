@@ -108,6 +108,12 @@ export default {
           editor.insertContent('<pre><code class="line-numbers language-javascript">&nbsp;</code></pre>');
         }
       });
+      editor.ui.registry.addButton('toMarkdownEditor', {
+        text: '切换编辑器',
+        onAction: function (_) {
+          window.$switchEditor()
+        }
+      });
     }
     //初始化tinymce编辑器
     tinymce.init({})
