@@ -157,7 +157,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 library.add(fas);
 
 //switch markdown and html
-import { toHtml, toMarkdown } from './switchContent'
+import { toHtml, toMarkdown } from '../utils/switchContent'
 
 export default {
   components: {

@@ -1,12 +1,32 @@
 <template>
   <div id="app">
-    <editor />
+    <editor v-if="isRenderEditor" :setting="editorSetting" :value="markdownContent" />
   </div>
 </template>
 
 <script>
+import { axiosPro } from "./utils/axiosPro"
 export default {
-  name: 'App'
+  name: 'App',
+  data() {
+    return {
+      isRenderEditor: false,
+      editorSetting: {},
+      markdownContent: "# 123"
+    }
+  },
+  methods: {
+    async getEditorInfo() {
+      let md = await axiosPro.get('/static/md_content.md')
+      let setting = await axiosPro.get('/static/setting.json')
+      this.markdownContent = md
+      this.editorSetting = setting
+      this.isRenderEditor = true
+    }
+  },
+  mounted() {
+    this.getEditorInfo()
+  }
 }
 </script>
 

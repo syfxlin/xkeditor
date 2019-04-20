@@ -4,7 +4,7 @@ import Vue from 'vue'
 import App from './App'
 // import AtComponents from 'at-ui'
 // import 'at-ui-style'
-import './components/dialogDrag'
+import './utils/dialogDrag'
 // Vue.use(AtComponents)
 
 import ACE from '@/components/ACE_Editor'

@@ -32,9 +32,9 @@
 <template>
 <div class="xkeditor">
   <div class="row">
-    <div :class="aceDivClass" v-show="EditorModeShow&&previewShow!='full'"><ace v-model="markdownContent" :setting="aceSetting" ref="ace"></ace></div>
+    <div :class="aceDivClass" v-show="EditorModeShow&&previewShow!='full'"><ace v-model="markdownContent" :setting="setting.aceSetting" ref="ace"></ace></div>
     <div :class="aceDivClass" v-show="EditorModeShow&&previewShow!='hide'"><div class="markdown-body" v-html="htmlViewContent" id="previewHtml" ref="htmlView"></div></div>
-    <div class="xk-col-24" v-show="!EditorModeShow"><tinymce v-model="htmlContent" :setting="tinymceSetting" ref="tinymce"></tinymce></div>
+    <div class="xk-col-24" v-show="!EditorModeShow"><tinymce v-model="htmlContent" :setting="setting.tinymceSetting" ref="tinymce"></tinymce></div>
     <button class="xk-button close-preview-full" @click="switchPreviewFull()" v-show="EditorModeShow&&previewShow=='full'">关闭</button>
     <transition name="slide-fade">
       <div id="toc" v-show="showToc"></div>
@@ -45,7 +45,7 @@
 
 <script>
 //HTML和Markdown互转
-import { toHtml, toMarkdown, getTocHtml } from './switchContent.js'
+import { toHtml, toMarkdown, getTocHtml } from '../utils/switchContent.js'
 
 import katex from "katex"
 import "katex/dist/katex.min.css"
@@ -54,6 +54,10 @@ import mermaid from "mermaid"
 
 export default {
   name: 'Editor',
+  props: {
+    value: String,
+    setting: Object
+  },
   data () {
     return {
       markdownContent: '',
@@ -64,42 +68,44 @@ export default {
       EditorMode: "ace",
       previewShow: 'show',
       aceDivClass: "xk-col-12",
-      tinymceSetting: {
-        language_url: '/static/tinymce/langs/zh_CN.js',
-        language: 'zh_CN',
-        skin_url: '/static/tinymce/skins/ui/oxide',
-        body_class: 'markdown-body',
-        content_css: '/static/github-markdown.css',
-        plugins: 'print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern',
-        toolbar: 'formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor prismjs | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | tex-$ tex-math flow seq gantt mermaid | removeformat code toMarkdownEditor | undo redo',
-        image_advtab: true,
-        importcss_append: true,
-        height: '100%',
-        template_cdate_format: '[CDATE: %m/%d/%Y : %H:%M:%S]',
-        template_mdate_format: '[MDATE: %m/%d/%Y : %H:%M:%S]',
-        image_caption: true,
-        spellchecker_dialog: true,
-        spellchecker_whitelist: ['Ephox', 'Moxiecode'],
-        images_upload_handler: function(blobInfo, success, failure) {
-          console.log('Upload')
+      defaultSetting: {
+        tinymceSetting: {
+          language_url: '/static/tinymce/langs/zh_CN.js',
+          language: 'zh_CN',
+          skin_url: '/static/tinymce/skins/ui/oxide',
+          body_class: 'markdown-body',
+          content_css: '/static/github-markdown.css',
+          plugins: 'print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern',
+          toolbar: 'formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor prismjs | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | tex-$ tex-math flow seq gantt mermaid | removeformat code toMarkdownEditor | undo redo',
+          image_advtab: true,
+          importcss_append: true,
+          height: '100%',
+          template_cdate_format: '[CDATE: %m/%d/%Y : %H:%M:%S]',
+          template_mdate_format: '[MDATE: %m/%d/%Y : %H:%M:%S]',
+          image_caption: true,
+          spellchecker_dialog: true,
+          spellchecker_whitelist: ['Ephox', 'Moxiecode'],
+          images_upload_handler: function(blobInfo, success, failure) {
+            console.log('Upload')
+          }
+        },
+        aceSetting: {
+          minLines: 10,
+          fontSize: 14,
+          theme: "ace/theme/solarized_light",
+          mode: "ace/mode/markdown",
+          tabSize: 4,
+          fontSize: "17px",
+          wrap: true,
+          enableSnippets: true,
+          enableLiveAutocompletion: true,
+          enableBasicAutocompletion: true
         }
-      },
-      aceSetting: {
-        minLines: 10,
-        fontSize: 14,
-        theme: "ace/theme/solarized_light",
-        mode: "ace/mode/markdown",
-        tabSize: 4,
-        fontSize: "17px",
-        wrap: true,
-        enableSnippets: true,
-        enableLiveAutocompletion: true,
-        enableBasicAutocompletion: true
       }
     }
   },
   created:function(){
-    this.markdownContent = '# XK-Editor'
+    this.markdownContent = this.value ? this.value : '# XK-Editor'
     this.htmlViewContent = toHtml(this.markdownContent, true, true)
   },
   computed: {
