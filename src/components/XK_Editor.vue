@@ -31,6 +31,7 @@
 
 <template>
 <div class="xkeditor">
+  <template  v-if="isRenderEditor">
   <div class="row">
     <div :class="aceDivClass" v-show="EditorModeShow&&previewShow!='full'"><ace v-model="markdownContent" :setting="setting.aceSetting" ref="ace"></ace></div>
     <div :class="aceDivClass" v-show="EditorModeShow&&previewShow!='hide'"><div class="markdown-body" v-html="htmlViewContent" id="previewHtml" ref="htmlView"></div></div>
@@ -40,10 +41,17 @@
       <div id="toc" v-show="showToc"></div>
     </transition>
   </div>
+  </template>
 </div>
 </template>
 
 <script>
+//导入基础组件
+import '@/utils/dialogDrag'
+import ACE from '@/components/ACE_Editor'
+import TinyMCE from '@/components/TinyMCE_Editor'
+
+import { axiosPro } from "@/utils/axiosPro"
 //HTML和Markdown互转
 import { toHtml, toMarkdown, getTocHtml } from '../utils/switchContent.js'
 
@@ -53,13 +61,16 @@ import renderMathInElement from "katex/dist/contrib/auto-render"
 import mermaid from "mermaid"
 
 export default {
-  name: 'Editor',
+  name: 'XK_Editor',
+  components: {
+    'ace': ACE,
+    'tinymce': TinyMCE
+  },
   props: {
-    value: String,
-    setting: Object
   },
   data () {
     return {
+      isRenderEditor: false,
       markdownContent: '',
       htmlContent: '',
       htmlViewContent: '',
@@ -68,7 +79,7 @@ export default {
       EditorMode: "ace",
       previewShow: 'show',
       aceDivClass: "xk-col-12",
-      defaultSetting: {
+      setting: {
         tinymceSetting: {
           language_url: '/static/tinymce/langs/zh_CN.js',
           language: 'zh_CN',
@@ -85,7 +96,7 @@ export default {
           image_caption: true,
           spellchecker_dialog: true,
           spellchecker_whitelist: ['Ephox', 'Moxiecode'],
-          images_upload_handler: function(blobInfo, success, failure) {
+          images_upload_handler(blobInfo, success, failure) {
             console.log('Upload')
           }
         },
@@ -104,12 +115,8 @@ export default {
       }
     }
   },
-  created:function(){
-    this.markdownContent = this.value ? this.value : '# XK-Editor'
-    this.htmlViewContent = toHtml(this.markdownContent, true, true)
-  },
   computed: {
-    EditorModeShow: function() {
+    EditorModeShow() {
       if(this.EditorMode === 'ace') {
         return true
       } else if(this.EditorMode === 'tinymce') {
@@ -117,33 +124,75 @@ export default {
       }
     }
   },
-  watch: {
-    markdownContent: function (val) {
-      this.htmlViewContent = toHtml(val, true)
-      this.renderNextTick()
-    },
-    htmlContent: function(val) {
-      this.htmlViewContent = val
-      this.renderNextTick()
-      this.$nextTick(function() {
-        Prism.highlightAll()
-      })
-    }
+  async mounted() {
+    await this.load()
+    this.htmlViewContent = toHtml(this.markdownContent, true, true)
+    await this.initEditor()
   },
   methods: {
-    switchEditor: function() {
+    async load() {
+      let md = await axiosPro.get('/static/md_content.md')
+      let setting = await axiosPro.get('/static/setting.json')
+      this.markdownContent = md
+      this.setting = setting
+      this.loadCss(setting.xkeditorSetting.previewCss)
+      this.isRenderEditor = true
+    },
+    loadCss(url) {
+      let css = document.createElement('link');
+      css.href = url;
+      css.rel = 'stylesheet';
+      css.type = 'text/css';
+      document.head.appendChild(css);
+    },
+    initEditor() {
+      mermaid.initialize({startOnLoad:true})
+      window.$ace = this.$refs.ace.aceEditor
+      window.$switchEditor = this.switchEditor
+      window.scrollBind = function(operate = null) {
+        var currentTab = 1
+        var editorDom = document.querySelector('.ace-editor')
+        var previewHtmlDom = document.querySelector('#previewHtml')
+        var aceContentHeight =  window.$ace.renderer.scrollBarV.scrollHeight - editorDom.offsetHeight
+        var previewHtmlHeight = previewHtmlDom.scrollHeight - previewHtmlDom.offsetHeight
+        window.scale = previewHtmlHeight/aceContentHeight
+        if(operate === 'init') {
+          editorDom.addEventListener('mouseover', function() {
+            currentTab = 1
+          })
+          previewHtmlDom.addEventListener('mouseover', function() {
+            currentTab = 2
+          })
+          window.$ace.session.on("changeScrollTop", function(data) {
+            if(currentTab === 1) {
+              previewHtmlDom.scrollTop = data * window.scale
+            }
+          });
+          previewHtmlDom.addEventListener('scroll', function() {
+            if (currentTab === 2) {
+              window.$ace.session.setScrollTop(previewHtmlDom.scrollTop / window.scale)
+            }
+          })
+        }
+      }
+      //初始化滚动绑定
+      window.scrollBind('init')
+      //初始化TOC
+      this.initTocTree()
+      window.toggleToc = this.toggleToc
+    },
+    switchEditor() {
       if(this.EditorMode !== 'ace') {
         this.markdownContent = toMarkdown(this.htmlContent)
         this.$refs.ace.setValue(this.markdownContent)
         this.EditorMode = 'ace'
       } else if(this.EditorMode !== 'tinymce') {
-        //TODO: TinyMCE在代码互转的情况下体验不佳
         this.htmlContent = toHtml(this.markdownContent, false)
         this.$refs.tinymce.setValue(this.htmlContent)
         this.EditorMode = 'tinymce'
       }
     },
-    switchPreviewShow: function() {
+    switchPreviewShow() {
       if(this.previewShow == 'show') {
         this.previewShow = 'hide'
         this.aceDivClass = "xk-col-24"
@@ -152,7 +201,7 @@ export default {
         this.aceDivClass = "xk-col-12"
       }
     },
-    switchPreviewFull: function() {
+    switchPreviewFull() {
       if(this.previewShow == 'full') {
         this.previewShow = 'show'
         this.aceDivClass = "xk-col-12"
@@ -161,7 +210,7 @@ export default {
         this.aceDivClass = "xk-col-24"
       }
     },
-    renderNextTick: function() {
+    renderNextTick() {
       this.$nextTick(function() {
         //制作TOC
         document.getElementById('toc').innerHTML = getTocHtml()
@@ -171,9 +220,6 @@ export default {
         if(document.getElementsByClassName('toc').length > 0) {
           document.getElementsByClassName('toc')[0].innerHTML = getTocHtml()
         }
-        //代码高亮
-        //TODO: 性能消耗严重，导致卡顿出现，已经移至输出渲染（部分渲染部分更新）
-        // Prism.highlightAll()
         //转换Tex公式
         renderMathInElement(document.getElementById('previewHtml'), {
           delimiters: [
@@ -193,25 +239,17 @@ export default {
         window.scrollBind()
       })
     },
-    switchToc: function() {
+    switchToc() {
       this.showToc = (!this.showToc)
     },
-    // scrollToAnchor: function(anchorName) {
-    //   if (anchorName) {
-    //     let anchorElement = document.getElementById(anchorName);
-    //     if(anchorElement) {
-    //       anchorElement.scrollIntoView(true);
-    //     }
-    //   }
-    // },
-    initTocTree: function() {
+    initTocTree() {
       var items = document.querySelectorAll('#toc .toc-img ~ ul')
       for (let i = 0; i < items.length; i++) {
         items[i].parentNode.children[0].setAttribute('src', '/static/svg/minus-square.svg')
         items[i].parentNode.children[0].setAttribute('onclick', 'toggleToc(this)')
       }
     },
-    toggleToc: function(ele) {
+    toggleToc(ele) {
       var display = ele.nextElementSibling.nextElementSibling.style.display
       if(display === '' || display === 'block') {
         ele.nextElementSibling.nextElementSibling.style.display = 'none'
@@ -222,42 +260,19 @@ export default {
       }
     }
   },
-  mounted() {
-    mermaid.initialize({startOnLoad:true})
-    window.$ace = this.$refs.ace.aceEditor
-    window.$switchEditor = this.switchEditor
-    window.scrollBind = function(operate = null) {
-      var currentTab = 1
-      var editorDom = document.querySelector('.ace-editor')
-      var previewHtmlDom = document.querySelector('#previewHtml')
-      var aceContentHeight =  window.$ace.renderer.scrollBarV.scrollHeight - editorDom.offsetHeight
-      var previewHtmlHeight = previewHtmlDom.scrollHeight - previewHtmlDom.offsetHeight
-      window.scale = previewHtmlHeight/aceContentHeight
-      if(operate === 'init') {
-        editorDom.addEventListener('mouseover', function() {
-          currentTab = 1
-        })
-        previewHtmlDom.addEventListener('mouseover', function() {
-          currentTab = 2
-        })
-        window.$ace.session.on("changeScrollTop", function(data) {
-          if(currentTab === 1) {
-            previewHtmlDom.scrollTop = data * window.scale
-          }
-        });
-        previewHtmlDom.addEventListener('scroll', function() {
-          if (currentTab === 2) {
-            window.$ace.session.setScrollTop(previewHtmlDom.scrollTop / window.scale)
-          }
-        })
-      }
+  watch: {
+    markdownContent (val) {
+      this.htmlViewContent = toHtml(val, true)
+      this.renderNextTick()
+    },
+    htmlContent(val) {
+      this.htmlViewContent = val
+      this.renderNextTick()
+      this.$nextTick(function() {
+        Prism.highlightAll()
+      })
     }
-    //初始化滚动绑定
-    window.scrollBind('init')
-    //初始化TOC
-    this.initTocTree()
-    window.toggleToc = this.toggleToc
-  },
+  }
 }
 </script>
 

@@ -1,31 +1,23 @@
 <template>
   <div id="app">
-    <editor v-if="isRenderEditor" :setting="editorSetting" :value="markdownContent" />
+    <xk-editor />
   </div>
 </template>
 
 <script>
-import { axiosPro } from "./utils/axiosPro"
+import XK_Editor from '@/components/XK_Editor'
 export default {
   name: 'App',
+  components: {
+    'xk-editor': XK_Editor
+  },
   data() {
     return {
-      isRenderEditor: false,
-      editorSetting: {},
-      markdownContent: "# 123"
     }
   },
   methods: {
-    async getEditorInfo() {
-      let md = await axiosPro.get('/static/md_content.md')
-      let setting = await axiosPro.get('/static/setting.json')
-      this.markdownContent = md
-      this.editorSetting = setting
-      this.isRenderEditor = true
-    }
   },
   mounted() {
-    this.getEditorInfo()
   }
 }
 </script>

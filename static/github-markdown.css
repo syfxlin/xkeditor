@@ -229,6 +229,8 @@
 
 .markdown-body pre[class*="language-"] {
   font-size: 0.8em;
+  /* 更换别的Prism主题时可能需要更改背景颜色 */
+  background: #272822;
 }
 
 .markdown-body hr {

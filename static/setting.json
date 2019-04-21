@@ -25,10 +25,13 @@
         "theme":"ace/theme/solarized_light",
         "mode":"ace/mode/markdown",
         "tabSize":4,
-        "wrap":false,
+        "wrap":true,
         "enableSnippets":true,
         "enableLiveAutocompletion":true,
         "enableBasicAutocompletion":true,
         "value":"# XK-Editor"
+    },
+    "xkeditorSetting":{
+        "previewCss":"/static/github-markdown.css"
     }
 }

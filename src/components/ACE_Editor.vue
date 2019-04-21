@@ -157,7 +157,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 library.add(fas);
 
 //switch markdown and html
-import { toHtml, toMarkdown } from '../utils/switchContent'
+import { toHtml, toMarkdown } from '@/utils/switchContent'
 
 export default {
   components: {
@@ -166,14 +166,6 @@ export default {
   props: {
     value: String,
     setting: Object
-  },
-  mounted() {
-    //初始化Value
-    this.setting.value = this.value ? this.value : ""
-    this.aceEditor = ace.edit(this.$refs.ace, 
-      this.setting
-    )
-    this.aceEditor.getSession().on('change', this.updateValue)
   },
   data() {
     return {
@@ -424,35 +416,43 @@ export default {
       ]
     };
   },
+  mounted() {
+    //初始化Value
+    this.setting.value = this.value ? this.value : ""
+    this.aceEditor = ace.edit(this.$refs.ace, 
+      this.setting
+    )
+    this.aceEditor.getSession().on('change', this.updateValue)
+  },
   methods: {
-    setValue: function(val) {
+    setValue(val) {
       this.aceEditor.setValue(val);
     },
-    updateValue: function() {
+    updateValue() {
       this.$emit("input", this.aceEditor.getSession().getValue())
     },
-    switchEditorMode: function() {
+    switchEditorMode() {
       if(this.isMarkdownMode) {
         this.switchToHtml()
       } else {
         this.switchToMarkdown()
       }
     },
-    switchToHtml: function() {
+    switchToHtml() {
       if (this.isMarkdownMode) {
         this.aceEditor.session.setMode("ace/mode/html");
         this.aceEditor.setValue(toHtml(this.aceEditor.getSession().getValue()))
         this.isMarkdownMode = false;
       }
     },
-    switchToMarkdown: function() {
+    switchToMarkdown() {
       if (!this.isMarkdownMode) {
         this.aceEditor.session.setMode("ace/mode/markdown");
         this.aceEditor.setValue(toMarkdown(this.aceEditor.getSession().getValue()));
         this.isMarkdownMode = true;
       }
     },
-    toolbarClick: function(operate) {
+    toolbarClick(operate) {
       this.aceToolbarModal.data.operate = operate
       let str = '';
       let isStart = false;
@@ -576,7 +576,7 @@ export default {
       }
       this.operateAceContent(isStart, toLeft, str)
     },
-    operateModal: function(operate, isShow, title = '') {
+    operateModal(operate, isShow, title = '') {
       if(!isShow) {
         this.aceToolbarModal[operate] = false
         return;
@@ -585,7 +585,7 @@ export default {
       this.aceToolbarModal.data.modalTitle = title
       this.aceToolbarModal.base.isShowModal = true;
     },
-    operateAceContent: function(isStart, toLeft, str) {
+    operateAceContent(isStart, toLeft, str) {
       let range = this.aceEditor.getSelectionRange();
       if (isStart) {
         for (let i = range.start.row; i <= range.end.row; i++) {
@@ -599,7 +599,7 @@ export default {
       }
       this.aceEditor.focus();
     },
-    aceToolbarSubmit: function () {
+    aceToolbarSubmit() {
       let str = ''
       let data = this.aceToolbarModal.data
       if(data.operate === 'table') {
@@ -643,7 +643,7 @@ export default {
       this.operateAceContent(false, 0, str)
       this.aceToolbarCancer()
     },
-    aceToolbarCancer: function() {
+    aceToolbarCancer() {
       this.aceToolbarModal.base.isShowModal = false
       this.aceToolbarModal.link =  false
       this.aceToolbarModal.image = false
@@ -652,7 +652,7 @@ export default {
       this.aceToolbarModal.search = false
       this.aceToolbarModal.table = false
     },
-    operateFullScreen: function() {
+    operateFullScreen() {
       if(document.fullscreenElement || document.msFullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement) {
         if(document.exitFullscreen) {
           return document.exitFullscreen()
