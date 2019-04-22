@@ -39,7 +39,7 @@
         </template>
       </template>
     </div>
-    <div class="ace-toolbar-html ace-toolbar" v-show="!aceToolbarShow">
+    <div class="ace-toolbar-html ace-toolbar" v-show="!aceToolbarShow&&aceToolbarHtmlShow">
       <button class="xk-button" type="text" title="转换为Markdown模式" @click="function(){aceToolbarShow = true;switchEditorMode()}"><fa-icon icon="file-code"/> 转换为Markdown模式</button>
     </div>
     <div class="ace-editor" ref="ace"></div>
@@ -171,6 +171,7 @@ export default {
       aceEditor: null,
       isMarkdownMode: true,
       aceToolbarShow: true,
+      aceToolbarHtmlShow: true,
       aceToolbarModal: {
         base: {
           isShowModal: false,
@@ -528,50 +529,8 @@ export default {
       } else if (operate === "video") {
         this.operateModal(operate, true, '添加视频')
         return;
-      } else if (operate === "toLine") {
-        this.aceToolbarModal.data.allLine = this.aceEditor.session.getLength();
-        this.operateModal(operate, true, '跳转到指定行')
-        return;
-      } else if (operate === "search") {
-        this.aceEditor.commands.commands.find.exec(this.aceEditor);
-        return;
-      } else if(operate === "toc") {
-        this.$parent.switchToc()
-        return;
-      } else if(operate === "switchPreview") {
-        this.$parent.switchPreviewShow()
-        this.$nextTick(function() {
-          this.aceEditor.resize(this.aceEditor)
-        })
-        return;
-      } else if(operate === "fullPreview") {
-        this.$parent.switchPreviewFull()
-        this.$nextTick(function() {
-          this.aceEditor.resize(this.aceEditor)
-        })
-        return;
-      } else if(operate === "fullScreen") {
-        this.operateFullScreen()
-        return;
-      } else if (operate === "toHtmlEditor") {
-        this.switchEditorMode()
-        this.aceToolbarShow = false;
-        return;
-      } else if(operate === "toTinyMCE") {
-        window.$switchEditor()
-        return;
-      } else if (operate === "empty") {
-        this.aceEditor.setValue("");
-        return;
-      } else if (operate === "setting") {
-        this.aceEditor.commands.commands.showSettingsMenu.exec(this.aceEditor);
-        return;
-      } else if(operate === "undo") {
-        this.aceEditor.undo()
-        return;
-      } else if(operate === "redo") {
-        this.aceEditor.redo()
-        return;
+      } else if (/(toLine|search|toc|switchPreview|fullPreview|fullScreen|toHtmlEditor|toTinyMCE|empty|setting|undo|redo)/g.test(operate)) {
+        this.execCommand(operate)
       }
       this.operateAceContent(isStart, toLeft, str)
     },
@@ -636,20 +595,21 @@ export default {
         this.aceEditor.gotoLine(data.line)
         this.aceEditor.focus()
         this.operateModal(data.operate, false)
-        return;
+        this.aceToolbarCancer()
+        return
       }
       this.operateModal(data.operate, false)
       this.operateAceContent(false, 0, str)
       this.aceToolbarCancer()
     },
     aceToolbarCancer() {
-      this.aceToolbarModal.base.isShowModal = false
       this.aceToolbarModal.link =  false
       this.aceToolbarModal.image = false
       this.aceToolbarModal.video = false
       this.aceToolbarModal.toLine = false
       this.aceToolbarModal.search = false
       this.aceToolbarModal.table = false
+      this.aceToolbarModal.base.isShowModal = false
     },
     operateFullScreen() {
       if(document.fullscreenElement || document.msFullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement) {
@@ -672,6 +632,75 @@ export default {
           return root.mozRequestFullScreen()
         } else if(root.msRequestFullscreen) {
           return root.msRequestFullscreen()
+        }
+      }
+    },
+    execCommand(command, data = null) {
+      if (command === "toLine") {
+        this.aceToolbarModal.data.allLine = this.aceEditor.session.getLength();
+        this.operateModal(command, true, '跳转到指定行')
+        return;
+      } else if (command === "search") {
+        this.aceEditor.commands.commands.find.exec(this.aceEditor);
+        return;
+      } else if(command === "toc") {
+        this.$parent.switchToc()
+        return;
+      } else if(command === "switchPreview") {
+        this.$parent.switchPreviewShow()
+        this.$nextTick(function() {
+          this.aceEditor.resize(this.aceEditor)
+        })
+        return;
+      } else if(command === "fullPreview") {
+        this.$parent.switchPreviewFull()
+        this.$nextTick(function() {
+          this.aceEditor.resize(this.aceEditor)
+        })
+        return;
+      } else if(command === "fullScreen") {
+        this.operateFullScreen()
+        return;
+      } else if (command === "toHtmlEditor") {
+        this.switchEditorMode()
+        this.aceToolbarShow = false;
+        return;
+      } else if(command === "toTinyMCE") {
+        window.$switchEditor()
+        return;
+      } else if (command === "empty") {
+        this.aceEditor.setValue("");
+        return;
+      } else if (command === "setting") {
+        this.aceEditor.commands.commands.showSettingsMenu.exec(this.aceEditor);
+        return;
+      } else if(command === "undo") {
+        this.aceEditor.undo()
+        return;
+      } else if(command === "redo") {
+        this.aceEditor.redo()
+        return;
+      } else if(command === "toolbar") {
+        this.aceToolbarShow = !this.aceToolbarShow
+        this.aceToolbarHtmlShow = !this.aceToolbarHtmlShow
+        return
+      } else if(command === "resize") {
+        this.$nextTick(function() {
+          this.aceEditor.resize(this.aceEditor)
+        })
+        return
+      } else if(command === "addKeys") {
+        for(let i = 0; i < data.length; i++) {
+          this.aceEditor.commands.addCommand({
+            name: data[i].name,
+            bindKey: {win: data[i].win,  mac: data[i].mac},
+            exec: data[i].exec,
+            readOnly: true
+          });
+        }
+      } else if(command === "removeKeys") {
+        for(let i = 0; i < data.length; i++) {
+          this.aceEditor.commands.removeCommand(data[i])
         }
       }
     }

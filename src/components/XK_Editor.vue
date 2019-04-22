@@ -128,6 +128,7 @@ export default {
     await this.load()
     this.htmlViewContent = toHtml(this.markdownContent, true, true)
     await this.initEditor()
+    this.setInterface()
   },
   methods: {
     async load() {
@@ -262,6 +263,54 @@ export default {
         ele.nextElementSibling.nextElementSibling.style.display = 'block'
         ele.setAttribute('src', '/static/svg/minus-square.svg')
       }
+    },
+    setInterface() {
+      var _this = this
+      window.XKEditor = {
+        getMarkdown: function() {
+          return _this.markdownContent
+        },
+        getHTML: function() {
+          return _this.htmlViewContent
+        },
+        switchEditor: function() {
+          _this.switchEditor()
+        },
+        switchPreview: function() {
+          _this.$refs.ace.execCommand('switchPreview')
+        },
+        switchFullPreview: function() {
+          _this.$refs.ace.execCommand('fullPreview')
+        },
+        switchFullScreen: function() {
+          _this.$refs.ace.execCommand('fullScreen')
+        },
+        toLine: function() {
+          _this.$refs.ace.execCommand('toLine')
+        },
+        toc: function() {
+          _this.$refs.ace.execCommand('toc')
+        },
+        toolbar: function() {
+          _this.$refs.ace.execCommand('toolbar')
+        },
+        resize: function() {
+          _this.$refs.ace.execCommand('resize')
+        },
+        addKeys: function(keys) { // keys = [{name,win,mac,exec},{name,win,mac,exec}]
+          _this.$refs.ace.execCommand('addKeys', keys)
+        },
+        removeKeys: function(keys) { // keys = [name, name]
+          _this.$refs.ace.execCommand('removeKeys', keys)
+        },
+        getEditor: function(name) {
+          if(name === 'ace') {
+            return window.$ace
+          } else if(name === 'tinymce') {
+            return window.tinymce
+          }
+        }
+      }
     }
   },
   watch: {
@@ -295,9 +344,10 @@ export default {
 #previewHtml {
   overflow: auto;
   max-height: 100%;
-  padding: 0px 15px;
+  padding: 15px 15px;
   word-break: break-all;
   white-space: normal;
+  box-sizing: border-box;
 }
 .toc ul,
 #toc ul {
