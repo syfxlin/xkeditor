@@ -33,10 +33,10 @@
 <div class="xkeditor">
   <template  v-if="isRenderEditor">
   <div class="row">
-    <div :class="aceDivClass" v-show="EditorModeShow&&previewShow!='full'"><ace v-model="markdownContent" :setting="setting.aceSetting" ref="ace"></ace></div>
-    <div :class="aceDivClass" v-show="EditorModeShow&&previewShow!='hide'"><div class="markdown-body" v-html="htmlViewContent" id="previewHtml" ref="htmlView"></div></div>
-    <div class="xk-col-24" v-show="!EditorModeShow"><tinymce v-model="htmlContent" :setting="setting.tinymceSetting" ref="tinymce"></tinymce></div>
-    <button class="xk-button close-preview-full" @click="switchPreviewFull()" v-show="EditorModeShow&&previewShow=='full'">关闭</button>
+    <div :class="aceDivClass" v-show="editorModeShow&&previewShow!='full'"><ace v-model="markdownContent" :setting="setting.aceSetting" ref="ace"></ace></div>
+    <div :class="aceDivClass" v-show="editorModeShow&&previewShow!='hide'"><div class="markdown-body" v-html="htmlViewContent" id="previewHtml" ref="htmlView"></div></div>
+    <div class="xk-col-24" v-show="!editorModeShow"><tinymce v-model="htmlContent" :setting="setting.tinymceSetting" ref="tinymce"></tinymce></div>
+    <button class="xk-button close-preview-full" @click="switchPreviewFull()" v-show="editorModeShow&&previewShow=='full'">关闭</button>
     <transition name="slide-fade">
       <div id="toc" v-show="showToc"></div>
     </transition>
@@ -116,7 +116,7 @@ export default {
     }
   },
   computed: {
-    EditorModeShow() {
+    editorModeShow() {
       if(this.EditorMode === 'ace') {
         return true
       } else if(this.EditorMode === 'tinymce') {
@@ -176,7 +176,11 @@ export default {
         }
       }
       //初始化滚动绑定
-      window.scrollBind('init')
+      this.$nextTick(function() {
+        setTimeout(function() {
+          window.scrollBind('init')
+        }, 1000)
+      })
       //初始化TOC
       this.initTocTree()
       window.toggleToc = this.toggleToc

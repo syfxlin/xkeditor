@@ -43,7 +43,6 @@
       <button class="xk-button" type="text" title="转换为Markdown模式" @click="function(){aceToolbarShow = true;switchEditorMode()}"><fa-icon icon="file-code"/> 转换为Markdown模式</button>
     </div>
     <div class="ace-editor" ref="ace"></div>
-
     <div class="ace-toolbar-modal" v-show="aceToolbarModal.base.isShowModal" v-dialogDrag>
       <div class="xk-modal-wrapper">
         <div class="xk-modal">
