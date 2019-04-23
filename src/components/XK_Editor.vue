@@ -203,25 +203,22 @@ export default {
             }
           })
           //惯性滚动
+          var inertiaScrollTime = null
           editorDom.addEventListener('touchstart', function(event) {
+            clearTimeout(inertiaScrollTime)
             var startY = event.changedTouches[0].pageY
             var endY = 0
             var startTime = Date.now()
             var endTime = 0
-            var stopInertia = true
             
             editorDom.addEventListener('touchend', function(event) {
               endY = event.changedTouches[0].pageY
               endTime = Date.now()
-              var _v = (endY - startY) / (endTime - startTime)
-              stopInertia = true
-              console.log('startY:' + startY +', endY:' + endY)
+              var _v = (endY - startY) / (endTime - startTime) * 1.5
               function scrollToTop(v, sTime, contentY) {
-                // console.log('v:' + v +', sTime:' + sTime + ', contentY:' + contentY)
                 var dir = v > 0 ? -1 : 1
-                var deceleration = dir*0.0006
+                var deceleration = dir*0.0018
                 var duration = v / deceleration
-                var dist = v * duration / 2
                 function inertiaMove() {  
                   // if(stopInertia) return;  
                   var nowTime = Date.now();  
@@ -233,8 +230,7 @@ export default {
                   }  
                   var moveY = - (v + nowV)/2 * t;
                   window.$ace.session.setScrollTop(contentY + moveY);
-                  // console.log(contentY + moveY)
-                  setTimeout(inertiaMove, 10);
+                  inertiaScrollTime = setTimeout(inertiaMove, 10);
                 }  
                 inertiaMove()
               }
