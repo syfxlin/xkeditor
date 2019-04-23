@@ -127,7 +127,9 @@ export default {
   async mounted() {
     await this.load()
     this.htmlViewContent = toHtml(this.markdownContent, true, true)
-    await this.initEditor()
+    this.$nextTick(function() {
+      this.initEditor()
+    })
     this.setInterface()
   },
   methods: {
