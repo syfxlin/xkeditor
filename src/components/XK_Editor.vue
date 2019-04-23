@@ -178,6 +178,13 @@ export default {
             previewHtmlDom.addEventListener('mouseover', function() {
               currentTab = 2
             })
+            //兼容触摸设备
+            editorDom.addEventListener('touchstart', function() {
+              currentTab = 1
+            })
+            previewHtmlDom.addEventListener('touchstart', function() {
+              currentTab = 2
+            })
           }
           window.$ace.session.on("changeScrollTop", function(data) {
             if(currentTab === 1) {
@@ -188,6 +195,51 @@ export default {
             if (currentTab === 2) {
               window.$ace.session.setScrollTop(previewHtmlDom.scrollTop / window.scale)
             }
+          })
+          //兼容触摸设备
+          previewHtmlDom.addEventListener('touchmove', function() {
+            if (currentTab === 2) {
+              window.$ace.session.setScrollTop(previewHtmlDom.scrollTop / window.scale)
+            }
+          })
+          //惯性滚动
+          editorDom.addEventListener('touchstart', function(event) {
+            var startY = event.changedTouches[0].pageY
+            var endY = 0
+            var startTime = Date.now()
+            var endTime = 0
+            var stopInertia = true
+            
+            editorDom.addEventListener('touchend', function(event) {
+              endY = event.changedTouches[0].pageY
+              endTime = Date.now()
+              var _v = (endY - startY) / (endTime - startTime)
+              stopInertia = true
+              console.log('startY:' + startY +', endY:' + endY)
+              function scrollToTop(v, sTime, contentY) {
+                // console.log('v:' + v +', sTime:' + sTime + ', contentY:' + contentY)
+                var dir = v > 0 ? -1 : 1
+                var deceleration = dir*0.0006
+                var duration = v / deceleration
+                var dist = v * duration / 2
+                function inertiaMove() {  
+                  // if(stopInertia) return;  
+                  var nowTime = Date.now();  
+                  var t = nowTime - sTime;  
+                  var nowV = v + t*deceleration;  
+                  // 速度方向变化表示速度达到0了
+                  if(dir*nowV > 0) {  
+                    return;  
+                  }  
+                  var moveY = - (v + nowV)/2 * t;
+                  window.$ace.session.setScrollTop(contentY + moveY);
+                  // console.log(contentY + moveY)
+                  setTimeout(inertiaMove, 10);
+                }  
+                inertiaMove()
+              }
+              scrollToTop(_v, endTime, window.$ace.session.getScrollTop())
+            })
           })
         }
       }
