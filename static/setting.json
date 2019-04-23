@@ -31,7 +31,9 @@
         "enableBasicAutocompletion":true,
         "value":"# XK-Editor"
     },
-    "xkeditorSetting":{
-        "previewCss":"/static/github-markdown.css"
+    "xkSetting":{
+        "previewCss":"/static/github-markdown.css",
+        "delayToHtml":500,
+        "scrollBind":"both"
     }
 }

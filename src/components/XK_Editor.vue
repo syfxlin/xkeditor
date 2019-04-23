@@ -79,6 +79,7 @@ export default {
       EditorMode: "ace",
       previewShow: 'show',
       aceDivClass: "xk-col-12",
+      delayToHtml: null,
       setting: {
         tinymceSetting: {
           language_url: '/static/tinymce/langs/zh_CN.js',
@@ -111,6 +112,11 @@ export default {
           enableSnippets: true,
           enableLiveAutocompletion: true,
           enableBasicAutocompletion: true
+        },
+        xkSetting: {
+          previewCss: "/static/github-markdown.css",
+          delayToHtml: 500,
+          scrollBind: 'both'
         }
       }
     }
@@ -138,7 +144,7 @@ export default {
       let setting = await axiosPro.get('/static/setting.json')
       this.markdownContent = md
       this.setting = setting
-      this.loadCss(setting.xkeditorSetting.previewCss)
+      this.loadCss(setting.xkSetting.previewCss)
       this.isRenderEditor = true
     },
     loadCss(url) {
@@ -152,7 +158,8 @@ export default {
       mermaid.initialize({startOnLoad:true})
       window.$ace = this.$refs.ace.aceEditor
       window.$switchEditor = this.switchEditor
-      window.scrollBind = function(operate = null) {
+      //TODO: 移动端左右滚动无法区分
+      window.scrollBind = function(operate = null, bindType = 'both') {
         var currentTab = 1
         var editorDom = document.querySelector('.ace-editor')
         var previewHtmlDom = document.querySelector('#previewHtml')
@@ -160,12 +167,18 @@ export default {
         var previewHtmlHeight = previewHtmlDom.scrollHeight - previewHtmlDom.offsetHeight
         window.scale = previewHtmlHeight/aceContentHeight
         if(operate === 'init') {
-          editorDom.addEventListener('mouseover', function() {
+          if(bindType === 'left') {
             currentTab = 1
-          })
-          previewHtmlDom.addEventListener('mouseover', function() {
+          } else if(bindType === 'right') {
             currentTab = 2
-          })
+          } else {
+            editorDom.addEventListener('mouseover', function() {
+              currentTab = 1
+            })
+            previewHtmlDom.addEventListener('mouseover', function() {
+              currentTab = 2
+            })
+          }
           window.$ace.session.on("changeScrollTop", function(data) {
             if(currentTab === 1) {
               previewHtmlDom.scrollTop = data * window.scale
@@ -180,8 +193,9 @@ export default {
       }
       //初始化滚动绑定
       this.$nextTick(function() {
+        var _this = this
         setTimeout(function() {
-          window.scrollBind('init')
+          window.scrollBind('init', _this.setting.xkSetting.scrollBind)
         }, 1000)
       })
       //初始化TOC
@@ -243,7 +257,9 @@ export default {
           console.log("May have errors")
         }
         //更新滚动绑定
-        window.scrollBind()
+        if(window.scrollBind) {
+          window.scrollBind()
+        }
       })
     },
     switchToc() {
@@ -317,8 +333,16 @@ export default {
   },
   watch: {
     markdownContent (val) {
-      this.htmlViewContent = toHtml(val, true)
-      this.renderNextTick()
+      var _this = this
+      //最少延迟250ms转换为html以保证性能，否则会造成输入卡顿
+      var delay = _this.setting.xkSetting.delayToHtml >= 250 ? _this.setting.xkSetting.delayToHtml : 250
+      if(_this.delayToHtml) {
+        clearTimeout(_this.delayToHtml)
+      }
+      _this.delayToHtml = setTimeout(function() {
+        _this.htmlViewContent = toHtml(val, true)
+        _this.renderNextTick()
+      }, delay)
     },
     htmlContent(val) {
       this.htmlViewContent = val
