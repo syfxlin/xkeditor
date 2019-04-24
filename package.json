@@ -21,6 +21,7 @@
     "at-ui-style": "^1.5.1",
     "axios": "^0.18.0",
     "bower": "^1.8.8",
+    "emoji-js": "^3.4.1",
     "flowchart.js": "^1.11.3",
     "katex": "^0.10.1",
     "marked": "^0.6.1",

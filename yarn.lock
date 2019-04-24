@@ -2802,6 +2802,18 @@ elliptic@^6.0.0:
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.0"
 
+emoji-datasource@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npm.taobao.org/emoji-datasource/download/emoji-datasource-4.0.0.tgz#3fc9c0c2f4fb321d9291138819f6d100603d3e2f"
+  integrity sha1-P8nAwvT7Mh2SkROIGfbRAGA9Pi8=
+
+emoji-js@^3.4.1:
+  version "3.4.1"
+  resolved "https://registry.npm.taobao.org/emoji-js/download/emoji-js-3.4.1.tgz#422cdf184fd818a910289861ead4782db3e8dc8d"
+  integrity sha1-QizfGE/YGKkQKJhh6tR4LbPo3I0=
+  dependencies:
+    emoji-datasource "4.0.0"
+
 emojis-list@^2.0.0:
   version "2.1.0"
   resolved "http://registry.npm.taobao.org/emojis-list/download/emojis-list-2.1.0.tgz#4daa4d9db00f9819880c79fa457ae5b09a1fd389"

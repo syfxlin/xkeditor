@@ -19,6 +19,8 @@ for (var item in prismComponents) {
   require('prismjs/components/prism-' + prismComponents[item] + '.js')
 }
 
+import EmojiConvertor from "emoji-js"
+
 var tocContent = [];
 export function getTocHtml() {
   var html = getTocHtmlTree(0, '')
@@ -183,6 +185,14 @@ export function toHtml(val, isFull) {
     }
     if(/\[TOC\]/g.test(text)) {
       return '<div class="toc"></div>'
+    }
+    if(/:(.*):/g.test(text)) {
+      var emoji = new EmojiConvertor()
+      emoji.replace_mode = 'unified'
+      text = text.replace(/(:.*:)/g, function($1, $2) {
+        return emoji.replace_colons($2)
+      })
+      return text
     }
     return marked.Renderer.prototype.paragraph.apply(this, arguments)
   }
