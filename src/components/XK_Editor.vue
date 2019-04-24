@@ -130,7 +130,7 @@ export default {
   },
   async mounted() {
     await this.load()
-    this.htmlViewContent = toHtml(this.markdownContent, true, true)
+    this.htmlViewContent = toHtml(this.markdownContent, true)
     this.$nextTick(function() {
       this.initEditor()
     })
@@ -330,6 +330,14 @@ export default {
     },
     setInterface() {
       var _this = this
+      var downloadFun = function(filename, data, type) {
+        var aLink = document.createElement('a');
+        var evt = document.createEvent("MouseEvents");
+        evt.initMouseEvent("click", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        aLink.download = filename + '.'+type;
+        aLink.href = URL.createObjectURL(new Blob([data], {type: 'text/'+type}));
+        aLink.dispatchEvent(evt);
+      }
       window.XKEditorAPI = {
         //response: {"error":false,"path":"img url"}
         imgUpload: function(file, success, failure) {
@@ -397,6 +405,29 @@ export default {
         },
         setType: function(data) {
           _this.$refs.ace.execCommand('typewriter', true)
+        },
+        download: async function(filename, type = 'markdown') {
+          var data = ''
+          if(type === 'markdown') {
+            data = _this.markdownContent
+            type = 'md'
+          } else if(type === 'html') {
+            data = _this.htmlViewContent
+          } else if(type === 'fullhtml') {
+            var d_t1 = '<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><title>';
+            var d_t2 = '</title>';
+            var d_t3 = '</head><body>';
+            var d_t4 = '</body></html>';
+            var style = await axiosPro.get('/static/github-markdown.css')
+            style += await axiosPro.get('/static/prism-okaidia.css')
+            style += await axiosPro.get('/static/prism-line-numbers.css')
+            style += await axiosPro.get('/static/prism-toolbar.css')
+            data = d_t1+filename+d_t2+'<style>'+style+'</style>'+d_t3+'<div class="markdown-body editormd-html-preview">'+_this.htmlViewContent+'</div>'+d_t4
+            type = 'html'
+            downloadFun(filename, data, type)
+            return
+          }
+          downloadFun(filename, data, type)
         }
       }
     }
