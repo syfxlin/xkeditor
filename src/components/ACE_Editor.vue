@@ -172,6 +172,7 @@ export default {
       isMarkdownMode: true,
       aceToolbarShow: true,
       aceToolbarHtmlShow: true,
+      typewriterMode: false,
       aceToolbarModal: {
         base: {
           isShowModal: false,
@@ -347,6 +348,11 @@ export default {
           title: "显示/隐藏目录",
           operate: "toc",
           icon: "bars"
+        },
+        {
+          title: "开启/关闭打字机模式",
+          operate: "typewriter",
+          icon: "i-cursor"
         },
         {
           title: "切换实时预览",
@@ -531,6 +537,8 @@ export default {
         return;
       } else if (/(toLine|search|toc|switchPreview|fullPreview|fullScreen|toHtmlEditor|toTinyMCE|empty|setting|undo|redo)/g.test(operate)) {
         this.execCommand(operate)
+      } else if (operate === "typewriter") {
+        this.execCommand(operate)
       }
       this.operateAceContent(isStart, toLeft, str)
     },
@@ -702,6 +710,43 @@ export default {
         for(let i = 0; i < data.length; i++) {
           this.aceEditor.commands.removeCommand(data[i])
         }
+      } else if(command === "typewriter") {
+        var isOne = true
+        var lastRow = window.$ace.selection.getCursor().row
+        if(!window.$typewriter) {
+          window.$typewriter = function() {
+            if(event && event.type && event.type !== 'mousedown' && event.type !== 'mouseup') {
+              var nowRow = window.$ace.selection.getCursor().row
+              let scroll = 0
+              if(isOne) {
+                scroll = window.$ace.session.getScrollTop() + (parseFloat(document.getElementsByClassName('ace_cursor')[0].style.top.replace('px', ''))
+                          - document.getElementsByClassName('ace-editor')[0].offsetHeight/3)
+                isOne = false
+              } else {
+                let rows = nowRow - lastRow
+                if(rows === 0) {
+                  if(event.key === 'ArrowDown') {
+                    rows = 1
+                  } else if(event.key === 'ArrowUp') {
+                    rows = -1
+                  }
+                }
+                scroll = window.$ace.session.getScrollTop() + rows * window.$ace.renderer.lineHeight
+              }
+              if(scroll != 0) {
+                window.$ace.session.setScrollTop(scroll)
+              }
+              lastRow = nowRow
+            }
+          }
+        }
+        if(!this.typewriterMode) {
+          window.$ace.selection.on('changeCursor', window.$typewriter)
+        } else {
+          window.$ace.selection.off('changeCursor', window.$typewriter)
+        }
+        this.typewriterMode = !this.typewriterMode
+        return
       }
     }
   }

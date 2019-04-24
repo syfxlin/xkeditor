@@ -76,7 +76,7 @@ export default {
       htmlViewContent: '',
       toc: '',
       showToc: false,
-      EditorMode: "ace",
+      editorMode: "ace",
       previewShow: 'show',
       aceDivClass: "xk-col-12",
       delayToHtml: null,
@@ -123,9 +123,9 @@ export default {
   },
   computed: {
     editorModeShow() {
-      if(this.EditorMode === 'ace') {
+      if(this.editorMode === 'ace') {
         return true
-      } else if(this.EditorMode === 'tinymce') {
+      } else if(this.editorMode === 'tinymce') {
         return false
       }
     }
@@ -251,14 +251,14 @@ export default {
       window.toggleToc = this.toggleToc
     },
     switchEditor() {
-      if(this.EditorMode !== 'ace') {
+      if(this.editorMode !== 'ace') {
         this.markdownContent = toMarkdown(this.htmlContent)
         this.$refs.ace.setValue(this.markdownContent)
-        this.EditorMode = 'ace'
-      } else if(this.EditorMode !== 'tinymce') {
+        this.editorMode = 'ace'
+      } else if(this.editorMode !== 'tinymce') {
         this.htmlContent = toHtml(this.markdownContent, false)
         this.$refs.tinymce.setValue(this.htmlContent)
-        this.EditorMode = 'tinymce'
+        this.editorMode = 'tinymce'
       }
     },
     switchPreviewShow() {
@@ -375,6 +375,9 @@ export default {
           } else if(name === 'tinymce') {
             return window.tinymce
           }
+        },
+        setType: function(data) {
+          _this.$refs.ace.execCommand('typewriter', true)
         }
       }
     }
