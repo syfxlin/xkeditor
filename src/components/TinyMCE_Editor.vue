@@ -67,6 +67,18 @@ export default {
     }
   },
   created() {
+    //上传功能
+    if(this.$parent.setting.xkSetting.imgUpload) {
+      this.init.images_upload_handler = function(blobInfo, success, failure) {
+        window.XKEditorAPI.imgUpload(blobInfo.blob(), function(response) {
+          success(response.path)
+          //TODO: 上传成功之后的提示
+        }, function(error) {
+          //TODO: 上传失败后的提示
+          failure(error)
+        })
+      }
+    }
     //添加自定义按钮
     this.init.setup = function (editor) {
       editor.ui.registry.addButton('tex-$', {

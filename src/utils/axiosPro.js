@@ -35,4 +35,4 @@ const axiosPro = {
     }
   },
 }
-export { axiosPro }
+export { axiosPro, axios }

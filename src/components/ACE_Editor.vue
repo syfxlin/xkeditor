@@ -71,6 +71,14 @@
               <div class="xk-input">
                 <input v-model="aceToolbarModal.data.art" placeholder="请输入图片描述"></input>
               </div>
+              <template v-if="openImgUpload">
+                <div class="xk-input xk-col-12">
+                  <input id="img-upload" type="file"/>
+                </div>
+                <div class="xk-input xk-col-12 img-upload-sub">
+                  <button class="xk-button" @click="imgUpload">上传</button>
+                </div>
+              </template>
             </div>
             <div v-show="aceToolbarModal.video">
               <label>视频链接</label>
@@ -175,7 +183,7 @@ export default {
       typewriterMode: false,
       aceToolbarModal: {
         base: {
-          isShowModal: false,
+          isShowModal: false
         },
         data: {
           modalTitle: ' ',
@@ -422,6 +430,11 @@ export default {
       ]
     };
   },
+  computed: {
+    openImgUpload() {
+      return this.$parent.setting.xkSetting.imgUpload ? true : false
+    }
+  },
   mounted() {
     //初始化Value
     this.setting.value = this.value ? this.value : ""
@@ -594,6 +607,7 @@ export default {
         str = '![' + data.art + '](' + data.src + ')'
       } else if(data.operate === 'video') {
         if(!/\w+\.(\w+)$/.test(data.src)) {
+          //TODO: 移除AT-UI后的依赖
           this.$Message.error('地址输入有误！请重新输入(无法识别扩展名)')
           return
         }
@@ -641,6 +655,22 @@ export default {
         } else if(root.msRequestFullscreen) {
           return root.msRequestFullscreen()
         }
+      }
+    },
+    imgUpload() {
+      var _this = this
+      if(document.getElementById('img-upload').files.length > 0) {
+        let file = document.getElementById('img-upload').files[0]
+        window.XKEditorAPI.imgUpload(file, function(response) {
+          _this.$set(_this.aceToolbarModal.data, 'src', response)
+          //TODO: 上传成功提示
+        }, function(error) {
+          //TODO: 上传失败提示
+          console.log(error)
+        })
+      } else {
+        //TODO: 未选择文件提示
+        console.log('error')
       }
     },
     execCommand(command, data = null) {
@@ -950,5 +980,8 @@ export default {
 }
 .xk-clear {
   clear: both;
+}
+.img-upload-sub {
+  padding-left: 10px;
 }
 </style>

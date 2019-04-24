@@ -51,7 +51,7 @@ import '@/utils/dialogDrag'
 import ACE from '@/components/ACE_Editor'
 import TinyMCE from '@/components/TinyMCE_Editor'
 
-import { axiosPro } from "@/utils/axiosPro"
+import { axiosPro, axios } from "@/utils/axiosPro"
 //HTML和Markdown互转
 import { toHtml, toMarkdown, getTocHtml } from '../utils/switchContent.js'
 
@@ -96,10 +96,7 @@ export default {
           template_mdate_format: '[MDATE: %m/%d/%Y : %H:%M:%S]',
           image_caption: true,
           spellchecker_dialog: true,
-          spellchecker_whitelist: ['Ephox', 'Moxiecode'],
-          images_upload_handler(blobInfo, success, failure) {
-            console.log('Upload')
-          }
+          spellchecker_whitelist: ['Ephox', 'Moxiecode']
         },
         aceSetting: {
           minLines: 10,
@@ -116,7 +113,8 @@ export default {
         xkSetting: {
           previewCss: "/static/github-markdown.css",
           delayToHtml: 500,
-          scrollBind: 'both'
+          scrollBind: 'both',
+          imgUpload: false
         }
       }
     }
@@ -332,6 +330,27 @@ export default {
     },
     setInterface() {
       var _this = this
+      window.XKEditorAPI = {
+        //response: {"error":false,"path":"img url"}
+        imgUpload: function(file, success, failure) {
+          if(_this.xkSetting.imgUpload) {
+            let param = new FormData()
+            param.append('file', file)
+            let config = {
+              headers:{'Content-Type':'multipart/form-data'}
+            }
+            axios.post(_this.xkSetting.imgUpload, param, config)
+              .then(function(response){
+                success(response)
+              })
+              .catch(function(error) {
+                failure(error)
+              })
+          } else {
+            //TODO: 上传关闭提示
+          }
+        }
+      }
       window.XKEditor = {
         getMarkdown: function() {
           return _this.markdownContent
