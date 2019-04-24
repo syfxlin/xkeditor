@@ -34,7 +34,7 @@
   <template  v-if="isRenderEditor">
   <div class="row">
     <div :class="aceDivClass" v-show="editorModeShow&&previewShow!='full'"><ace v-model="markdownContent" :setting="setting.aceSetting" ref="ace"></ace></div>
-    <div :class="aceDivClass" v-show="editorModeShow&&previewShow!='hide'"><div class="markdown-body" v-html="htmlViewContent" id="previewHtml" ref="htmlView"></div></div>
+    <div :class="aceDivClass" v-show="editorModeShow&&previewShow!='hide'"><div :class="setting.xkSetting.previewClass" v-html="htmlViewContent" id="previewHtml" ref="htmlView"></div></div>
     <div class="xk-col-24" v-show="!editorModeShow"><tinymce v-model="htmlContent" :setting="setting.tinymceSetting" ref="tinymce"></tinymce></div>
     <button class="xk-button close-preview-full" @click="switchPreviewFull()" v-show="editorModeShow&&previewShow=='full'">关闭</button>
     <transition name="slide-fade">
@@ -67,6 +67,8 @@ export default {
     'tinymce': TinyMCE
   },
   props: {
+    settingApi: String,
+    contentApi: String
   },
   data () {
     return {
@@ -112,6 +114,7 @@ export default {
         },
         xkSetting: {
           previewCss: "/static/github-markdown.css",
+          previewClass: "markdown-body",
           delayToHtml: 500,
           scrollBind: 'both',
           imgUpload: false
@@ -138,8 +141,8 @@ export default {
   },
   methods: {
     async load() {
-      let md = await axiosPro.get('/static/md_content.md')
-      let setting = await axiosPro.get('/static/setting.json')
+      let md = await axiosPro.get(this.contentApi)
+      let setting = await axiosPro.get(this.settingApi)
       this.markdownContent = md
       this.setting = setting
       this.loadCss(setting.xkSetting.previewCss)
@@ -156,7 +159,6 @@ export default {
       mermaid.initialize({startOnLoad:true})
       window.$ace = this.$refs.ace.aceEditor
       window.$switchEditor = this.switchEditor
-      //TODO: 移动端左右滚动无法区分
       window.scrollBind = function(operate = null, bindType = 'both') {
         var currentTab = 1
         var editorDom = document.querySelector('.ace-editor')
@@ -418,7 +420,7 @@ export default {
             var d_t2 = '</title>';
             var d_t3 = '</head><body>';
             var d_t4 = '</body></html>';
-            var style = await axiosPro.get('/static/github-markdown.css')
+            var style = await axiosPro.get(_this.setting.xkSetting.previewCss)
             style += await axiosPro.get('/static/prism-okaidia.css')
             style += await axiosPro.get('/static/prism-line-numbers.css')
             style += await axiosPro.get('/static/prism-toolbar.css')

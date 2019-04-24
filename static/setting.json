@@ -33,6 +33,7 @@
     },
     "xkSetting":{
         "previewCss":"/static/github-markdown.css",
+        "previewClass":"markdown-body",
         "delayToHtml":500,
         "scrollBind":"both",
         "imgUpload":false

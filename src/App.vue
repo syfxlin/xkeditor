@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <xk-editor />
+    <xk-editor :settingApi="setting" :contentApi="content"/>
   </div>
 </template>
 
@@ -13,6 +13,8 @@ export default {
   },
   data() {
     return {
+      setting: '/static/setting.json',
+      content: '/static/md_content.md'
     }
   },
   methods: {

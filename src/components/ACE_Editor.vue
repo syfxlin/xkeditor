@@ -745,7 +745,7 @@ export default {
         var lastRow = window.$ace.selection.getCursor().row
         if(!window.$typewriter) {
           window.$typewriter = function() {
-            if(event && event.type && event.type !== 'mousedown' && event.type !== 'mouseup') {
+            if(event && event.type && !/(mousedown|mouseup|touchstart|touchend|touchmove)/g.test(event.type)) {
               var nowRow = window.$ace.selection.getCursor().row
               let scroll = 0
               if(isOne) {
