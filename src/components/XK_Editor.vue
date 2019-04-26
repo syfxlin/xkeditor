@@ -68,7 +68,9 @@ export default {
   },
   props: {
     settingApi: String,
-    contentApi: String
+    contentApi: String,
+    settingProps: Object,
+    contentProps: String
   },
   data () {
     return {
@@ -142,8 +144,18 @@ export default {
   },
   methods: {
     async load() {
-      let md = await axiosPro.get(this.contentApi)
-      let setting = await axiosPro.get(this.settingApi)
+      let md = null
+      let setting = null
+      if(!this.contentProps) {
+        md = await axiosPro.get(this.contentApi)
+      } else {
+        md = this.contentProps
+      }
+      if(!this.settingProps) {
+        setting = await axiosPro.get(this.settingApi)
+      } else {
+        setting = this.settingProps
+      }
       this.markdownContent = md
       this.setting = setting
       this.loadCss(setting.xkSetting.previewCss)

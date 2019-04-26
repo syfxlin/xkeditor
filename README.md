@@ -14,6 +14,7 @@
   - [安装 Install](#%E5%AE%89%E8%A3%85-install)
     - [从本项目上构建](#%E4%BB%8E%E6%9C%AC%E9%A1%B9%E7%9B%AE%E4%B8%8A%E6%9E%84%E5%BB%BA)
     - [组件方式使用](#%E7%BB%84%E4%BB%B6%E6%96%B9%E5%BC%8F%E4%BD%BF%E7%94%A8)
+    - [所需依赖](#%E6%89%80%E9%9C%80%E4%BE%9D%E8%B5%96)
     - [setting.json](#settingjson)
   - [文档 Doc](#%E6%96%87%E6%A1%A3-doc)
   - [维护者 Maintainer](#%E7%BB%B4%E6%8A%A4%E8%80%85-maintainer)
@@ -108,6 +109,24 @@ export default {
 <xk-editor :settingApi="setting" :contentApi="content"/>
 //settingApi: setting.json的地址，或者返回setting的API接口地址(GET)
 //contentApi: Markdown文件的地址，或者返回Markdown格式的API接口地址(GET)
+```
+
+### 所需依赖
+```
+ace-builds
+@fortawesome/fontawesome-svg-core
+@fortawesome/free-solid-svg-icons
+@fortawesome/vue-fontawesome
+@tinymce/tinymce-vue
+axios
+emoji-js
+katex
+marked
+mermaid
+prismjs
+tinymce
+turndown
+turndown-plugin-gfm
 ```
 
 ### setting.json
