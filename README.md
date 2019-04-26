@@ -50,7 +50,7 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 
 ## 演示 Demo
 
-[XK-Editor](https://lab.ixk.me/xkeditor)
+[XK-Editor](https://xkeditor.ixk.me/)
 
 ## 安装 Install
 
