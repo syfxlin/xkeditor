@@ -608,9 +608,20 @@ export default {
       this.setting
     )
     this.aceEditor.getSession().on('change', this.updateValue)
+    if(!this.isMobile()) {
+      this.execCommand('switchPreview')
+    }
     this.initKey()
   },
   methods: {
+    isMobile() {
+      if(!window.isMobile) {
+        window.isMobile = true
+        return (!navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i))
+      } else {
+        return true
+      }
+    },
     initKey() {
       var _this = this
       var keys = [
