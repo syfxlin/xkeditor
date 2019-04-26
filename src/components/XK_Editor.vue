@@ -368,6 +368,28 @@ export default {
         getHTML: function() {
           return _this.htmlViewContent
         },
+        setMarkdown: function(val, valueType = 'markdown') { //默认设置时在ACE编辑界面
+          if(_this.editorMode !== 'ace') {
+            //TODO: 提示不可设置，因为不在ACE状态
+            return
+          }
+          if(valueType !== 'markdown') {
+            val = toMarkdown(val)
+          }
+          _this.markdownContent = val
+          _this.$refs.ace.setValue(val)
+        },
+        setHTML: function(val, valueType = 'html') { //默认设置时在TinyMCE编辑界面
+          if(_this.editorMode !== 'tinymce') {
+            //TODO: 提示不可设置，因为不在TinyMCE状态
+            return
+          }
+          if(valueType !== 'html') {
+            val = toHtml(val, false)
+          }
+          _this.htmlContent = val
+          _this.$refs.tinymce.setValue(val)
+        },
         switchEditor: function() {
           _this.switchEditor()
         },
@@ -430,28 +452,6 @@ export default {
             return
           }
           downloadFun(filename, data, type)
-        },
-        setMarkdown: function(val, valueType = 'markdown') { //默认设置时在ACE编辑界面
-          if(_this.editorMode !== 'ace') {
-            //TODO: 提示不可设置，因为不在ACE状态
-            return
-          }
-          if(valueType !== 'markdown') {
-            val = toMarkdown(val)
-          }
-          _this.markdownContent = val
-          _this.$refs.ace.setValue(val)
-        },
-        setHTML: function(val, valueType = 'html') { //默认设置时在TinyMCE编辑界面
-          if(_this.editorMode !== 'tinymce') {
-            //TODO: 提示不可设置，因为不在TinyMCE状态
-            return
-          }
-          if(valueType !== 'html') {
-            val = toHtml(val, false)
-          }
-          _this.htmlContent = val
-          _this.$refs.tinymce.setValue(val)
         },
       }
     }
