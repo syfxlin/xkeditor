@@ -133,7 +133,7 @@
               </div>
             </div>
             <div v-show="aceToolbarModal.help" class="markdown-body help">
-              <h3>Markdown语法教程</h3>
+              <h3>Markdown语法</h3>
               <ul>
                 <li><a href="http://www.markdown.cn/">Markdown 语法说明</a></li>
                 <li><a href="https://help.github.com/articles/github-flavored-markdown/">GitHub Flavored Markdown</a></li>
@@ -157,6 +157,7 @@
                 </tr>
               </table>
               <h3>键盘快捷键</h3>
+              <blockquote>当编辑器取得焦点的时候才能使用快捷键</blockquote>
               <table>
                 <tr>
                   <th>快捷键</th>
@@ -279,9 +280,21 @@
                   <td>跳转到指定的行</td>
                 </tr>
               </table>
+              <h3>Emoji表情</h3>
+              <a href="https://www.webfx.com/tools/emoji-cheat-sheet/">EMOJI CHEAT SHEET</a>
+              <h3>流程图/时序图/甘特图</h3>
+              <a href="https://mermaidjs.github.io/">mermaid - GitBook</a>
+              <h3>Tex数学公式</h3>
+              <a href="https://juejin.im/post/5af93ec6518825428b38e7f4">markdown 数学公式Latex语法 - 掘金</a>
             </div>
-            <div v-show="aceToolbarModal.info">
-              
+            <div v-show="aceToolbarModal.info" class="markdown-body info">
+              <h2>XK-Editor</h2>
+              <p>开源的Markdown和富文本编辑器。基于Vue开发</p>
+              <p>支持Markdown和HTML互转</p>
+              <p><strong>项目地址：</strong><a href="https://github.com/syfxlin/xkeditor">https://github.com/syfxlin/xkeditor</a></p>
+              <p><a href="https://github.com/syfxlin/xkeditor">XK-Editor</a> 由 <a href="https://github.com/syfxlin">Otstar Lin</a>和下列<a href="https://github.com/syfxlin/xkeditor/graphs/contributors">贡献者</a>的帮助下撰写和维护。</p>
+              <blockquote>Otstar Lin - <a href="https://ixk.me/">Personal Website</a> · <a href="https://blog.ixk.me/">Blog</a> · <a href="https://github.com/syfxlin">Github</a></blockquote>
+              <p style="font-size:0.8em">Copyright © 2019 Otstar Lin, 根据 Apache License 2.0 许可证开源。</p>
             </div>
           </div>
           <div class="xk-clear"></div>
@@ -1190,6 +1203,15 @@ th {
 .help {
   overflow-y: auto;
   height: 50vh;
+}
+.info {
+  overflow-y: auto;
+}
+.info p {
+  font-size: 0.9em;
+}
+.info * {
+  margin: 5px;
 }
 .show {
   display: block;
