@@ -7,20 +7,20 @@
   预览的HTML == htmlViewContent
   markdownContent.toHtmlFull -> htmlViewContent
   htmlContent -> htmlViewContent
-  
+
   Set:
   switch时
   htmlContent.toMarkdown -> markdownContent => ACE_Editor
   markdownContent.toHtml -> htmlContent => TinyMCE_Editor
-  
+
   Render:
   Prism.js 在转换时就渲染
   Mermaid  在转换后推送到DOM后渲染
   KaTex    在转换后推送到DOM后渲染
   TOC      在转换后推送到DOM后渲染
-  
+
   滚动绑定 在每次输入推送到DOM后进行重新计算
-  
+
   TODO:
   优化界面
   提升TinyMCE编辑体验
@@ -113,6 +113,7 @@ export default {
           enableBasicAutocompletion: true
         },
         xkSetting: {
+          apiBaseUrl: "",
           previewCss: "/static/github-markdown.css",
           previewClass: "markdown-body",
           delayToHtml: 500,
@@ -210,7 +211,6 @@ export default {
             var endY = 0
             var startTime = Date.now()
             var endTime = 0
-            
             editorDom.addEventListener('touchend', function(event) {
               endY = event.changedTouches[0].pageY
               endTime = Date.now()
@@ -219,19 +219,19 @@ export default {
                 var dir = v > 0 ? -1 : 1
                 var deceleration = dir*0.0018
                 var duration = v / deceleration
-                function inertiaMove() {  
-                  // if(stopInertia) return;  
-                  var nowTime = Date.now();  
-                  var t = nowTime - sTime;  
-                  var nowV = v + t*deceleration;  
+                function inertiaMove() {
+                  // if(stopInertia) return;
+                  var nowTime = Date.now();
+                  var t = nowTime - sTime;
+                  var nowV = v + t*deceleration;
                   // 速度方向变化表示速度达到0了
-                  if(dir*nowV > 0) {  
-                    return;  
-                  }  
+                  if(dir*nowV > 0) {
+                    return;
+                  }
                   var moveY = - (v + nowV)/2 * t;
                   window.$ace.session.setScrollTop(contentY + moveY);
                   inertiaScrollTime = setTimeout(inertiaMove, 10);
-                }  
+                }
                 inertiaMove()
               }
               scrollToTop(_v, endTime, window.$ace.session.getScrollTop())

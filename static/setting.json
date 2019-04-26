@@ -32,6 +32,7 @@
         "value":"# XK-Editor"
     },
     "xkSetting":{
+        "apiBaseUrl": "",
         "previewCss":"/static/github-markdown.css",
         "previewClass":"markdown-body",
         "delayToHtml":500,

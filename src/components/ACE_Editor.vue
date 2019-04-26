@@ -28,7 +28,7 @@
         </template>
         <template v-else>
           <button
-            class="xk-button" 
+            class="xk-button"
             :key="item.id"
             type="text"
             :title="item.title"
@@ -55,21 +55,21 @@
             <div v-show="aceToolbarModal.link">
               <label>链接</label>
               <div class="xk-input">
-                <input v-model="aceToolbarModal.data.href" placeholder="请输入链接" autofocus></input>
+                <input v-model="aceToolbarModal.data.href" placeholder="请输入链接" autofocus />
               </div>
               <label>标题</label>
               <div class="xk-input">
-                <input v-model="aceToolbarModal.data.title" placeholder="请输入标题"></input>
+                <input v-model="aceToolbarModal.data.title" placeholder="请输入标题" />
               </div>
             </div>
             <div v-show="aceToolbarModal.image">
               <label>图片链接</label>
               <div class="xk-input">
-                <input v-model="aceToolbarModal.data.src" placeholder="请输入图片链接" autofocus></input>
+                <input v-model="aceToolbarModal.data.src" placeholder="请输入图片链接" autofocus />
               </div>
               <label>图片描述</label>
               <div class="xk-input">
-                <input v-model="aceToolbarModal.data.art" placeholder="请输入图片描述"></input>
+                <input v-model="aceToolbarModal.data.art" placeholder="请输入图片描述" />
               </div>
               <template v-if="openImgUpload">
                 <div class="xk-input xk-col-12">
@@ -83,31 +83,31 @@
             <div v-show="aceToolbarModal.video">
               <label>视频链接</label>
               <div class="xk-input">
-                <input v-model="aceToolbarModal.data.src" placeholder="请输入视频链接" autofocus></input>
+                <input v-model="aceToolbarModal.data.src" placeholder="请输入视频链接" autofocus />
               </div>
               <div class="xk-row">
                 <div class="xk-input xk-col-12">
-                  <input v-model="aceToolbarModal.data.width" placeholder="请输入宽"></input>
+                  <input v-model="aceToolbarModal.data.width" placeholder="请输入宽" />
                 </div>
                 <div class="xk-input xk-col-12">
-                  <input v-model="aceToolbarModal.data.height" placeholder="请输入高"></input>
+                  <input v-model="aceToolbarModal.data.height" placeholder="请输入高" />
                 </div>
               </div>
             </div>
             <div v-show="aceToolbarModal.toLine">
               <label>行号(1-{{ aceToolbarModal.data.allLine }})</label>
               <div class="xk-input">
-                <input v-model="aceToolbarModal.data.line" placeholder="请输入行号" autofocus></input>
+                <input v-model="aceToolbarModal.data.line" placeholder="请输入行号" autofocus />
               </div>
             </div>
             <div v-show="aceToolbarModal.table">
               <label>单元格数</label>
               <div class="xk-row">
                 <div class="xk-input xk-col-12">
-                  <input v-model="aceToolbarModal.data.row" placeholder="请输入行数" autofocus></input>
+                  <input v-model="aceToolbarModal.data.row" placeholder="请输入行数" autofocus />
                 </div>
                 <div class="xk-input xk-col-12">
-                  <input v-model="aceToolbarModal.data.column" placeholder="请输入列数"></input>
+                  <input v-model="aceToolbarModal.data.column" placeholder="请输入列数" />
                 </div>
               </div>
               <label>对齐方式</label>
@@ -131,6 +131,157 @@
                   </div>
                 </div>
               </div>
+            </div>
+            <div v-show="aceToolbarModal.help" class="markdown-body help">
+              <h3>Markdown语法教程</h3>
+              <ul>
+                <li><a href="http://www.markdown.cn/">Markdown 语法说明</a></li>
+                <li><a href="https://help.github.com/articles/github-flavored-markdown/">GitHub Flavored Markdown</a></li>
+              </ul>
+              <h3>XK-Editor独有的语法</h3>
+              <table>
+                <tr>
+                  <th>语法格式</th>
+                  <th>参数</th>
+                  <th>样例</th>
+                </tr>
+                <tr>
+                  <td>[text]{style|label}</td>
+                  <td>text:内容，style:样式(css)，label:包裹的标签(span,p,font)默认为p</td>
+                  <td>[这是蓝色的字]{color:blue} [灰色背景]{background:#ddd|span}</td>
+                </tr>
+                <tr>
+                  <td>[TOC]</td>
+                  <td>null</td>
+                  <td>在[TOC]位置填充目录</td>
+                </tr>
+              </table>
+              <h3>键盘快捷键</h3>
+              <table>
+                <tr>
+                  <th>快捷键</th>
+                  <th>说明</th>
+                </tr>
+                <tr>
+                  <td>F1</td>
+                  <td>转换为HTML编辑</td>
+                </tr>
+                <tr>
+                  <td>F2</td>
+                  <td>转换为TinyMCE</td>
+                </tr>
+                <tr>
+                  <td>F7</td>
+                  <td>显示隐藏目录</td>
+                </tr>
+                <tr>
+                  <td>F8</td>
+                  <td>开启/关闭打字机模式</td>
+                </tr>
+                <tr>
+                  <td>F9</td>
+                  <td>开启/关闭实时预览</td>
+                </tr>
+                <tr>
+                  <td>F10</td>
+                  <td>切换全窗口预览</td>
+                </tr>
+                <tr>
+                  <td>F11</td>
+                  <td>切换全屏</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + 1~6 / Command + 1~6</td>
+                  <td>插入标题1~6</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + A / Command + A</td>
+                  <td>全选</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + B / Command + B</td>
+                  <td>粗体</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + D / Command + D</td>
+                  <td>插入时间</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + F / Command + F</td>
+                  <td>搜索</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + G / Command + G</td>
+                  <td>匹配下一项</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + H / Command + H</td>
+                  <td>插入水平线</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + I / Command + I</td>
+                  <td>斜体</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + K / Command + K</td>
+                  <td>插入行内代码</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + L / Command + L</td>
+                  <td>插入链接</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + U / Command + U</td>
+                  <td>插入无序列表</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + Z / Command + Z</td>
+                  <td>撤销</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + Y / Command + Y</td>
+                  <td>重做</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + Shift + I</td>
+                  <td>插入图片</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + Shift + K</td>
+                  <td>插入TeX(KaTeX)公式符号</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + Shift + O</td>
+                  <td>插入有序列表</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + Shift + P</td>
+                  <td>插入Code块</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + Shift + Q</td>
+                  <td>插入引用</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + Shift + S</td>
+                  <td>插入删除线</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + Shift + T</td>
+                  <td>插入表格</td>
+                </tr>
+                <tr>
+                  <td>Shift + Shift + H</td>
+                  <td>打开使用帮助对话框</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + Shift + G</td>
+                  <td>跳转到指定的行</td>
+                </tr>
+              </table>
+            </div>
+            <div v-show="aceToolbarModal.info">
+              
             </div>
           </div>
           <div class="xk-clear"></div>
@@ -194,7 +345,9 @@ export default {
         video: false,
         toLine: false,
         search: false,
-        table: false
+        table: false,
+        info: false,
+        help: false
       },
       aceToolbarButtons: [
         {
@@ -424,7 +577,7 @@ export default {
         },
         {
           title: "关于",
-          operate: "about",
+          operate: "info",
           icon: "info-circle"
         }
       ]
@@ -438,12 +591,251 @@ export default {
   mounted() {
     //初始化Value
     this.setting.value = this.value ? this.value : ""
-    this.aceEditor = ace.edit(this.$refs.ace, 
+    this.aceEditor = ace.edit(this.$refs.ace,
       this.setting
     )
     this.aceEditor.getSession().on('change', this.updateValue)
+    this.initKey()
   },
   methods: {
+    initKey() {
+      var _this = this
+      var keys = [
+        {
+          name: 'toHtmlEditor',
+          win: 'F1',
+          mac: 'F1',
+          exec: function() {
+            _this.toolbarClick('toHtmlEditor')
+          }
+        },
+        {
+          name: 'toTinyMCE',
+          win: 'F2',
+          mac: 'F2',
+          exec: function() {
+            _this.toolbarClick('toTinyMCE')
+          }
+        },
+        {
+          name: 'toc',
+          win: 'F7',
+          mac: 'F7',
+          exec: function() {
+            _this.toolbarClick('toc')
+          }
+        },
+        {
+          name: 'typewriter',
+          win: 'F8',
+          mac: 'F8',
+          exec: function() {
+            _this.toolbarClick('typewriter')
+          }
+        },
+        {
+          name: 'switchPreview',
+          win: 'F9',
+          mac: 'F9',
+          exec: function() {
+            _this.toolbarClick('switchPreview')
+          }
+        },
+        {
+          name: 'fullPreview',
+          win: 'F10',
+          mac: 'F10',
+          exec: function() {
+            _this.toolbarClick('fullPreview')
+          }
+        },
+        {
+          name: 'fullScreen',
+          win: 'F11',
+          mac: 'F11',
+          exec: function() {
+            _this.toolbarClick('fullScreen')
+          }
+        },
+        {
+          name: 'H1',
+          win: 'Ctrl-1',
+          mac: 'Command-1',
+          exec: function() {
+            _this.toolbarClick('h1')
+          }
+        },
+        {
+          name: 'H2',
+          win: 'Ctrl-2',
+          mac: 'Command-2',
+          exec: function() {
+            _this.toolbarClick('h2')
+          }
+        },
+        {
+          name: 'H3',
+          win: 'Ctrl-3',
+          mac: 'Command-3',
+          exec: function() {
+            _this.toolbarClick('h3')
+          }
+        },
+        {
+          name: 'H4',
+          win: 'Ctrl-4',
+          mac: 'Command-4',
+          exec: function() {
+            _this.toolbarClick('h4')
+          }
+        },
+        {
+          name: 'H5',
+          win: 'Ctrl-5',
+          mac: 'Command-5',
+          exec: function() {
+            _this.toolbarClick('h5')
+          }
+        },
+        {
+          name: 'H6',
+          win: 'Ctrl-6',
+          mac: 'Command-6',
+          exec: function() {
+            _this.toolbarClick('h6')
+          }
+        },
+        {
+          name: 'bold',
+          win: 'Ctrl-B',
+          mac: 'Command-B',
+          exec: function() {
+            _this.toolbarClick('bold')
+          }
+        },
+        {
+          name: 'time',
+          win: 'Ctrl-D',
+          mac: 'Command-D',
+          exec: function() {
+            _this.toolbarClick('time')
+          }
+        },
+        {
+          name: 'minus',
+          win: 'Ctrl-H',
+          mac: 'Command-H',
+          exec: function() {
+            _this.toolbarClick('minus')
+          }
+        },
+        {
+          name: 'italic',
+          win: 'Ctrl-I',
+          mac: 'Command-I',
+          exec: function() {
+            _this.toolbarClick('italic')
+          }
+        },
+        {
+          name: 'mark',
+          win: 'Ctrl-K',
+          mac: 'Command-K',
+          exec: function() {
+            _this.toolbarClick('mark')
+          }
+        },
+        {
+          name: 'link',
+          win: 'Ctrl-L',
+          mac: 'Command-L',
+          exec: function() {
+            _this.toolbarClick('link')
+          }
+        },
+        {
+          name: 'ul',
+          win: 'Ctrl-U',
+          mac: 'Command-U',
+          exec: function() {
+            _this.toolbarClick('ul')
+          }
+        },
+        {
+          name: 'image',
+          win: 'Ctrl-Shift-I',
+          mac: 'Command-Shift-I',
+          exec: function() {
+            _this.toolbarClick('image')
+          }
+        },
+        {
+          name: 'tex-$',
+          win: 'Ctrl-Shift-K',
+          mac: 'Command-Shift-K',
+          exec: function() {
+            _this.toolbarClick('tex-$')
+          }
+        },
+        {
+          name: 'ol',
+          win: 'Ctrl-Shift-O',
+          mac: 'Command-Shift-O',
+          exec: function() {
+            _this.toolbarClick('ol')
+          }
+        },
+        {
+          name: 'code',
+          win: 'Ctrl-Shift-P',
+          mac: 'Command-Shift-P',
+          exec: function() {
+            _this.toolbarClick('code')
+          }
+        },
+        {
+          name: 'quote',
+          win: 'Ctrl-Shift-Q',
+          mac: 'Command-Shift-Q',
+          exec: function() {
+            _this.toolbarClick('quote')
+          }
+        },
+        {
+          name: 'strikethrough',
+          win: 'Ctrl-Shift-S',
+          mac: 'Command-Shift-S',
+          exec: function() {
+            _this.toolbarClick('strikethrough')
+          }
+        },
+        {
+          name: 'table',
+          win: 'Ctrl-Shift-T',
+          mac: 'Command-Shift-T',
+          exec: function() {
+            _this.toolbarClick('table')
+          }
+        },
+        {
+          name: 'help',
+          win: 'Ctrl-Shift-H',
+          mac: 'Command-Shift-H',
+          exec: function() {
+            _this.toolbarClick('help')
+          }
+        },
+        {
+          name: 'toLine',
+          win: 'Ctrl-Shift-G',
+          mac: 'Command-Shift-G',
+          exec: function() {
+            _this.toolbarClick('toLine')
+          }
+        }
+      ]
+      this.execCommand('addKeys', keys)
+    },
     setValue(val) {
       this.aceEditor.setValue(val);
     },
@@ -552,6 +944,12 @@ export default {
         this.execCommand(operate)
       } else if (operate === "typewriter") {
         this.execCommand(operate)
+      } else if(operate === 'help') {
+        this.operateModal(operate, true, '帮助')
+        return;
+      } else if(operate === 'info') {
+        this.operateModal(operate, true, '关于')
+        return;
       }
       this.operateAceContent(isStart, toLeft, str)
     },
@@ -631,6 +1029,8 @@ export default {
       this.aceToolbarModal.toLine = false
       this.aceToolbarModal.search = false
       this.aceToolbarModal.table = false
+      this.aceToolbarModal.help = false
+      this.aceToolbarModal.info = false
       this.aceToolbarModal.base.isShowModal = false
     },
     operateFullScreen() {
@@ -784,6 +1184,13 @@ export default {
 </script>
 
 <style scoped>
+th {
+  text-align: left
+}
+.help {
+  overflow-y: auto;
+  height: 50vh;
+}
 .show {
   display: block;
 }
