@@ -23,3 +23,18 @@ steps:
       from_secret: target
     source: dist/*
     rm: true
+- name: movefile
+  image: appleboy/drone-ssh
+  settings:
+    host:
+      from_secret: host
+    username:
+      from_secret: username
+    password:
+      from_secret: password
+    port:
+      from_secret: port
+    script:
+      - cd /home/admin/web/xkeditor.ixk.me/public_html/
+      - mv dist/* .
+      - rm -rf dist
