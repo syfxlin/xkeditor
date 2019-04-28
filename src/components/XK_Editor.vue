@@ -495,7 +495,8 @@ export default {
 <style>
 .xkeditor {
   height: 100%;
-  overflow-x: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 .xkeditor .row {
   height: 100%;
@@ -536,7 +537,6 @@ export default {
   float: left;
   border-left: 1px solid #ddd;
   box-sizing: border-box;
-  
 }
 .xk-col-24 {
   padding: 0px;

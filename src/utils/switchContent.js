@@ -1,3 +1,4 @@
+"use strict";
 import marked from "marked"
 import turndown from "turndown"
 var turndownGfm = require("turndown-plugin-gfm")
@@ -20,6 +21,8 @@ for (var item in prismComponents) {
 }
 
 import EmojiConvertor from "emoji-js"
+var emoji = new EmojiConvertor()
+emoji.replace_mode = 'unified'
 
 var tocContent = [];
 export function getTocHtml() {
@@ -172,8 +175,9 @@ export function toHtml(val, isFull) {
   tocContent = []
   var markedRenderer = new marked.Renderer()
   markedRenderer.paragraph = function(text) {
+    var args = arguments
     if(/\[(.*)]{(.*)}/g.test(text)) {
-      text = text.replace(/(\[([^\[\]]*)]{([^{}|]*)(\|span|\|p|\|font|\||)})/g, function($1, $2, $3, $4, $5) {
+      args[0] = text.replace(/(\[([^\[\]]*)]{([^{}|]*)(\|span|\|p|\|font|\||)})/g, function($1, $2, $3, $4, $5) {
         if($5 == '|' || $5 == '' || $5 == null) {
           $5 = 'p'
         } else {
@@ -181,24 +185,35 @@ export function toHtml(val, isFull) {
         }
         return '<' + $5 + ' style="' + $4 + '">' + $3 + '</' + $5 + '>'
       })
-      return text
     }
     if(/\[TOC\]/g.test(text)) {
-      return '<div class="toc"></div>'
+      args[0] = '<div class="toc"></div>'
     }
     if(/:(.*):/g.test(text)) {
-      var emoji = new EmojiConvertor()
-      emoji.replace_mode = 'unified'
-      text = text.replace(/(:.*:)/g, function($1, $2) {
+      args[0] = text.replace(/(:.*:)/g, function($1, $2) {
         return emoji.replace_colons($2)
       })
-      return text
     }
-    return marked.Renderer.prototype.paragraph.apply(this, arguments)
+    return marked.Renderer.prototype.paragraph.apply(this, args)
   }
   markedRenderer.heading = function(title, level) {
+    var args = arguments
     tocContent.push({title: title, level: level})
-    return marked.Renderer.prototype.heading.apply(this, arguments)
+    if(/:(.*):/g.test(title)) {
+      args[0] = title.replace(/(:.*:)/g, function($1, $2) {
+        return emoji.replace_colons($2)
+      })
+    }
+    return marked.Renderer.prototype.heading.apply(this, args)
+  }
+  markedRenderer.blockquote = function(quote) {
+    var args = arguments
+    if(/:(.*):/g.test(quote)) {
+      args[0] = quote.replace(/(:.*:)/g, function($1, $2) {
+        return emoji.replace_colons($2)
+      })
+    }
+    return marked.Renderer.prototype.blockquote.apply(this, args)
   }
   markedRenderer.code = function(code, language) {
     if(language === 'math' || language === "tex") {
@@ -222,7 +237,7 @@ export function toHtml(val, isFull) {
       if(Prism.languages[language] != null && Prism.languages[language] != undefined) {
         return '<div class="code-toolbar"><pre class="line-numbers language-' + language + '"><code class="language-' + language + '">' + Prism.highlight(code, Prism.languages[language], Prism.languages[language]) + '<span aria-hidden="true" class="line-numbers-rows">' + lineNums + '</code></pre><div class="toolbar"><div class="toolbar-item"><a>Copy</a></div><div class="toolbar-item"><span>' + langTitle + '</span></div></div></div>'
       } else {
-        return '<pre class="line-numbers language-' + language + '"><code class="language-' + language + '">' + code + '<span aria-hidden="true" class="line-numbers-rows">' + lineNums + '</code></pre>'
+        return '<pre class="line-numbers language- language-undefined"><code class="language- language-undefined">' + code + '<span aria-hidden="true" class="line-numbers-rows">' + lineNums + '</code></pre>'
       }
     }
     return marked.Renderer.prototype.code.apply(this, arguments)
