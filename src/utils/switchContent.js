@@ -1,4 +1,4 @@
-"use strict";
+// "use strict";
 import marked from "marked"
 import turndown from "turndown"
 var turndownGfm = require("turndown-plugin-gfm")

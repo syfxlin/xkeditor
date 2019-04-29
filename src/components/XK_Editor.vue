@@ -530,6 +530,11 @@ export default {
   vertical-align: middle;
   padding-right: 5px;
 }
+#toc a {
+  color: #0366d6;
+  text-decoration: none;
+  font-size: 1.05em;
+}
 .row {
   margin: 0px;
 }

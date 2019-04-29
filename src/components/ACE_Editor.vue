@@ -876,14 +876,14 @@ export default {
     switchToHtml() {
       if (this.isMarkdownMode) {
         this.aceEditor.session.setMode("ace/mode/html");
-        this.aceEditor.setValue(toHtml(this.aceEditor.getSession().getValue()))
+        this.aceEditor.getSession().setValue(toHtml(this.aceEditor.getSession().getValue(), false))
         this.isMarkdownMode = false;
       }
     },
     switchToMarkdown() {
       if (!this.isMarkdownMode) {
         this.aceEditor.session.setMode("ace/mode/markdown");
-        this.aceEditor.setValue(toMarkdown(this.aceEditor.getSession().getValue()));
+        this.aceEditor.getSession().setValue(toMarkdown(this.aceEditor.getSession().getValue()));
         this.isMarkdownMode = true;
       }
     },
