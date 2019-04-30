@@ -312,20 +312,20 @@
 </template>
 
 <script>
-import ace from "ace-builds";
-import "ace-builds/webpack-resolver"; // 在 webpack 环境中使用必须要导入
-import "ace-builds/src-noconflict/theme-solarized_light"; // 默认设置的主题
-import "ace-builds/src-noconflict/mode-markdown";
-import "ace-builds/src-noconflict/snippets/markdown";
-import "ace-builds/src-noconflict/mode-html";
-import "ace-builds/src-noconflict/snippets/html";
-import "ace-builds/src-noconflict/ext-language_tools";
+import ace from "ace-builds"
+import "ace-builds/webpack-resolver" // 在 webpack 环境中使用必须要导入
+import "ace-builds/src-noconflict/theme-solarized_light" // 默认设置的主题
+import "ace-builds/src-noconflict/mode-markdown"
+import "ace-builds/src-noconflict/snippets/markdown"
+import "ace-builds/src-noconflict/mode-html"
+import "ace-builds/src-noconflict/snippets/html"
+import "ace-builds/src-noconflict/ext-language_tools"
 
 //fa icon
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { fas } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-library.add(fas);
+import { library } from "@fortawesome/fontawesome-svg-core"
+import { fas } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
+library.add(fas)
 
 //switch markdown and html
 import { toHtml, toMarkdown } from '@/utils/switchContent'
@@ -594,7 +594,7 @@ export default {
           icon: "info-circle"
         }
       ]
-    };
+    }
   },
   computed: {
     openImgUpload() {
@@ -861,7 +861,7 @@ export default {
       this.execCommand('addKeys', keys)
     },
     setValue(val) {
-      this.aceEditor.setValue(val);
+      this.aceEditor.setValue(val)
     },
     updateValue() {
       this.$emit("input", this.aceEditor.getSession().getValue())
@@ -875,48 +875,48 @@ export default {
     },
     switchToHtml() {
       if (this.isMarkdownMode) {
-        this.aceEditor.session.setMode("ace/mode/html");
+        this.aceEditor.session.setMode("ace/mode/html")
         this.aceEditor.getSession().setValue(toHtml(this.aceEditor.getSession().getValue(), false))
-        this.isMarkdownMode = false;
+        this.isMarkdownMode = false
       }
     },
     switchToMarkdown() {
       if (!this.isMarkdownMode) {
-        this.aceEditor.session.setMode("ace/mode/markdown");
-        this.aceEditor.getSession().setValue(toMarkdown(this.aceEditor.getSession().getValue()));
-        this.isMarkdownMode = true;
+        this.aceEditor.session.setMode("ace/mode/markdown")
+        this.aceEditor.getSession().setValue(toMarkdown(this.aceEditor.getSession().getValue()))
+        this.isMarkdownMode = true
       }
     },
     toolbarClick(operate) {
       this.aceToolbarModal.data.operate = operate
-      let str = '';
-      let isStart = false;
-      let toLeft = 0;
-      let selectText = this.aceEditor.getSelectedText();
+      let str = ''
+      let isStart = false
+      let toLeft = 0
+      let selectText = this.aceEditor.getSelectedText()
       if (operate.match(/^h(\d)/)) {
-        str = "#".repeat(operate.substring(1)) + " ";
-        isStart = true;
+        str = "#".repeat(operate.substring(1)) + " "
+        isStart = true
       } else if (operate === "bold") {
-        str = "**" + selectText + "**";
-        toLeft = 2;
+        str = "**" + selectText + "**"
+        toLeft = 2
       } else if (operate === "italic") {
-        str = "*" + selectText + "*";
-        toLeft = 1;
+        str = "*" + selectText + "*"
+        toLeft = 1
       } else if (operate === "underline") {
-        str = '<span style="text-decoration: underline;">' + selectText + "</span>";
-        toLeft = 7;
+        str = '<span style="text-decoration: underline">' + selectText + "</span>"
+        toLeft = 7
       } else if (operate === "strikethrough") {
-        str = "~" + selectText + "~";
-        toLeft = 1;
+        str = "~" + selectText + "~"
+        toLeft = 1
       } else if (operate === "quote") {
-        str = "> ";
-        isStart = true;
+        str = "> "
+        isStart = true
       } else if (operate === "mark") {
-        str = "`" + selectText + "`";
-        toLeft = 1;
+        str = "`" + selectText + "`"
+        toLeft = 1
       } else if (operate === "code") {
-        str = "```\n```";
-        toLeft = 4;
+        str = "```\n```"
+        toLeft = 4
       } else if(operate === "sup") {
         str = "<sup>" + selectText + "</sup>"
         toLeft = 6
@@ -942,63 +942,63 @@ export default {
         str = "```mermaid\n\n```"
         toLeft = 4
       } else if (operate === "ul") {
-        str = "- ";
-        isStart = true;
+        str = "- "
+        isStart = true
       } else if (operate === "ol") {
-        str = "1. ";
-        isStart = true;
+        str = "1. "
+        isStart = true
       } else if (operate === "minus") {
-        str = "\n---\n\n";
-        isStart = true;
+        str = "\n---\n\n"
+        isStart = true
       } else if (operate === "table") {
         this.operateModal(operate, true, '添加表格')
-        return;
+        return
       } else if (operate === "time") {
-        str = new Date().toLocaleString();
+        str = new Date().toLocaleString()
       } else if (operate === "link") {
         this.operateModal(operate, true, '添加链接')
-        return;
+        return
       } else if (operate === "image") {
         this.operateModal(operate, true, '添加图片')
-        return;
+        return
       } else if (operate === "video") {
         this.operateModal(operate, true, '添加视频')
-        return;
+        return
       } else if (/(toLine|search|toc|switchPreview|fullPreview|fullScreen|toHtmlEditor|toTinyMCE|empty|setting|undo|redo)/g.test(operate)) {
         this.execCommand(operate)
       } else if (operate === "typewriter") {
         this.execCommand(operate)
       } else if(operate === 'help') {
         this.operateModal(operate, true, '帮助')
-        return;
+        return
       } else if(operate === 'info') {
         this.operateModal(operate, true, '关于')
-        return;
+        return
       }
       this.operateAceContent(isStart, toLeft, str)
     },
     operateModal(operate, isShow, title = '') {
       if(!isShow) {
         this.aceToolbarModal[operate] = false
-        return;
+        return
       }
-      this.aceToolbarModal[operate] = true;
+      this.aceToolbarModal[operate] = true
       this.aceToolbarModal.data.modalTitle = title
-      this.aceToolbarModal.base.isShowModal = true;
+      this.aceToolbarModal.base.isShowModal = true
     },
     operateAceContent(isStart, toLeft, str) {
-      let range = this.aceEditor.getSelectionRange();
+      let range = this.aceEditor.getSelectionRange()
       if (isStart) {
         for (let i = range.start.row; i <= range.end.row; i++) {
-          this.aceEditor.session.replace(new ace.Range(i, 0, i, 0), str);
+          this.aceEditor.session.replace(new ace.Range(i, 0, i, 0), str)
         }
       } else {
-        this.aceEditor.session.replace(range, str);
+        this.aceEditor.session.replace(range, str)
       }
       if (toLeft) {
-        this.aceEditor.navigateLeft(toLeft);
+        this.aceEditor.navigateLeft(toLeft)
       }
-      this.aceEditor.focus();
+      this.aceEditor.focus()
     },
     aceToolbarSubmit() {
       let str = ''
@@ -1099,49 +1099,49 @@ export default {
     },
     execCommand(command, data = null) {
       if (command === "toLine") {
-        this.aceToolbarModal.data.allLine = this.aceEditor.session.getLength();
+        this.aceToolbarModal.data.allLine = this.aceEditor.session.getLength()
         this.operateModal(command, true, '跳转到指定行')
-        return;
+        return
       } else if (command === "search") {
-        this.aceEditor.commands.commands.find.exec(this.aceEditor);
-        return;
+        this.aceEditor.commands.commands.find.exec(this.aceEditor)
+        return
       } else if(command === "toc") {
         this.$parent.switchToc()
-        return;
+        return
       } else if(command === "switchPreview") {
         this.$parent.switchPreviewShow()
         this.$nextTick(function() {
           this.aceEditor.resize(this.aceEditor)
         })
-        return;
+        return
       } else if(command === "fullPreview") {
         this.$parent.switchPreviewFull()
         this.$nextTick(function() {
           this.aceEditor.resize(this.aceEditor)
         })
-        return;
+        return
       } else if(command === "fullScreen") {
         this.operateFullScreen()
-        return;
+        return
       } else if (command === "toHtmlEditor") {
         this.switchEditorMode()
-        this.aceToolbarShow = false;
-        return;
+        this.aceToolbarShow = false
+        return
       } else if(command === "toTinyMCE") {
         window.$switchEditor()
-        return;
+        return
       } else if (command === "empty") {
-        this.aceEditor.setValue("");
-        return;
+        this.aceEditor.setValue("")
+        return
       } else if (command === "setting") {
-        this.aceEditor.commands.commands.showSettingsMenu.exec(this.aceEditor);
-        return;
+        this.aceEditor.commands.commands.showSettingsMenu.exec(this.aceEditor)
+        return
       } else if(command === "undo") {
         this.aceEditor.undo()
-        return;
+        return
       } else if(command === "redo") {
         this.aceEditor.redo()
-        return;
+        return
       } else if(command === "toolbar") {
         this.aceToolbarShow = !this.aceToolbarShow
         this.aceToolbarHtmlShow = !this.aceToolbarHtmlShow
@@ -1158,7 +1158,7 @@ export default {
             bindKey: {win: data[i].win,  mac: data[i].mac},
             exec: data[i].exec,
             readOnly: true
-          });
+          })
         }
       } else if(command === "removeKeys") {
         for(let i = 0; i < data.length; i++) {
@@ -1204,12 +1204,12 @@ export default {
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>
 th {
-  text-align: left
+  text-align: left;
 }
 .help {
   overflow-y: auto;

@@ -84,51 +84,51 @@ export default {
       editor.ui.registry.addButton('tex-$', {
         text: '行内公式',
         onAction(_) {
-          editor.insertContent('<p>$$$$</p>');
+          editor.insertContent('<p>$$$$</p>')
         }
-      });
+      })
       editor.ui.registry.addButton('tex-math', {
         text: '块公式',
         onAction(_) {
-          editor.insertContent('<pre>&nbsp;```math&nbsp;```&nbsp;</pre>');
+          editor.insertContent('<pre>&nbsp;```math&nbsp;```&nbsp;</pre>')
         }
-      });
+      })
       editor.ui.registry.addButton('flow', {
         text: '流程图',
         onAction(_) {
-          editor.insertContent('<pre class="xkeditor-mermaid">graph </pre>');
+          editor.insertContent('<pre class="xkeditor-mermaid">graph </pre>')
         }
-      });
+      })
       editor.ui.registry.addButton('seq', {
         text: '时序图',
         onAction(_) {
-          editor.insertContent('<pre class="xkeditor-mermaid">sequenceDiagram&nbsp;</pre>');
+          editor.insertContent('<pre class="xkeditor-mermaid">sequenceDiagram&nbsp;</pre>')
         }
-      });
+      })
       editor.ui.registry.addButton('gantt', {
         text: '甘特图',
         onAction(_) {
-          editor.insertContent('<pre class="xkeditor-mermaid">gantt&nbsp;</pre>');
+          editor.insertContent('<pre class="xkeditor-mermaid">gantt&nbsp;</pre>')
         }
-      });
+      })
       editor.ui.registry.addButton('mermaid', {
         text: '添加图',
         onAction(_) {
-          editor.insertContent('<pre class="xkeditor-mermaid">&nbsp;</pre>');
+          editor.insertContent('<pre class="xkeditor-mermaid">&nbsp;</pre>')
         }
-      });
+      })
       editor.ui.registry.addButton('prismjs', {
         text: '代码块',
         onAction(_) {
-          editor.insertContent('<pre><code class="line-numbers language-javascript">&nbsp;</code></pre>');
+          editor.insertContent('<pre><code class="line-numbers language-javascript">&nbsp;</code></pre>')
         }
-      });
+      })
       editor.ui.registry.addButton('toMarkdownEditor', {
         text: '切换编辑器',
         onAction(_) {
           window.$switchEditor()
         }
-      });
+      })
     }
   },
   mounted () {

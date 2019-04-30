@@ -24,14 +24,14 @@ import EmojiConvertor from "emoji-js"
 var emoji = new EmojiConvertor()
 emoji.replace_mode = 'unified'
 
-var tocContent = [];
+var tocContent = []
 export function getTocHtml() {
   var html = getTocHtmlTree(0, '')
   window.$toc = html
-  return html;
+  return html
 }
 function getTocHtmlTree(index, str) {
-  if(index >= tocContent.length) return str;
+  if(index >= tocContent.length) return str
   if(index == 0) {
     str += ''
   } else if(tocContent[index].level > tocContent[index-1].level) {
@@ -246,8 +246,8 @@ export function toHtml(val, isFull) {
   marked.setOptions({
     langPrefix: "line-numbers language-",
     renderer: markedRenderer
-  });
-  return marked(val);
+  })
+  return marked(val)
 }
 
 export function toMarkdown(htmlVal) {
@@ -257,14 +257,14 @@ export function toMarkdown(htmlVal) {
     bulletListMarker: "-",
     codeBlockStyle: "fenced",
     emDelimiter: "*"
-  });
+  })
   turndownService.keep([
     "iframe",
     "style",
     "script",
     "title",
-  ]);
-  turndownService.use(turndownGfm.gfm);
+  ])
+  turndownService.use(turndownGfm.gfm)
   turndownService.addRule('mermaid', {
     filter:  function (node) {
       return (node.nodeName === 'PRE')&&(node.classList.contains('xkeditor-mermaid'))

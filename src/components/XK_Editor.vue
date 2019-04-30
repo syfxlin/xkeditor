@@ -162,11 +162,11 @@ export default {
       this.isRenderEditor = true
     },
     loadCss(url) {
-      let css = document.createElement('link');
-      css.href = url;
-      css.rel = 'stylesheet';
-      css.type = 'text/css';
-      document.head.appendChild(css);
+      let css = document.createElement('link')
+      css.href = url
+      css.rel = 'stylesheet'
+      css.type = 'text/css'
+      document.head.appendChild(css)
     },
     initEditor() {
       mermaid.initialize({startOnLoad:true})
@@ -203,7 +203,7 @@ export default {
             if(currentTab === 1) {
               previewHtmlDom.scrollTop = data * window.scale
             }
-          });
+          })
           previewHtmlDom.addEventListener('scroll', function() {
             if (currentTab === 2) {
               window.$ace.session.setScrollTop(previewHtmlDom.scrollTop / window.scale)
@@ -232,17 +232,17 @@ export default {
                 var deceleration = dir*0.0018
                 var duration = v / deceleration
                 function inertiaMove() {
-                  // if(stopInertia) return;
-                  var nowTime = Date.now();
-                  var t = nowTime - sTime;
-                  var nowV = v + t*deceleration;
+                  // if(stopInertia) return
+                  var nowTime = Date.now()
+                  var t = nowTime - sTime
+                  var nowV = v + t*deceleration
                   // 速度方向变化表示速度达到0了
                   if(dir*nowV > 0) {
-                    return;
+                    return
                   }
-                  var moveY = - (v + nowV)/2 * t;
-                  window.$ace.session.setScrollTop(contentY + moveY);
-                  inertiaScrollTime = setTimeout(inertiaMove, 10);
+                  var moveY = - (v + nowV)/2 * t
+                  window.$ace.session.setScrollTop(contentY + moveY)
+                  inertiaScrollTime = setTimeout(inertiaMove, 10)
                 }
                 inertiaMove()
               }
@@ -309,10 +309,10 @@ export default {
             {left: "```tex", right: "```"}
           ],
           ignoredTags: ["script", "noscript", "style", "textarea", "code"]
-        });
+        })
         //转换Mermaid图
         try {
-          mermaid.init({noteMargin: 10}, ".xkeditor-mermaid");
+          mermaid.init({noteMargin: 10}, ".xkeditor-mermaid")
         } catch (error) {
           console.log("May have errors")
         }
@@ -345,12 +345,12 @@ export default {
     setInterface() {
       var _this = this
       var downloadFun = function(filename, data, type) {
-        var aLink = document.createElement('a');
-        var evt = document.createEvent("MouseEvents");
-        evt.initMouseEvent("click", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-        aLink.download = filename + '.'+type;
-        aLink.href = URL.createObjectURL(new Blob([data], {type: 'text/'+type}));
-        aLink.dispatchEvent(evt);
+        var aLink = document.createElement('a')
+        var evt = document.createEvent("MouseEvents")
+        evt.initMouseEvent("click", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
+        aLink.download = filename + '.'+type
+        aLink.href = URL.createObjectURL(new Blob([data], {type: 'text/'+type}))
+        aLink.dispatchEvent(evt)
       }
       window.XKEditorAPI = {
         //response: {"error":false,"path":"img url"}
@@ -450,10 +450,10 @@ export default {
           } else if(type === 'html') {
             data = _this.htmlViewContent
           } else if(type === 'fullhtml') {
-            var d_t1 = '<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><title>';
-            var d_t2 = '</title>';
-            var d_t3 = '</head><body>';
-            var d_t4 = '</body></html>';
+            var d_t1 = '<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><title>'
+            var d_t2 = '</title>'
+            var d_t3 = '</head><body>'
+            var d_t4 = '</body></html>'
             var style = await axiosPro.get(_this.setting.xkSetting.previewCss)
             style += await axiosPro.get('/static/prism-okaidia.css')
             style += await axiosPro.get('/static/prism-line-numbers.css')
