@@ -36,6 +36,7 @@
 <li><a href="#%E6%BC%94%E7%A4%BA-demo">演示 Demo</a></li>
 <li><a href="#%E5%AE%89%E8%A3%85-install">安装 Install</a>
 <ul>
+<li><a href="#%E4%BB%8E-npm-%E5%AE%89%E8%A3%85">从 NPM 安装</a></li>
 <li><a href="#%E4%BB%8E%E6%9C%AC%E9%A1%B9%E7%9B%AE%E4%B8%8A%E6%9E%84%E5%BB%BA">从本项目上构建</a></li>
 <li><a href="#%E7%BB%84%E4%BB%B6%E6%96%B9%E5%BC%8F%E4%BD%BF%E7%94%A8">组件方式使用</a></li>
 <li><a href="#%E6%89%80%E9%9C%80%E4%BE%9D%E8%B5%96">所需依赖</a></li>
@@ -76,6 +77,31 @@
 <h2 id="%E6%BC%94%E7%A4%BA-demo">演示 Demo</h2>
 <p><a href="https://xkeditor.ixk.me/">XK-Editor</a></p>
 <h2 id="%E5%AE%89%E8%A3%85-install">安装 Install</h2>
+<h3 id="%E4%BB%8E-npm-%E5%AE%89%E8%A3%85">从 NPM 安装</h3>
+<blockquote>
+<p>由于某些原因需要等到 5月1日才能发布到 NPMJS，若您急于使用该方法可以使用<code>npm pack</code>进行本地打包和安装</p>
+</blockquote>
+<p>你可以轻松将 XK-Editor 引入你现有的项目</p>
+<ol>
+<li>安装XK-Editor</li>
+</ol>
+<pre><code class="language-bash"><div>npm i --save xkeditor
+</div></code></pre>
+<ol start="2">
+<li>将XK-Editor static文件复制到项目根目录</li>
+</ol>
+<pre><code class="language-bash"><div>cp -r ./node_modules/xkeditor/static ./
+</div></code></pre>
+<ol start="3">
+<li>导入XK-Editor组件</li>
+</ol>
+<pre><code class="language-javascript"><div><span class="hljs-keyword">import</span> XK_Editor <span class="hljs-keyword">from</span> <span class="hljs-string">'xkeditor'</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> {
+    <span class="hljs-attr">components</span>: {
+        <span class="hljs-string">'xk-editor'</span>: XK_Editor
+    }
+}
+</div></code></pre>
 <h3 id="%E4%BB%8E%E6%9C%AC%E9%A1%B9%E7%9B%AE%E4%B8%8A%E6%9E%84%E5%BB%BA">从本项目上构建</h3>
 <ol>
 <li>首先clone本项目，或者前往<a href="https://github.com/syfxlin/xkeditor/releases">Releases</a>下载本项目并解压</li>
@@ -136,9 +162,14 @@ npm run build
 <ol start="6">
 <li>在合适的位置调用组件</li>
 </ol>
-<pre><code class="language-javascript"><div>&lt;xk-editor :settingApi=<span class="hljs-string">"setting"</span> :contentApi=<span class="hljs-string">"content"</span>/&gt;
+<pre><code class="language-javascript"><div>&lt;xk-editor :settingApi=<span class="hljs-string">"setting"</span> :contentApi=<span class="hljs-string">"content"</span> /&gt;
 <span class="hljs-comment">//settingApi: setting.json的地址，或者返回setting的API接口地址(GET)</span>
 <span class="hljs-comment">//contentApi: Markdown文件的地址，或者返回Markdown格式的API接口地址(GET)</span>
+
+<span class="hljs-comment">//or</span>
+&lt;xk-editor :setting=<span class="hljs-string">"setting"</span> :content=<span class="hljs-string">"content"</span> /&gt;
+<span class="hljs-comment">//setting: 即setting object，解析setting.json得到的对象</span>
+<span class="hljs-comment">//content： Markdown内容文本</span>
 </div></code></pre>
 <h3 id="%E6%89%80%E9%9C%80%E4%BE%9D%E8%B5%96">所需依赖</h3>
 <pre><code><div>ace-builds

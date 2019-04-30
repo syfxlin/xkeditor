@@ -1,9 +1,9 @@
 {
-  "name": "md_editor",
-  "version": "1.0.0",
-  "description": "A Vue.js project",
+  "name": "xkeditor",
+  "version": "1.0.2",
+  "description": "An Editor Supporting Rich Text and Markdown",
   "author": "syfxlin <syfxlin@gmail.com>",
-  "private": true,
+  "private": false,
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
@@ -84,5 +84,25 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "main": "./src/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/syfxlin/xkeditor.git"
+  },
+  "keywords": [
+    "markdown",
+    "markdown-editor",
+    "editor",
+    "md",
+    "vue"
+  ],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/syfxlin/xkeditor/issues"
+  },
+  "homepage": "https://github.com/syfxlin/xkeditor#readme"
 }

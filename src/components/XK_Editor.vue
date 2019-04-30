@@ -47,11 +47,11 @@
 
 <script>
 //导入基础组件
-import '@/utils/dialogDrag'
-import ACE from '@/components/ACE_Editor'
-import TinyMCE from '@/components/TinyMCE_Editor'
+import '../utils/dialogDrag.js'
+import ACE from './ACE_Editor.vue'
+import TinyMCE from './TinyMCE_Editor.vue'
 
-import { axiosPro, axios } from "@/utils/axiosPro"
+import { axiosPro, axios } from "../utils/axiosPro.js"
 //HTML和Markdown互转
 import { toHtml, toMarkdown, getTocHtml } from '../utils/switchContent.js'
 

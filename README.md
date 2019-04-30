@@ -12,6 +12,7 @@
   - [特性 Feature](#%E7%89%B9%E6%80%A7-feature)
   - [演示 Demo](#%E6%BC%94%E7%A4%BA-demo)
   - [安装 Install](#%E5%AE%89%E8%A3%85-install)
+    - [从 NPM 安装](#%E4%BB%8E-npm-%E5%AE%89%E8%A3%85)
     - [从本项目上构建](#%E4%BB%8E%E6%9C%AC%E9%A1%B9%E7%9B%AE%E4%B8%8A%E6%9E%84%E5%BB%BA)
     - [组件方式使用](#%E7%BB%84%E4%BB%B6%E6%96%B9%E5%BC%8F%E4%BD%BF%E7%94%A8)
     - [所需依赖](#%E6%89%80%E9%9C%80%E4%BE%9D%E8%B5%96)
@@ -53,6 +54,30 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 [XK-Editor](https://xkeditor.ixk.me/)
 
 ## 安装 Install
+
+### 从 NPM 安装
+
+> 由于某些原因需要等到 5月1日才能发布到 NPMJS，若您急于使用该方法可以使用`npm pack`进行本地打包和安装
+
+你可以轻松将 XK-Editor 引入你现有的项目
+
+1. 安装XK-Editor
+```bash
+npm i --save xkeditor
+```
+2. 将XK-Editor static文件复制到项目根目录
+```bash
+cp -r ./node_modules/xkeditor/static ./
+```
+3. 导入XK-Editor组件
+```javascript
+import XK_Editor from 'xkeditor'
+export default {
+    components: {
+        'xk-editor': XK_Editor
+    }
+}
+```
 
 ### 从本项目上构建
 1. 首先clone本项目，或者前往[Releases](https://github.com/syfxlin/xkeditor/releases)下载本项目并解压
@@ -106,9 +131,14 @@ export default {
 ```
 6. 在合适的位置调用组件
 ```javascript
-<xk-editor :settingApi="setting" :contentApi="content"/>
+<xk-editor :settingApi="setting" :contentApi="content" />
 //settingApi: setting.json的地址，或者返回setting的API接口地址(GET)
 //contentApi: Markdown文件的地址，或者返回Markdown格式的API接口地址(GET)
+
+//or
+<xk-editor :setting="setting" :content="content" />
+//setting: 即setting object，解析setting.json得到的对象
+//content： Markdown内容文本
 ```
 
 ### 所需依赖

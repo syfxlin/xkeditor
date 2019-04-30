@@ -5,7 +5,8 @@
 </template>
 
 <script>
-import XK_Editor from '@/components/XK_Editor'
+// import XK_Editor from '@/components/XK_Editor'
+import XK_Editor from './index.js'
 export default {
   name: 'App',
   components: {
