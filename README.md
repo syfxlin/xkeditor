@@ -57,8 +57,6 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 
 ### 从 NPM 安装
 
-> 由于某些原因需要等到 5月1日才能发布到 NPMJS，若您急于使用该方法可以使用`npm pack`进行本地打包和安装
-
 你可以轻松将 XK-Editor 引入你现有的项目
 
 1. 安装XK-Editor
