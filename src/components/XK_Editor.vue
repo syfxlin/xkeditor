@@ -442,6 +442,24 @@ export default {
         switchTypewriter: function(data) {
           _this.$refs.ace.execCommand('typewriter', true)
         },
+        setLocalStorage: function(filename) {
+          window.localStorage.setItem('xkeditor_' + filename, window.XKEditor.getMarkdown())
+        },
+        getLocalStorage: function(filename) {
+          return window.localStorage.getItem('xkeditor_' + filename)
+        },
+        listLocalStorage: function() {
+          var list = {}
+          for (const key in window.localStorage) {
+            if(key.indexOf('xkeditor_') != -1) {
+              list[key.substring(9)] = window.localStorage.getItem(key)
+            }
+          }
+          return list
+        },
+        removeLocalStorage: function(filename) {
+          window.localStorage.removeItem('xkeditor_' + filename)
+        },
         download: async function(filename, type = 'markdown') {
           var data = ''
           if(type === 'markdown') {
