@@ -100,6 +100,12 @@
                 <input v-model="aceToolbarModal.data.line" placeholder="请输入行号" autofocus />
               </div>
             </div>
+            <div v-show="aceToolbarModal.localStorage">
+              <label>保存的标记(Filename)</label>
+              <div class="xk-input">
+                <input v-model="aceToolbarModal.data.locationStorage" placeholder="请输入保存的标记" autofocus />
+              </div>
+            </div>
             <div v-show="aceToolbarModal.table">
               <label>单元格数</label>
               <div class="xk-row">
@@ -360,7 +366,9 @@ export default {
         search: false,
         table: false,
         info: false,
-        help: false
+        help: false,
+        setLocalStorage: false,
+        getLocalStorage: false
       },
       aceToolbarButtons: [
         {
@@ -577,6 +585,26 @@ export default {
           title: "重做",
           operate: "redo",
           icon: "redo"
+        },
+        {
+          title: "",
+          operate: "|",
+          icon: "|"
+        },
+        {
+          title: "保存到本地",
+          operate: "setLocalStorage",
+          icon: "box"
+        },
+        {
+          title: "从本地读取",
+          operate: "getLocalStorage",
+          icon: "box-open"
+        },
+        {
+          title: "删除本地存储",
+          operate: "removeLocalStorage",
+          icon: "trash-alt"
         },
         {
           title: "",
@@ -968,6 +996,15 @@ export default {
         this.execCommand(operate)
       } else if (operate === "typewriter") {
         this.execCommand(operate)
+      } else if(operate === 'setLocalStorage') {
+        this.operateModal('localStorage', true, '保存到本地')
+        return
+      } else if(operate === 'getLocalStorage') {
+        this.operateModal('localStorage', true, '从本地读取')
+        return
+      } else if(operate === 'removeLocalStorage') {
+        this.operateModal('localStorage', true, '删除本地存储')
+        return
       } else if(operate === 'help') {
         this.operateModal(operate, true, '帮助')
         return
@@ -1041,6 +1078,19 @@ export default {
         this.operateModal(data.operate, false)
         this.aceToolbarCancer()
         return
+      } else if(data.operate === 'setLocalStorage') {
+        window.XKEditor.setLocalStorage(this.aceToolbarModal.data.locationStorage)
+        this.aceToolbarCancer()
+        return
+      } else if(data.operate === 'getLocalStorage') {
+        str = window.XKEditor.getLocalStorage(this.aceToolbarModal.data.locationStorage)
+        this.setValue(str)
+        this.aceToolbarCancer()
+        return
+      } else if(data.operate === 'removeLocalStorage') {
+        window.XKEditor.removeLocalStorage(this.aceToolbarModal.data.locationStorage)
+        this.aceToolbarCancer()
+        return
       }
       this.operateModal(data.operate, false)
       this.operateAceContent(false, 0, str)
@@ -1055,6 +1105,7 @@ export default {
       this.aceToolbarModal.table = false
       this.aceToolbarModal.help = false
       this.aceToolbarModal.info = false
+      this.aceToolbarModal.localStorage = false
       this.aceToolbarModal.base.isShowModal = false
     },
     operateFullScreen() {
