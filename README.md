@@ -15,6 +15,7 @@
     - [从 NPM 安装](#%E4%BB%8E-npm-%E5%AE%89%E8%A3%85)
     - [从本项目上构建](#%E4%BB%8E%E6%9C%AC%E9%A1%B9%E7%9B%AE%E4%B8%8A%E6%9E%84%E5%BB%BA)
     - [组件方式使用](#%E7%BB%84%E4%BB%B6%E6%96%B9%E5%BC%8F%E4%BD%BF%E7%94%A8)
+    - [调用方法](#%E8%B0%83%E7%94%A8%E6%96%B9%E6%B3%95)
     - [所需依赖](#%E6%89%80%E9%9C%80%E4%BE%9D%E8%B5%96)
     - [setting.json](#settingjson)
   - [文档 Doc](#%E6%96%87%E6%A1%A3-doc)
@@ -127,7 +128,18 @@ export default {
     }
 }
 ```
-6. 在合适的位置调用组件
+
+### 调用方法
+1. 导入XK-Editor组件
+```javascript
+import XK_Editor from '@/components/XK_Editor'
+export default {
+    components: {
+        'xk-editor': XK_Editor
+    }
+}
+```
+2. 在合适的位置调用组件
 ```javascript
 <xk-editor :settingApi="setting" :contentApi="content" />
 //settingApi: setting.json的地址，或者返回setting的API接口地址(GET)

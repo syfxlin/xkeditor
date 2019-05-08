@@ -39,6 +39,7 @@
 <li><a href="#%E4%BB%8E-npm-%E5%AE%89%E8%A3%85">从 NPM 安装</a></li>
 <li><a href="#%E4%BB%8E%E6%9C%AC%E9%A1%B9%E7%9B%AE%E4%B8%8A%E6%9E%84%E5%BB%BA">从本项目上构建</a></li>
 <li><a href="#%E7%BB%84%E4%BB%B6%E6%96%B9%E5%BC%8F%E4%BD%BF%E7%94%A8">组件方式使用</a></li>
+<li><a href="#%E8%B0%83%E7%94%A8%E6%96%B9%E6%B3%95">调用方法</a></li>
 <li><a href="#%E6%89%80%E9%9C%80%E4%BE%9D%E8%B5%96">所需依赖</a></li>
 <li><a href="#settingjson">setting.json</a></li>
 </ul>
@@ -156,7 +157,18 @@ npm run build
     }
 }
 </div></code></pre>
-<ol start="6">
+<h3 id="%E8%B0%83%E7%94%A8%E6%96%B9%E6%B3%95">调用方法</h3>
+<ol>
+<li>导入XK-Editor组件</li>
+</ol>
+<pre><code class="language-javascript"><div><span class="hljs-keyword">import</span> XK_Editor <span class="hljs-keyword">from</span> <span class="hljs-string">'@/components/XK_Editor'</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> {
+    <span class="hljs-attr">components</span>: {
+        <span class="hljs-string">'xk-editor'</span>: XK_Editor
+    }
+}
+</div></code></pre>
+<ol start="2">
 <li>在合适的位置调用组件</li>
 </ol>
 <pre><code class="language-javascript"><div>&lt;xk-editor :settingApi=<span class="hljs-string">"setting"</span> :contentApi=<span class="hljs-string">"content"</span> /&gt;
