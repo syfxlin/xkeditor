@@ -217,7 +217,7 @@ turndown-plugin-gfm
 
 ## 文档 Doc
 
-正在加急编写文档中~(￣▽￣)~*
+[Wiki](https://github.com/syfxlin/xkeditor/wiki/)
 
 ## 维护者 Maintainer
 
