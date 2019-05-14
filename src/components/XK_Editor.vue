@@ -120,7 +120,8 @@ export default {
           previewClass: "markdown-body",
           delayToHtml: 500,
           scrollBind: 'both',
-          imgUpload: false
+          imgUpload: false,
+          scrollMode: 'anchor'
         }
       }
     }
@@ -249,6 +250,16 @@ export default {
               scrollToTop(_v, endTime, window.$ace.session.getScrollTop())
             })
           })
+        }
+      }
+      // 模拟锚点
+      window.scrollMode = this.setting.xkSetting.scrollMode
+      window.sta = function(anchorName) {
+        if (anchorName) {
+          let anchorElement = document.getElementById(anchorName);
+          if(anchorElement) {
+            anchorElement.scrollIntoView(true);
+          }
         }
       }
       //初始化滚动绑定

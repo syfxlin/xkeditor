@@ -45,7 +45,13 @@ function getTocHtmlTree(index, str) {
   } else {
     str += '</li>'
   }
-  str += '<li><img class="toc-img" src="/static/svg/disc.svg"><a href="#' + tocContent[index].title.toLowerCase().replace(/ /g, "-").replace(/[^\u4e00-\u9fa5a-zA-Z0-9-]/g, "") + '">' + tocContent[index].title + '</a>'
+  var tocUrl = tocContent[index].title.toLowerCase().replace(/ /g, "-").replace(/[^\u4e00-\u9fa5a-zA-Z0-9-]/g, "")
+  if (window.scrollMode === 'anchor') {
+    tocUrl = '#' + tocUrl
+  } else {
+    tocUrl = 'javascript:sta(\'' + tocUrl + '\');'
+  }
+  str += '<li><img class="toc-img" src="/static/svg/disc.svg"><a href="' + tocUrl + '">' + tocContent[index].title + '</a>'
   return getTocHtmlTree(index+1, str)
 }
 
