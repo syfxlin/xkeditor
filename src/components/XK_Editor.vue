@@ -33,9 +33,16 @@
 <div class="xkeditor">
   <template  v-if="isRenderEditor">
   <div class="row">
-    <div :class="aceDivClass" v-show="editorModeShow&&previewShow!='full'"><ace v-model="markdownContent" :setting="setting.aceSetting" ref="ace"></ace></div>
-    <div :class="aceDivClass" v-show="editorModeShow&&previewShow!='hide'"><div :class="setting.xkSetting.previewClass" v-html="htmlViewContent" id="previewHtml" ref="htmlView"></div></div>
-    <div class="xk-col-24" v-show="!editorModeShow"><tinymce v-model="htmlContent" :setting="setting.tinymceSetting" ref="tinymce"></tinymce></div>
+    <div :class="aceDivClass" v-show="editorModeShow&&previewShow!='full'">
+      <ace v-model="markdownContent" :setting="setting.aceSetting" ref="ace"></ace>
+    </div>
+    <div :class="aceDivClass" v-show="editorModeShow&&previewShow!='hide'">
+      <div :class="setting.xkSetting.previewClass + (previewShow=='full'&&!isMobile?' preview-min':'')" v-html="htmlViewContent" id="previewHtml" ref="htmlView"></div>
+      <div v-show="previewShow=='full'&&!isMobile" class="toc preview-toc"></div>
+    </div>
+    <div class="xk-col-24" v-show="!editorModeShow">
+      <tinymce v-model="htmlContent" :setting="setting.tinymceSetting" ref="tinymce"></tinymce>
+    </div>
     <button class="xk-button close-preview-full" @click="switchPreviewFull()" v-show="editorModeShow&&previewShow=='full'">关闭</button>
     <transition name="slide-fade">
       <div id="toc" v-show="showToc"></div>
@@ -133,9 +140,13 @@ export default {
       } else if(this.editorMode === 'tinymce') {
         return false
       }
+    },
+    isMobile() {
+      return window.isMobile
     }
   },
   async mounted() {
+    window.isMobile = /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i.test(navigator.userAgent)
     await this.load()
     this.htmlViewContent = toHtml(this.markdownContent, true)
     this.$nextTick(function() {
@@ -305,13 +316,14 @@ export default {
     renderNextTick() {
       this.$nextTick(function() {
         //制作TOC
-        document.getElementById('toc').innerHTML = getTocHtml()
+        var tocHtml = getTocHtml();
+        document.getElementById('toc').innerHTML = tocHtml
+        //制作文章内TOC
+        for (let i = 0; i < document.getElementsByClassName('toc').length; i++) {
+          document.getElementsByClassName('toc')[i].innerHTML = tocHtml
+        }
         //更新TOC icon
         this.initTocTree()
-        //制作文章内TOC
-        if(document.getElementsByClassName('toc').length > 0) {
-          document.getElementsByClassName('toc')[0].innerHTML = getTocHtml()
-        }
         //转换Tex公式
         renderMathInElement(document.getElementById('previewHtml'), {
           delimiters: [
@@ -337,7 +349,7 @@ export default {
       this.showToc = (!this.showToc)
     },
     initTocTree() {
-      var items = document.querySelectorAll('#toc .toc-img ~ ul')
+      var items = document.querySelectorAll('#toc .toc-img ~ ul,.toc .toc-img ~ ul')
       for (let i = 0; i < items.length; i++) {
         items[i].parentNode.children[0].setAttribute('src', '/static/svg/minus-square.svg')
         items[i].parentNode.children[0].setAttribute('onclick', 'toggleToc(this)')
@@ -538,9 +550,26 @@ export default {
   overflow: auto;
   max-height: 100%;
   padding: 15px 15px;
-  word-break: break-all;
+  word-break: break-word;
   white-space: normal;
   box-sizing: border-box;
+}
+.xk-col-24 .preview-min {
+  float: left;
+  width: 80%;
+}
+.xk-col-24 .preview-toc {
+  float: left;
+  padding: 20px;
+  box-sizing: border-box;
+  width: 20%;
+}
+.toc,
+#toc {
+  word-break: break-word;
+  white-space: normal;
+  overflow-y: auto;
+  height: 100%;
 }
 .toc ul,
 #toc ul {
@@ -559,6 +588,7 @@ export default {
   vertical-align: middle;
   padding-right: 5px;
 }
+.toc a,
 #toc a {
   color: #0366d6;
   text-decoration: none;
@@ -591,9 +621,7 @@ export default {
   position: fixed;
   right: 0px;
   width: 20%;
-  height: 100%;
   background: #f5f5f5;
-  overflow-y: auto;
   border-left: 1px solid #ddd;
 }
 .xk-button {
