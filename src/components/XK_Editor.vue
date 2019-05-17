@@ -37,8 +37,7 @@
       <ace v-model="markdownContent" :setting="setting.aceSetting" ref="ace"></ace>
     </div>
     <div :class="aceDivClass" v-show="editorModeShow&&previewShow!='hide'">
-      <div :class="setting.xkSetting.previewClass + (previewShow=='full'&&!isMobile?' preview-min':'')" v-html="htmlViewContent" id="previewHtml" ref="htmlView"></div>
-      <div v-show="previewShow=='full'&&!isMobile" class="toc preview-toc"></div>
+      <div :class="setting.xkSetting.previewClass" v-html="htmlViewContent" id="previewHtml" ref="htmlView"></div>
     </div>
     <div class="xk-col-24" v-show="!editorModeShow">
       <tinymce v-model="htmlContent" :setting="setting.tinymceSetting" ref="tinymce"></tinymce>
@@ -47,6 +46,7 @@
     <transition name="slide-fade">
       <div id="toc" v-show="showToc"></div>
     </transition>
+    <div id="toc-button" class="xk-button"><fa-icon icon="bars"/></div>
   </div>
   </template>
 </div>
@@ -67,11 +67,18 @@ import "katex/dist/katex.min.css"
 import renderMathInElement from "katex/dist/contrib/auto-render"
 import mermaid from "mermaid"
 
+//fa icon
+import { library } from "@fortawesome/fontawesome-svg-core"
+import { fas } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
+library.add(fas)
+
 export default {
   name: 'XK_Editor',
   components: {
     'ace': ACE,
-    'tinymce': TinyMCE
+    'tinymce': TinyMCE,
+    "fa-icon": FontAwesomeIcon
   },
   props: {
     settingApi: String,
@@ -181,6 +188,7 @@ export default {
       document.head.appendChild(css)
     },
     initEditor() {
+      var _this = this
       mermaid.initialize({startOnLoad:true})
       window.$ace = this.$refs.ace.aceEditor
       window.$switchEditor = this.switchEditor
@@ -275,7 +283,6 @@ export default {
       }
       //初始化滚动绑定
       this.$nextTick(function() {
-        var _this = this
         setTimeout(function() {
           window.scrollBind('init', _this.setting.xkSetting.scrollBind)
         }, 1000)
@@ -283,6 +290,10 @@ export default {
       //初始化TOC
       this.initTocTree()
       window.toggleToc = this.toggleToc
+      //注册TOC按钮
+      document.getElementById('toc-button').addEventListener('click', function() {
+        _this.switchToc();
+      })
     },
     switchEditor() {
       if(this.editorMode !== 'ace') {
@@ -308,9 +319,18 @@ export default {
       if(this.previewShow == 'full') {
         this.previewShow = 'show'
         this.aceDivClass = "xk-col-12"
+        document.getElementById('toc-button').style.display = 'block'
+        this.showToc = false
       } else {
         this.previewShow = 'full'
         this.aceDivClass = "xk-col-24"
+        this.$nextTick(function() {
+          var preEle = document.getElementById('previewHtml')
+          if (Math.round(preEle.offsetWidth / preEle.parentElement.offsetWidth * 100) <= 80) {
+            document.getElementById('toc-button').style.display = 'none'
+            this.showToc = true
+          }
+        })
       }
     },
     renderNextTick() {
@@ -554,15 +574,9 @@ export default {
   white-space: normal;
   box-sizing: border-box;
 }
-.xk-col-24 .preview-min {
+.xk-col-24 #previewHtml {
   float: left;
   width: 80%;
-}
-.xk-col-24 .preview-toc {
-  float: left;
-  padding: 20px;
-  box-sizing: border-box;
-  width: 20%;
 }
 .toc,
 #toc {
@@ -614,15 +628,29 @@ export default {
 }
 .close-preview-full {
   position: fixed;
-  right: 10px;
-  top: 10px;
+  right: 20px;
+  top: 20px;
+  z-index: 1000;
 }
 #toc {
   position: fixed;
+  top: 0px;
   right: 0px;
   width: 20%;
   background: #f5f5f5;
   border-left: 1px solid #ddd;
+  z-index: 999;
+  padding: 20px;
+  box-sizing: border-box;
+}
+#toc-button {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 20px;
+  height: 20px;
+  padding: 6px;
+  z-index: 1000;
 }
 .xk-button {
   display: inline-block;
@@ -642,6 +670,16 @@ export default {
   -ms-user-select: none;
   user-select: none;
   cursor: pointer;
+}
+
+@media (max-width: 991px) {
+  .xk-col-24 #previewHtml {
+    float: left;
+    width: 100%;
+  }
+  #toc {
+    width: 80%;
+  }
 }
 
 /* 可以设置不同的进入和离开动画 */
