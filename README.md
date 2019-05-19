@@ -12,6 +12,7 @@
   - [特性 Feature](#%E7%89%B9%E6%80%A7-feature)
   - [演示 Demo](#%E6%BC%94%E7%A4%BA-demo)
   - [安装 Install](#%E5%AE%89%E8%A3%85-install)
+    - [注意事项](#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9)
     - [从 NPM 安装](#%E4%BB%8E-npm-%E5%AE%89%E8%A3%85)
     - [从本项目上构建](#%E4%BB%8E%E6%9C%AC%E9%A1%B9%E7%9B%AE%E4%B8%8A%E6%9E%84%E5%BB%BA)
     - [组件方式使用](#%E7%BB%84%E4%BB%B6%E6%96%B9%E5%BC%8F%E4%BD%BF%E7%94%A8)
@@ -55,6 +56,33 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 [XK-Editor](https://xkeditor.ixk.me/)
 
 ## 安装 Install
+
+### 注意事项
+
+从 Version 1.0.8 开始，为了减小Vendor体积，防止加载时间过长，XK-Editor默认使用`jsDelivr CDN`加载部分`node_modules`
+需要在index.html中添加一下script标签，若您不打算使用该方式加载，请将`node_modules/xkeditor/components`下的文件中s所有的`import`注释取消。
+```html
+<!-- ACE Editor -->
+<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.4.4/src-noconflict/ace.min.js"></script>
+<!-- Prism.js -->
+<script src="/static/prism.js"></script>
+<link rel="stylesheet" href="/static/prism-okaidia.css">
+<link rel="stylesheet" href="/static/prism-line-numbers.css">
+<link rel="stylesheet" href="/static/prism-toolbar.css">
+<link rel="stylesheet" href="/static/prism-copy-to-clipboard.min.css">
+<!-- Katex -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css">
+<!-- Mermaid -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@8.0.0/dist/mermaid.min.js"></script>
+<!-- Emoji-js -->
+<script src="https://cdn.jsdelivr.net/npm/emoji-js@3.4.1/lib/emoji.min.js"></script>
+<!-- TinyMCE -->
+<script src="https://cdn.jsdelivr.net/npm/tinymce@5.0.5/tinymce.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tinymce@5.0.5/themes/silver/theme.min.js"></script>
+<script src="https://cdn.jsdelivr.net/combine/npm/tinymce@5.0.5/plugins/print/plugin.min.js,npm/tinymce@5.0.5/plugins/preview/plugin.min.js,npm/tinymce@5.0.5/plugins/fullpage/plugin.min.js,npm/tinymce@5.0.5/plugins/fullscreen/plugin.min.js,npm/tinymce@5.0.5/plugins/searchreplace/plugin.min.js,npm/tinymce@5.0.5/plugins/autolink/plugin.min.js,npm/tinymce@5.0.5/plugins/directionality/plugin.min.js,npm/tinymce@5.0.5/plugins/code/plugin.min.js,npm/tinymce@5.0.5/plugins/visualblocks/plugin.min.js,npm/tinymce@5.0.5/plugins/visualchars/plugin.min.js,npm/tinymce@5.0.5/plugins/image/plugin.min.js,npm/tinymce@5.0.5/plugins/link/plugin.min.js,npm/tinymce@5.0.5/plugins/media/plugin.min.js,npm/tinymce@5.0.5/plugins/template/plugin.min.js,npm/tinymce@5.0.5/plugins/codesample/plugin.min.js,npm/tinymce@5.0.5/plugins/table/plugin.min.js,npm/tinymce@5.0.5/plugins/charmap/plugin.min.js,npm/tinymce@5.0.5/plugins/hr/plugin.min.js,npm/tinymce@5.0.5/plugins/pagebreak/plugin.min.js,npm/tinymce@5.0.5/plugins/nonbreaking/plugin.min.js,npm/tinymce@5.0.5/plugins/anchor/plugin.min.js,npm/tinymce@5.0.5/plugins/toc/plugin.min.js,npm/tinymce@5.0.5/plugins/insertdatetime/plugin.min.js,npm/tinymce@5.0.5/plugins/advlist/plugin.min.js,npm/tinymce@5.0.5/plugins/lists/plugin.min.js,npm/tinymce@5.0.5/plugins/wordcount/plugin.min.js,npm/tinymce@5.0.5/plugins/imagetools/plugin.min.js,npm/tinymce@5.0.5/plugins/textpattern/plugin.min.js"></script>
+```
 
 ### 从 NPM 安装
 
