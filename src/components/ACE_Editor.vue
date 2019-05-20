@@ -1412,7 +1412,7 @@ th {
   position: relative;
   top: 100px;
   width: 520px;
-  margin: 0 auto 0 100px;
+  margin: 0 auto 0 10%;
   border: none;
   border-radius: 4px;
   background-color: #FFF;
@@ -1467,5 +1467,10 @@ th {
 }
 .img-upload-sub {
   padding-left: 10px;
+}
+@media (max-width: 991px) {
+  .xk-modal {
+    width: 80%;
+  }
 }
 </style>
