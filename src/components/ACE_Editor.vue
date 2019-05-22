@@ -904,7 +904,7 @@ export default {
     switchToMarkdown() {
       if (!this.isMarkdownMode) {
         this.aceEditor.session.setMode("ace/mode/markdown")
-        this.aceEditor.getSession().setValue(toMarkdown(this.aceEditor.getSession().getValue()))
+        this.aceEditor.getSession().setValue(toMarkdown(this.aceEditor.getSession().getValue(), true))
         this.isMarkdownMode = true
       }
     },
@@ -1130,7 +1130,7 @@ export default {
       if(document.getElementById('img-upload').files.length > 0) {
         let file = document.getElementById('img-upload').files[0]
         window.XKEditorAPI.imgUpload(file, function(response) {
-          _this.$set(_this.aceToolbarModal.data, 'src', response)
+          _this.$set(_this.aceToolbarModal.data, 'src', response.path)
           //TODO: 上传成功提示
         }, function(error) {
           //TODO: 上传失败提示

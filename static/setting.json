@@ -38,6 +38,8 @@
         "delayToHtml":500,
         "scrollBind":"both",
         "imgUpload":false,
-        "scrollMode":"javascript"
+        "scrollMode":"javascript",
+        "pasteFormat":true,
+        "pasteImageUpload":true
     }
 }

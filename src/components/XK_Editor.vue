@@ -134,8 +134,10 @@ export default {
           previewClass: "markdown-body",
           delayToHtml: 500,
           scrollBind: 'both',
-          imgUpload: false,
-          scrollMode: 'anchor'
+          imgUpload: true,
+          scrollMode: 'anchor',
+          pasteFormat: true,
+          pasteImageUpload: true
         }
       }
     }
@@ -292,12 +294,41 @@ export default {
       window.toggleToc = this.toggleToc
       //注册TOC按钮
       document.getElementById('toc-button').addEventListener('click', function() {
-        _this.switchToc();
+        _this.switchToc()
       })
+      //粘贴格式化
+      if (this.setting.xkSetting.pasteFormat) {
+        window.$ace.on("paste", function(e) {
+          if (e.event.clipboardData.getData('text/html')) {
+            e.text = toMarkdown(e.event.clipboardData.getData('text/html'), false)
+          }
+        })
+      }
+      //图片粘贴上传
+      if (this.setting.xkSetting.pasteImageUpload && this.setting.xkSetting.imageUpload) {
+        document.getElementsByClassName('ace-container')[0].addEventListener("paste", function (e){
+          if ( !(e.clipboardData && e.clipboardData.items) ) {
+            return
+          }
+          for (var i = 0, len = e.clipboardData.items.length; i < len; i++) {
+            var item = e.clipboardData.items[i]
+            if (item.kind === "file") {
+              var pasteFile = item.getAsFile()
+              window.XKEditorAPI.imgUpload(pasteFile, function(response) {
+                window.$ace.insert("[](" + response.path + ")")
+                //TODO: 上传成功提示
+              }, function(error) {
+                //TODO: 上传失败提示
+                console.log(error)
+              })
+            }
+          }
+        });
+      }
     },
     switchEditor() {
       if(this.editorMode !== 'ace') {
-        this.markdownContent = toMarkdown(this.htmlContent)
+        this.markdownContent = toMarkdown(this.htmlContent, true)
         this.$refs.ace.setValue(this.markdownContent)
         this.editorMode = 'ace'
       } else if(this.editorMode !== 'tinymce') {
@@ -398,13 +429,14 @@ export default {
       window.XKEditorAPI = {
         //response: {"error":false,"path":"img url"}
         imgUpload: function(file, success, failure) {
-          if(_this.xkSetting.imgUpload) {
+          if(_this.setting.xkSetting.imgUpload) {
             let param = new FormData()
             param.append('file', file)
             let config = {
               headers:{'Content-Type':'multipart/form-data'}
             }
-            axios.post(_this.xkSetting.imgUpload, param, config)
+            // success({"error":false,"path":"https://img.url"})
+            axios.post(_this.setting.xkSetting.imgUpload, param, config)
               .then(function(response){
                 success(response)
               })
@@ -429,7 +461,7 @@ export default {
             return
           }
           if(valueType !== 'markdown') {
-            val = toMarkdown(val)
+            val = toMarkdown(val, true)
           }
           _this.markdownContent = val
           _this.$refs.ace.setValue(val)
@@ -651,6 +683,7 @@ export default {
   height: 20px;
   padding: 6px;
   z-index: 1000;
+  box-sizing: content-box;
 }
 .xk-button {
   display: inline-block;

@@ -245,7 +245,7 @@ export function toHtml(val, isFull) {
   return marked(val)
 }
 
-export function toMarkdown(htmlVal) {
+export function toMarkdown(htmlVal, styleSwitch = true) {
   var turndownService = new turndown({
     headingStyle: "atx",
     hr: "---",
@@ -301,39 +301,41 @@ export function toMarkdown(htmlVal) {
       return '<sub>' + content + '</sub>'
     }
   })
-  turndownService.addRule('havaStyle', {
-    filter:  function (node) {
-      return (node.nodeName === 'FONT' || node.nodeName === 'P' || node.nodeName === 'SPAN')&&(node.getAttribute('style') !== null)
-    },
-    replacement: function (content, node) {
-      var parseStyle = [
-        'color',
-        'font-size',
-        'padding-left',
-        'background-color',
-        'text-align',
-        'font-family'
-      ]
-      var out = node.outerHTML
-      if(node.style.textDecoration === 'underline') {
-        out = '<u>' + content + '</u>'
-      } else if(node.style.textDecoration === 'line-through') {
-        out = '~' + content + '~'
-      } else {
-        out = '[' + content + ']{'
-        for(let i = 0; i < parseStyle.length; i++) {
-          if(node.style[parseStyle[i]] !== '') {
-            out += parseStyle[i] + ':' + node.style[parseStyle[i]] + ';'
+  if (styleSwitch) {
+    turndownService.addRule('haveStyle', {
+      filter:  function (node) {
+        return (node.nodeName === 'FONT' || node.nodeName === 'P' || node.nodeName === 'SPAN')&&(node.getAttribute('style') !== null)
+      },
+      replacement: function (content, node) {
+        var parseStyle = [
+          'color',
+          'font-size',
+          'padding-left',
+          'background-color',
+          'text-align',
+          'font-family'
+        ]
+        var out = node.outerHTML
+        if(node.style.textDecoration === 'underline') {
+          out = '<u>' + content + '</u>'
+        } else if(node.style.textDecoration === 'line-through') {
+          out = '~' + content + '~'
+        } else {
+          out = '[' + content + ']{'
+          for(let i = 0; i < parseStyle.length; i++) {
+            if(node.style[parseStyle[i]] !== '') {
+              out += parseStyle[i] + ':' + node.style[parseStyle[i]] + ';'
+            }
+          }
+          if(node.localName === 'p') {
+            out += '}'
+          } else {
+            out += '|' + node.localName + '}'
           }
         }
-        if(node.localName === 'p') {
-          out += '}'
-        } else {
-          out += '|' + node.localName + '}'
-        }
+        return out
       }
-      return out
-    }
-  })
+    })
+  }
   return turndownService.turndown(htmlVal)
 }
