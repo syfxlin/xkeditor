@@ -40,6 +40,7 @@
         "imgUpload":"http://test.ixk.me/upload.php",
         "scrollMode":"javascript",
         "pasteFormat":true,
-        "pasteImageUpload":true
+        "pasteImageUpload":true,
+        "enableTinyMCE":true
     }
 }

@@ -39,7 +39,7 @@
     <div :class="aceDivClass" v-show="editorModeShow&&previewShow!='hide'">
       <div :class="setting.xkSetting.previewClass" v-html="htmlViewContent" id="previewHtml" ref="htmlView"></div>
     </div>
-    <div class="xk-col-24" v-show="!editorModeShow">
+    <div class="xk-col-24" v-show="!editorModeShow" v-if="setting.xkSetting.enableTinyMCE">
       <tinymce v-model="htmlContent" :setting="setting.tinymceSetting" ref="tinymce"></tinymce>
     </div>
     <button class="xk-button close-preview-full" @click="switchPreviewFull()" v-show="editorModeShow&&previewShow=='full'">关闭</button>
@@ -191,7 +191,8 @@ export default {
           imgUpload: true,
           scrollMode: 'anchor',
           pasteFormat: true,
-          pasteImageUpload: true
+          pasteImageUpload: true,
+          enableTinyMCE: true
         }
       }
     }
@@ -394,6 +395,7 @@ export default {
       })
     },
     switchEditor() {
+      if(!this.setting.xkSetting.enableTinyMCE) return false
       if(this.editorMode !== 'ace') {
         this.markdownContent = toMarkdown(this.htmlContent, true)
         this.$refs.ace.setValue(this.markdownContent)
