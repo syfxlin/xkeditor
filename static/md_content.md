@@ -1,3 +1,5 @@
+<img class="graffiti" id="canvas-1" src="static/bg.jpg">
+
 # XK-Editor
 
 > 一个支持富文本和Markdown的编辑器
