@@ -18,7 +18,13 @@
   <div class="ace-container">
     <div class="ace-toolbar" v-show="aceToolbarShow">
       <template v-for="num in 6">
-        <button class="xk-button" type="text" :key="num.id" :title="'标题' + num" @click="toolbarClick('h' + num)">
+        <button
+          class="xk-button"
+          type="text"
+          :key="num.id"
+          :title="'标题' + num"
+          @click="toolbarClick('h' + num)"
+        >
           <b>H{{ num }}</b>
         </button>
       </template>
@@ -34,13 +40,20 @@
             :title="item.title"
             @click="toolbarClick(item.operate)"
           >
-            <fa-icon :icon="item.icon"/>
+            <fa-icon :icon="item.icon" />
           </button>
         </template>
       </template>
     </div>
     <div class="ace-toolbar-html ace-toolbar" v-show="!aceToolbarShow&&aceToolbarHtmlShow">
-      <button class="xk-button" type="text" title="转换为Markdown模式" @click="function(){aceToolbarShow = true;switchEditorMode()}"><fa-icon icon="file-code"/> 转换为Markdown模式</button>
+      <button
+        class="xk-button"
+        type="text"
+        title="转换为Markdown模式"
+        @click="function(){aceToolbarShow = true;switchEditorMode()}"
+      >
+        <fa-icon icon="file-code" />转换为Markdown模式
+      </button>
     </div>
     <div class="ace-editor" ref="ace"></div>
     <div class="ace-toolbar-modal" v-show="aceToolbarModal.base.isShowModal" v-dialogDrag>
@@ -73,7 +86,7 @@
               </div>
               <template v-if="openImgUpload">
                 <div class="xk-input xk-col-12">
-                  <input id="img-upload" type="file"/>
+                  <input id="img-upload" type="file" />
                 </div>
                 <div class="xk-input xk-col-12 img-upload-sub">
                   <button class="xk-button" @click="imgUpload">上传</button>
@@ -103,7 +116,11 @@
             <div v-show="aceToolbarModal.localStorage">
               <label>保存的标记(Filename)</label>
               <div class="xk-input">
-                <input v-model="aceToolbarModal.data.locationStorage" placeholder="请输入保存的标记" autofocus />
+                <input
+                  v-model="aceToolbarModal.data.locationStorage"
+                  placeholder="请输入保存的标记"
+                  autofocus
+                />
               </div>
             </div>
             <div v-show="aceToolbarModal.table">
@@ -120,20 +137,52 @@
               <div>
                 <div class="xk-radio-group">
                   <div class="xk-radio">
-                    <input type="radio" value="normal" v-model="aceToolbarModal.data.type" id="xk-type-normal" />
-                    <label for="xk-type-normal"><div class="advice"></div><fa-icon icon="align-justify"/></label>
+                    <input
+                      type="radio"
+                      value="normal"
+                      v-model="aceToolbarModal.data.type"
+                      id="xk-type-normal"
+                    />
+                    <label for="xk-type-normal">
+                      <div class="advice"></div>
+                      <fa-icon icon="align-justify" />
+                    </label>
                   </div>
                   <div class="xk-radio">
-                    <input type="radio" value="left" v-model="aceToolbarModal.data.type" id="xk-type-left" />
-                    <label for="xk-type-left"><div class="advice"></div><fa-icon icon="align-left"/></label>
+                    <input
+                      type="radio"
+                      value="left"
+                      v-model="aceToolbarModal.data.type"
+                      id="xk-type-left"
+                    />
+                    <label for="xk-type-left">
+                      <div class="advice"></div>
+                      <fa-icon icon="align-left" />
+                    </label>
                   </div>
                   <div class="xk-radio">
-                    <input type="radio" value="center" v-model="aceToolbarModal.data.type" id="xk-type-center" />
-                    <label for="xk-type-center"><div class="advice"></div><fa-icon icon="align-center"/></label>
+                    <input
+                      type="radio"
+                      value="center"
+                      v-model="aceToolbarModal.data.type"
+                      id="xk-type-center"
+                    />
+                    <label for="xk-type-center">
+                      <div class="advice"></div>
+                      <fa-icon icon="align-center" />
+                    </label>
                   </div>
                   <div class="xk-radio">
-                    <input type="radio" value="right" v-model="aceToolbarModal.data.type" id="xk-type-right" />
-                    <label for="xk-type-right"><div class="advice"></div><fa-icon icon="align-right"/></label>
+                    <input
+                      type="radio"
+                      value="right"
+                      v-model="aceToolbarModal.data.type"
+                      id="xk-type-right"
+                    />
+                    <label for="xk-type-right">
+                      <div class="advice"></div>
+                      <fa-icon icon="align-right" />
+                    </label>
                   </div>
                 </div>
               </div>
@@ -141,8 +190,14 @@
             <div v-show="aceToolbarModal.help" class="markdown-body help">
               <h3>Markdown语法</h3>
               <ul>
-                <li><a href="http://www.markdown.cn/">Markdown 语法说明</a></li>
-                <li><a href="https://help.github.com/articles/github-flavored-markdown/">GitHub Flavored Markdown</a></li>
+                <li>
+                  <a href="http://www.markdown.cn/">Markdown 语法说明</a>
+                </li>
+                <li>
+                  <a
+                    href="https://help.github.com/articles/github-flavored-markdown/"
+                  >GitHub Flavored Markdown</a>
+                </li>
               </ul>
               <h3>XK-Editor独有的语法</h3>
               <table>
@@ -297,10 +352,31 @@
               <h2>XK-Editor</h2>
               <p>开源的Markdown和富文本编辑器。基于Vue开发</p>
               <p>支持Markdown和HTML互转</p>
-              <p><strong>项目地址：</strong><a href="https://github.com/syfxlin/xkeditor">https://github.com/syfxlin/xkeditor</a></p>
-              <p><a href="https://github.com/syfxlin/xkeditor">XK-Editor</a> 由 <a href="https://github.com/syfxlin">Otstar Lin</a>和下列<a href="https://github.com/syfxlin/xkeditor/graphs/contributors">贡献者</a>的帮助下撰写和维护。</p>
-              <blockquote>Otstar Lin - <a href="https://ixk.me/">Personal Website</a> · <a href="https://blog.ixk.me/">Blog</a> · <a href="https://github.com/syfxlin">Github</a></blockquote>
+              <p>
+                <strong>项目地址：</strong>
+                <a href="https://github.com/syfxlin/xkeditor">https://github.com/syfxlin/xkeditor</a>
+              </p>
+              <p>
+                <a href="https://github.com/syfxlin/xkeditor">XK-Editor</a> 由
+                <a href="https://github.com/syfxlin">Otstar Lin</a>和下列
+                <a href="https://github.com/syfxlin/xkeditor/graphs/contributors">贡献者</a>的帮助下撰写和维护。
+              </p>
+              <blockquote>
+                Otstar Lin -
+                <a href="https://ixk.me/">Personal Website</a> ·
+                <a href="https://blog.ixk.me/">Blog</a> ·
+                <a href="https://github.com/syfxlin">Github</a>
+              </blockquote>
               <p style="font-size:0.8em">Copyright © 2019 Otstar Lin, 根据 Apache License 2.0 许可证开源。</p>
+            </div>
+            <div v-show="aceToolbarModal.graff">
+              <label>若涂鸦板要使用基础图像，请上传图片，若不使用请直接点击上传。</label>
+              <div class="xk-input xk-col-12">
+                <input id="graff-upload" type="file" accept="image/png" />
+              </div>
+              <div class="xk-input xk-col-12 graff-upload-sub">
+                <button class="xk-button" @click="graffUpload">上传</button>
+              </div>
             </div>
           </div>
           <div class="xk-clear"></div>
@@ -309,7 +385,7 @@
             <button class="xk-button xk-button-primary" @click="aceToolbarSubmit">确定</button>
           </div>
           <span class="xk-modal-close" @click="aceToolbarCancer">
-            <fa-icon icon="times"/>
+            <fa-icon icon="times" />
           </span>
         </div>
       </div>
@@ -328,13 +404,13 @@
 // import "ace-builds/src-noconflict/ext-language_tools"
 
 //fa icon
-import { library } from "@fortawesome/fontawesome-svg-core"
-import { fas } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
-library.add(fas)
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+library.add(fas);
 
 //switch markdown and html
-import { toHtml, toMarkdown } from '../utils/switchContent'
+import { toHtml, toMarkdown } from "../utils/switchContent";
 
 export default {
   components: {
@@ -356,8 +432,8 @@ export default {
           isShowModal: false
         },
         data: {
-          modalTitle: ' ',
-          allLine: 1,
+          modalTitle: " ",
+          allLine: 1
         },
         link: false,
         image: false,
@@ -368,7 +444,8 @@ export default {
         info: false,
         help: false,
         setLocalStorage: false,
-        getLocalStorage: false
+        getLocalStorage: false,
+        graff: false
       },
       aceToolbarButtons: [
         {
@@ -512,6 +589,11 @@ export default {
           icon: "video"
         },
         {
+          title: "涂鸦",
+          operate: "graff",
+          icon: "palette"
+        },
+        {
           title: "",
           operate: "|",
           icon: "|"
@@ -622,633 +704,739 @@ export default {
           icon: "info-circle"
         }
       ]
-    }
+    };
   },
   computed: {
     openImgUpload() {
-      return this.$parent.setting.xkSetting.imgUpload ? true : false
+      return this.$parent.setting.xkSetting.imgUpload ? true : false;
     }
   },
   mounted() {
     //初始化Value
-    this.setting.value = this.value ? this.value : ""
-    ace.config.set('basePath', 'https://cdn.jsdelivr.net/npm/ace-builds@1.4.4/src-noconflict/')
-    this.aceEditor = ace.edit(this.$refs.ace,
-      this.setting
-    )
-    this.aceEditor.getSession().on('change', this.updateValue)
-    if(window.isMobile) {
-      this.execCommand('switchPreview')
+    this.setting.value = this.value ? this.value : "";
+    ace.config.set(
+      "basePath",
+      "https://cdn.jsdelivr.net/npm/ace-builds@1.4.4/src-noconflict/"
+    );
+    this.aceEditor = ace.edit(this.$refs.ace, this.setting);
+    this.aceEditor.getSession().on("change", this.updateValue);
+    if (window.isMobile) {
+      this.execCommand("switchPreview");
     }
-    this.initKey()
+    this.initKey();
   },
   methods: {
     initKey() {
-      var _this = this
+      var _this = this;
       var keys = [
         {
-          name: 'toHtmlEditor',
-          win: 'F1',
-          mac: 'F1',
+          name: "toHtmlEditor",
+          win: "F1",
+          mac: "F1",
           exec: function() {
-            _this.toolbarClick('toHtmlEditor')
+            _this.toolbarClick("toHtmlEditor");
           }
         },
         {
-          name: 'toTinyMCE',
-          win: 'F2',
-          mac: 'F2',
+          name: "toTinyMCE",
+          win: "F2",
+          mac: "F2",
           exec: function() {
-            _this.toolbarClick('toTinyMCE')
+            _this.toolbarClick("toTinyMCE");
           }
         },
         {
-          name: 'toc',
-          win: 'F7',
-          mac: 'F7',
+          name: "toc",
+          win: "F7",
+          mac: "F7",
           exec: function() {
-            _this.toolbarClick('toc')
+            _this.toolbarClick("toc");
           }
         },
         {
-          name: 'typewriter',
-          win: 'F8',
-          mac: 'F8',
+          name: "typewriter",
+          win: "F8",
+          mac: "F8",
           exec: function() {
-            _this.toolbarClick('typewriter')
+            _this.toolbarClick("typewriter");
           }
         },
         {
-          name: 'switchPreview',
-          win: 'F9',
-          mac: 'F9',
+          name: "switchPreview",
+          win: "F9",
+          mac: "F9",
           exec: function() {
-            _this.toolbarClick('switchPreview')
+            _this.toolbarClick("switchPreview");
           }
         },
         {
-          name: 'fullPreview',
-          win: 'F10',
-          mac: 'F10',
+          name: "fullPreview",
+          win: "F10",
+          mac: "F10",
           exec: function() {
-            _this.toolbarClick('fullPreview')
+            _this.toolbarClick("fullPreview");
           }
         },
         {
-          name: 'fullScreen',
-          win: 'F11',
-          mac: 'F11',
+          name: "fullScreen",
+          win: "F11",
+          mac: "F11",
           exec: function() {
-            _this.toolbarClick('fullScreen')
+            _this.toolbarClick("fullScreen");
           }
         },
         {
-          name: 'H1',
-          win: 'Ctrl-1',
-          mac: 'Command-1',
+          name: "H1",
+          win: "Ctrl-1",
+          mac: "Command-1",
           exec: function() {
-            _this.toolbarClick('h1')
+            _this.toolbarClick("h1");
           }
         },
         {
-          name: 'H2',
-          win: 'Ctrl-2',
-          mac: 'Command-2',
+          name: "H2",
+          win: "Ctrl-2",
+          mac: "Command-2",
           exec: function() {
-            _this.toolbarClick('h2')
+            _this.toolbarClick("h2");
           }
         },
         {
-          name: 'H3',
-          win: 'Ctrl-3',
-          mac: 'Command-3',
+          name: "H3",
+          win: "Ctrl-3",
+          mac: "Command-3",
           exec: function() {
-            _this.toolbarClick('h3')
+            _this.toolbarClick("h3");
           }
         },
         {
-          name: 'H4',
-          win: 'Ctrl-4',
-          mac: 'Command-4',
+          name: "H4",
+          win: "Ctrl-4",
+          mac: "Command-4",
           exec: function() {
-            _this.toolbarClick('h4')
+            _this.toolbarClick("h4");
           }
         },
         {
-          name: 'H5',
-          win: 'Ctrl-5',
-          mac: 'Command-5',
+          name: "H5",
+          win: "Ctrl-5",
+          mac: "Command-5",
           exec: function() {
-            _this.toolbarClick('h5')
+            _this.toolbarClick("h5");
           }
         },
         {
-          name: 'H6',
-          win: 'Ctrl-6',
-          mac: 'Command-6',
+          name: "H6",
+          win: "Ctrl-6",
+          mac: "Command-6",
           exec: function() {
-            _this.toolbarClick('h6')
+            _this.toolbarClick("h6");
           }
         },
         {
-          name: 'bold',
-          win: 'Ctrl-B',
-          mac: 'Command-B',
+          name: "bold",
+          win: "Ctrl-B",
+          mac: "Command-B",
           exec: function() {
-            _this.toolbarClick('bold')
+            _this.toolbarClick("bold");
           }
         },
         {
-          name: 'time',
-          win: 'Ctrl-D',
-          mac: 'Command-D',
+          name: "time",
+          win: "Ctrl-D",
+          mac: "Command-D",
           exec: function() {
-            _this.toolbarClick('time')
+            _this.toolbarClick("time");
           }
         },
         {
-          name: 'minus',
-          win: 'Ctrl-H',
-          mac: 'Command-H',
+          name: "minus",
+          win: "Ctrl-H",
+          mac: "Command-H",
           exec: function() {
-            _this.toolbarClick('minus')
+            _this.toolbarClick("minus");
           }
         },
         {
-          name: 'italic',
-          win: 'Ctrl-I',
-          mac: 'Command-I',
+          name: "italic",
+          win: "Ctrl-I",
+          mac: "Command-I",
           exec: function() {
-            _this.toolbarClick('italic')
+            _this.toolbarClick("italic");
           }
         },
         {
-          name: 'mark',
-          win: 'Ctrl-K',
-          mac: 'Command-K',
+          name: "mark",
+          win: "Ctrl-K",
+          mac: "Command-K",
           exec: function() {
-            _this.toolbarClick('mark')
+            _this.toolbarClick("mark");
           }
         },
         {
-          name: 'link',
-          win: 'Ctrl-L',
-          mac: 'Command-L',
+          name: "link",
+          win: "Ctrl-L",
+          mac: "Command-L",
           exec: function() {
-            _this.toolbarClick('link')
+            _this.toolbarClick("link");
           }
         },
         {
-          name: 'ul',
-          win: 'Ctrl-U',
-          mac: 'Command-U',
+          name: "ul",
+          win: "Ctrl-U",
+          mac: "Command-U",
           exec: function() {
-            _this.toolbarClick('ul')
+            _this.toolbarClick("ul");
           }
         },
         {
-          name: 'image',
-          win: 'Ctrl-Shift-I',
-          mac: 'Command-Shift-I',
+          name: "image",
+          win: "Ctrl-Shift-I",
+          mac: "Command-Shift-I",
           exec: function() {
-            _this.toolbarClick('image')
+            _this.toolbarClick("image");
           }
         },
         {
-          name: 'tex-$',
-          win: 'Ctrl-Shift-K',
-          mac: 'Command-Shift-K',
+          name: "tex-$",
+          win: "Ctrl-Shift-K",
+          mac: "Command-Shift-K",
           exec: function() {
-            _this.toolbarClick('tex-$')
+            _this.toolbarClick("tex-$");
           }
         },
         {
-          name: 'ol',
-          win: 'Ctrl-Shift-O',
-          mac: 'Command-Shift-O',
+          name: "ol",
+          win: "Ctrl-Shift-O",
+          mac: "Command-Shift-O",
           exec: function() {
-            _this.toolbarClick('ol')
+            _this.toolbarClick("ol");
           }
         },
         {
-          name: 'code',
-          win: 'Ctrl-Shift-P',
-          mac: 'Command-Shift-P',
+          name: "code",
+          win: "Ctrl-Shift-P",
+          mac: "Command-Shift-P",
           exec: function() {
-            _this.toolbarClick('code')
+            _this.toolbarClick("code");
           }
         },
         {
-          name: 'quote',
-          win: 'Ctrl-Shift-Q',
-          mac: 'Command-Shift-Q',
+          name: "quote",
+          win: "Ctrl-Shift-Q",
+          mac: "Command-Shift-Q",
           exec: function() {
-            _this.toolbarClick('quote')
+            _this.toolbarClick("quote");
           }
         },
         {
-          name: 'strikethrough',
-          win: 'Ctrl-Shift-S',
-          mac: 'Command-Shift-S',
+          name: "strikethrough",
+          win: "Ctrl-Shift-S",
+          mac: "Command-Shift-S",
           exec: function() {
-            _this.toolbarClick('strikethrough')
+            _this.toolbarClick("strikethrough");
           }
         },
         {
-          name: 'table',
-          win: 'Ctrl-Shift-T',
-          mac: 'Command-Shift-T',
+          name: "table",
+          win: "Ctrl-Shift-T",
+          mac: "Command-Shift-T",
           exec: function() {
-            _this.toolbarClick('table')
+            _this.toolbarClick("table");
           }
         },
         {
-          name: 'help',
-          win: 'Ctrl-Shift-H',
-          mac: 'Command-Shift-H',
+          name: "help",
+          win: "Ctrl-Shift-H",
+          mac: "Command-Shift-H",
           exec: function() {
-            _this.toolbarClick('help')
+            _this.toolbarClick("help");
           }
         },
         {
-          name: 'toLine',
-          win: 'Ctrl-Shift-G',
-          mac: 'Command-Shift-G',
+          name: "toLine",
+          win: "Ctrl-Shift-G",
+          mac: "Command-Shift-G",
           exec: function() {
-            _this.toolbarClick('toLine')
+            _this.toolbarClick("toLine");
           }
         }
-      ]
-      this.execCommand('addKeys', keys)
+      ];
+      this.execCommand("addKeys", keys);
     },
     setValue(val) {
-      this.aceEditor.setValue(val)
+      this.aceEditor.setValue(val);
     },
     updateValue() {
-      this.$emit("input", this.aceEditor.getSession().getValue())
+      this.$emit("input", this.aceEditor.getSession().getValue());
     },
     switchEditorMode() {
-      if(this.isMarkdownMode) {
-        this.switchToHtml()
+      if (this.isMarkdownMode) {
+        this.switchToHtml();
       } else {
-        this.switchToMarkdown()
+        this.switchToMarkdown();
       }
     },
     switchToHtml() {
       if (this.isMarkdownMode) {
-        this.aceEditor.session.setMode("ace/mode/html")
-        this.aceEditor.getSession().setValue(toHtml(this.aceEditor.getSession().getValue(), false))
-        this.isMarkdownMode = false
+        this.aceEditor.session.setMode("ace/mode/html");
+        this.aceEditor
+          .getSession()
+          .setValue(toHtml(this.aceEditor.getSession().getValue(), false));
+        this.isMarkdownMode = false;
       }
     },
     switchToMarkdown() {
       if (!this.isMarkdownMode) {
-        this.aceEditor.session.setMode("ace/mode/markdown")
-        this.aceEditor.getSession().setValue(toMarkdown(this.aceEditor.getSession().getValue(), true))
-        this.isMarkdownMode = true
+        this.aceEditor.session.setMode("ace/mode/markdown");
+        this.aceEditor
+          .getSession()
+          .setValue(toMarkdown(this.aceEditor.getSession().getValue(), true));
+        this.isMarkdownMode = true;
       }
     },
     toolbarClick(operate) {
-      this.aceToolbarModal.data.operate = operate
-      let str = ''
-      let isStart = false
-      let toLeft = 0
-      let selectText = this.aceEditor.getSelectedText()
+      this.aceToolbarModal.data.operate = operate;
+      let str = "";
+      let isStart = false;
+      let toLeft = 0;
+      let selectText = this.aceEditor.getSelectedText();
       if (operate.match(/^h(\d)/)) {
-        str = "#".repeat(operate.substring(1)) + " "
-        isStart = true
+        str = "#".repeat(operate.substring(1)) + " ";
+        isStart = true;
       } else if (operate === "bold") {
-        str = "**" + selectText + "**"
-        toLeft = 2
+        str = "**" + selectText + "**";
+        toLeft = 2;
       } else if (operate === "italic") {
-        str = "*" + selectText + "*"
-        toLeft = 1
+        str = "*" + selectText + "*";
+        toLeft = 1;
       } else if (operate === "underline") {
-        str = '<span style="text-decoration: underline">' + selectText + "</span>"
-        toLeft = 7
+        str =
+          '<span style="text-decoration: underline">' + selectText + "</span>";
+        toLeft = 7;
       } else if (operate === "strikethrough") {
-        str = "~" + selectText + "~"
-        toLeft = 1
+        str = "~" + selectText + "~";
+        toLeft = 1;
       } else if (operate === "quote") {
-        str = "> "
-        isStart = true
+        str = "> ";
+        isStart = true;
       } else if (operate === "mark") {
-        str = "`" + selectText + "`"
-        toLeft = 1
+        str = "`" + selectText + "`";
+        toLeft = 1;
       } else if (operate === "code") {
-        str = "```\n```"
-        toLeft = 4
-      } else if(operate === "sup") {
-        str = "<sup>" + selectText + "</sup>"
-        toLeft = 6
-      } else if(operate === "sub") {
-        str = "<sub>" + selectText + "</sub>"
-        toLeft = 6
-      } else if(operate === "tex-$") {
-        str = "$$" + selectText + "$$"
-        toLeft = 2
-      } else if(operate === "tex-math") {
-        str = "```math\n\n```"
-        toLeft = 4
-      } else if(operate === "flow") {
-        str = "```flow\n```"
-        toLeft = 4
-      } else if(operate === "seq") {
-        str = "```seq\n\n```"
-        toLeft = 4
-      } else if(operate === "gantt") {
-        str = "```gantt\n\n```"
-        toLeft = 4
-      } else if(operate === "mermaid") {
-        str = "```mermaid\n\n```"
-        toLeft = 4
+        str = "```\n```";
+        toLeft = 4;
+      } else if (operate === "sup") {
+        str = "<sup>" + selectText + "</sup>";
+        toLeft = 6;
+      } else if (operate === "sub") {
+        str = "<sub>" + selectText + "</sub>";
+        toLeft = 6;
+      } else if (operate === "tex-$") {
+        str = "$$" + selectText + "$$";
+        toLeft = 2;
+      } else if (operate === "tex-math") {
+        str = "```math\n\n```";
+        toLeft = 4;
+      } else if (operate === "flow") {
+        str = "```flow\n```";
+        toLeft = 4;
+      } else if (operate === "seq") {
+        str = "```seq\n\n```";
+        toLeft = 4;
+      } else if (operate === "gantt") {
+        str = "```gantt\n\n```";
+        toLeft = 4;
+      } else if (operate === "mermaid") {
+        str = "```mermaid\n\n```";
+        toLeft = 4;
       } else if (operate === "ul") {
-        str = "- "
-        isStart = true
+        str = "- ";
+        isStart = true;
       } else if (operate === "ol") {
-        str = "1. "
-        isStart = true
+        str = "1. ";
+        isStart = true;
       } else if (operate === "minus") {
-        str = "\n---\n\n"
-        isStart = true
+        str = "\n---\n\n";
+        isStart = true;
       } else if (operate === "table") {
-        this.operateModal(operate, true, '添加表格')
-        return
+        this.operateModal(operate, true, "添加表格");
+        return;
       } else if (operate === "time") {
-        str = new Date().toLocaleString()
+        str = new Date().toLocaleString();
       } else if (operate === "link") {
-        this.operateModal(operate, true, '添加链接')
-        return
+        this.operateModal(operate, true, "添加链接");
+        return;
       } else if (operate === "image") {
-        this.operateModal(operate, true, '添加图片')
-        return
+        this.operateModal(operate, true, "添加图片");
+        return;
       } else if (operate === "video") {
-        this.operateModal(operate, true, '添加视频')
-        return
-      } else if (/(toLine|search|toc|switchPreview|fullPreview|fullScreen|toHtmlEditor|toTinyMCE|empty|setting|undo|redo)/g.test(operate)) {
-        this.execCommand(operate)
+        this.operateModal(operate, true, "添加视频");
+        return;
+      } else if (operate === "graff") {
+        this.operateModal(operate, true, "上传涂鸦图");
+        return;
+      } else if (
+        /(toLine|search|toc|switchPreview|fullPreview|fullScreen|toHtmlEditor|toTinyMCE|empty|setting|undo|redo)/g.test(
+          operate
+        )
+      ) {
+        this.execCommand(operate);
       } else if (operate === "typewriter") {
-        this.execCommand(operate)
-      } else if(operate === 'setLocalStorage') {
-        this.operateModal('localStorage', true, '保存到本地')
-        return
-      } else if(operate === 'getLocalStorage') {
-        this.operateModal('localStorage', true, '从本地读取')
-        return
-      } else if(operate === 'removeLocalStorage') {
-        this.operateModal('localStorage', true, '删除本地存储')
-        return
-      } else if(operate === 'help') {
-        this.operateModal(operate, true, '帮助')
-        return
-      } else if(operate === 'info') {
-        this.operateModal(operate, true, '关于')
-        return
+        this.execCommand(operate);
+      } else if (operate === "setLocalStorage") {
+        this.operateModal("localStorage", true, "保存到本地");
+        return;
+      } else if (operate === "getLocalStorage") {
+        this.operateModal("localStorage", true, "从本地读取");
+        return;
+      } else if (operate === "removeLocalStorage") {
+        this.operateModal("localStorage", true, "删除本地存储");
+        return;
+      } else if (operate === "help") {
+        this.operateModal(operate, true, "帮助");
+        return;
+      } else if (operate === "info") {
+        this.operateModal(operate, true, "关于");
+        return;
       }
-      this.operateAceContent(isStart, toLeft, str)
+      this.operateAceContent(isStart, toLeft, str);
     },
-    operateModal(operate, isShow, title = '') {
-      if(!isShow) {
-        this.aceToolbarModal[operate] = false
-        return
+    operateModal(operate, isShow, title = "") {
+      if (!isShow) {
+        this.aceToolbarModal[operate] = false;
+        return;
       }
-      this.aceToolbarModal[operate] = true
-      this.aceToolbarModal.data.modalTitle = title
-      this.aceToolbarModal.base.isShowModal = true
+      this.aceToolbarModal[operate] = true;
+      this.aceToolbarModal.data.modalTitle = title;
+      this.aceToolbarModal.base.isShowModal = true;
     },
     operateAceContent(isStart, toLeft, str) {
-      let range = this.aceEditor.getSelectionRange()
+      let range = this.aceEditor.getSelectionRange();
       if (isStart) {
         for (let i = range.start.row; i <= range.end.row; i++) {
-          this.aceEditor.session.replace(new ace.Range(i, 0, i, 0), str)
+          this.aceEditor.session.replace(new ace.Range(i, 0, i, 0), str);
         }
       } else {
-        this.aceEditor.session.replace(range, str)
+        this.aceEditor.session.replace(range, str);
       }
       if (toLeft) {
-        this.aceEditor.navigateLeft(toLeft)
+        this.aceEditor.navigateLeft(toLeft);
       }
-      this.aceEditor.focus()
+      this.aceEditor.focus();
     },
     aceToolbarSubmit() {
-      let str = ''
-      let data = this.aceToolbarModal.data
-      if(data.operate === 'table') {
-        if(data.row > 1) {
-          data.row = parseInt(data.row) + 1
+      let str = "";
+      let data = this.aceToolbarModal.data;
+      if (data.operate === "table") {
+        if (data.row > 1) {
+          data.row = parseInt(data.row) + 1;
         }
         for (let i = 0; i < data.row; i++) {
           for (let j = 0; j < data.column; j++) {
-            str += '| '
-            if(i == 1) {
-              if(data.type === 'left' || data.type === 'center') {
-                str += ':'
+            str += "| ";
+            if (i == 1) {
+              if (data.type === "left" || data.type === "center") {
+                str += ":";
               }
-              str += '----------'
-              if(data.type === 'right' || data.type === 'center') {
-                str += ':'
+              str += "----------";
+              if (data.type === "right" || data.type === "center") {
+                str += ":";
               }
             }
-            str += ' '
+            str += " ";
           }
-          str += '|\n'
+          str += "|\n";
         }
-      } else if(data.operate === 'link') {
-        str = '[' + data.title + '](' + data.href + ')'
-      } else if(data.operate === 'image') {
-        str = '![' + data.art + '](' + data.src + ')'
-      } else if(data.operate === 'video') {
-        if(!/\w+\.(\w+)$/.test(data.src)) {
+      } else if (data.operate === "link") {
+        str = "[" + data.title + "](" + data.href + ")";
+      } else if (data.operate === "image") {
+        str = "![" + data.art + "](" + data.src + ")";
+      } else if (data.operate === "video") {
+        if (!/\w+\.(\w+)$/.test(data.src)) {
           //TODO: 移除AT-UI后的依赖
-          this.$Message.error('地址输入有误！请重新输入(无法识别扩展名)')
-          return
+          this.$Message.error("地址输入有误！请重新输入(无法识别扩展名)");
+          return;
         }
-        let type = data.src.match(/\w+\.(\w+)$/)
-        str = '<video controls="controls" width="' + data.width + '" height="' + data.height + '"><source src="' + data.src + '" type="video/' + type[1] + '" /></video>'
-      } else if(data.operate === 'toLine') {
-        this.aceEditor.gotoLine(data.line)
-        this.aceEditor.focus()
-        this.operateModal(data.operate, false)
-        this.aceToolbarCancer()
-        return
-      } else if(data.operate === 'setLocalStorage') {
-        window.XKEditor.setLocalStorage(this.aceToolbarModal.data.locationStorage)
-        this.aceToolbarCancer()
-        return
-      } else if(data.operate === 'getLocalStorage') {
-        str = window.XKEditor.getLocalStorage(this.aceToolbarModal.data.locationStorage)
-        this.setValue(str)
-        this.aceToolbarCancer()
-        return
-      } else if(data.operate === 'removeLocalStorage') {
-        window.XKEditor.removeLocalStorage(this.aceToolbarModal.data.locationStorage)
-        this.aceToolbarCancer()
-        return
+        let type = data.src.match(/\w+\.(\w+)$/);
+        str =
+          '<video controls="controls" width="' +
+          data.width +
+          '" height="' +
+          data.height +
+          '"><source src="' +
+          data.src +
+          '" type="video/' +
+          type[1] +
+          '" /></video>';
+      } else if (data.operate === "graff") {
+        str = "[graff]{" + data.hash + "}";
+      } else if (data.operate === "toLine") {
+        this.aceEditor.gotoLine(data.line);
+        this.aceEditor.focus();
+        this.operateModal(data.operate, false);
+        this.aceToolbarCancer();
+        return;
+      } else if (data.operate === "setLocalStorage") {
+        window.XKEditor.setLocalStorage(
+          this.aceToolbarModal.data.locationStorage
+        );
+        this.aceToolbarCancer();
+        return;
+      } else if (data.operate === "getLocalStorage") {
+        str = window.XKEditor.getLocalStorage(
+          this.aceToolbarModal.data.locationStorage
+        );
+        this.setValue(str);
+        this.aceToolbarCancer();
+        return;
+      } else if (data.operate === "removeLocalStorage") {
+        window.XKEditor.removeLocalStorage(
+          this.aceToolbarModal.data.locationStorage
+        );
+        this.aceToolbarCancer();
+        return;
       }
-      this.operateModal(data.operate, false)
-      this.operateAceContent(false, 0, str)
-      this.aceToolbarCancer()
+      this.operateModal(data.operate, false);
+      this.operateAceContent(false, 0, str);
+      this.aceToolbarCancer();
     },
     aceToolbarCancer() {
-      this.aceToolbarModal.link =  false
-      this.aceToolbarModal.image = false
-      this.aceToolbarModal.video = false
-      this.aceToolbarModal.toLine = false
-      this.aceToolbarModal.search = false
-      this.aceToolbarModal.table = false
-      this.aceToolbarModal.help = false
-      this.aceToolbarModal.info = false
-      this.aceToolbarModal.localStorage = false
-      this.aceToolbarModal.base.isShowModal = false
+      this.aceToolbarModal.link = false;
+      this.aceToolbarModal.image = false;
+      this.aceToolbarModal.video = false;
+      this.aceToolbarModal.toLine = false;
+      this.aceToolbarModal.search = false;
+      this.aceToolbarModal.table = false;
+      this.aceToolbarModal.help = false;
+      this.aceToolbarModal.info = false;
+      this.aceToolbarModal.localStorage = false;
+      this.aceToolbarModal.graff = false;
+      this.aceToolbarModal.base.isShowModal = false;
     },
     operateFullScreen() {
-      if(document.fullscreenElement || document.msFullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement) {
-        if(document.exitFullscreen) {
-          return document.exitFullscreen()
-        } else if(document.webkitExitFullscreen) {
-          return document.webkitExitFullscreen()
-        } else if(document.mozCancelFullScreen) {
-          return document.mozCancelFullScreen()
-        } else if(document.msExitFullscreen) {
-          return document.msExitFullscreen()
+      if (
+        document.fullscreenElement ||
+        document.msFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.webkitFullscreenElement
+      ) {
+        if (document.exitFullscreen) {
+          return document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          return document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          return document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          return document.msExitFullscreen();
         }
       } else {
-        var root = document.documentElement
-        if(root.requestFullscreen) {
-          return root.requestFullscreen()
-        } else if(root.webkitRequestFullscreen) {
-          return root.webkitRequestFullscreen()
-        } else if(root.mozRequestFullScreen) {
-          return root.mozRequestFullScreen()
-        } else if(root.msRequestFullscreen) {
-          return root.msRequestFullscreen()
+        var root = document.documentElement;
+        if (root.requestFullscreen) {
+          return root.requestFullscreen();
+        } else if (root.webkitRequestFullscreen) {
+          return root.webkitRequestFullscreen();
+        } else if (root.mozRequestFullScreen) {
+          return root.mozRequestFullScreen();
+        } else if (root.msRequestFullscreen) {
+          return root.msRequestFullscreen();
         }
       }
     },
     imgUpload() {
-      var _this = this
-      if(document.getElementById('img-upload').files.length > 0) {
-        let file = document.getElementById('img-upload').files[0]
-        window.XKEditorAPI.imgUpload(file, function(response) {
-          _this.$set(_this.aceToolbarModal.data, 'src', response.data.path)
-          //TODO: 上传成功提示
-        }, function(error) {
-          //TODO: 上传失败提示
-          console.log(error)
-        })
+      if (document.getElementById("img-upload").files.length > 0) {
+        let file = document.getElementById("img-upload").files[0];
+        window.XKEditorAPI.imgUpload(
+          file,
+          function(response) {
+            window.eThis.a.$set(
+              window.eThis.a.aceToolbarModal.data,
+              "src",
+              response.data.path
+            );
+            //TODO: 上传成功提示
+          },
+          function(error) {
+            //TODO: 上传失败提示
+            console.log(error);
+          }
+        );
       } else {
         //TODO: 未选择文件提示
-        console.log('error')
+        console.log("error");
+      }
+    },
+    graffUpload() {
+      let hash = Math.random()
+        .toString(36)
+        .substring(2, 8);
+      if (document.getElementById("graff-upload").files.length > 0) {
+        let file = document.getElementById("graff-upload").files[0];
+        window.XKEditorAPI.graffUpload(
+          file,
+          function(response) {
+            window.eThis.a.$set(
+              window.eThis.a.aceToolbarModal.data,
+              "hash",
+              hash
+            );
+            //TODO: 上传成功提示
+          },
+          function(error) {
+            //TODO: 上传失败提示
+            console.log(error);
+          },
+          "graff-" + hash + ".png"
+        );
+      } else {
+        let canvas = document.getElementById("canvas");
+        canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+        canvas.toBlob(function(blob) {
+          let file = new window.File([blob], "graff-" + hash + ".png", {
+            type: blob.type
+          });
+          window.XKEditorAPI.graffUpload(
+            file,
+            function(response) {
+              window.eThis.a.$set(
+                window.eThis.a.aceToolbarModal.data,
+                "hash",
+                hash
+              );
+              //TODO: 上传成功提示
+            },
+            function(error) {
+              //TODO: 上传失败提示
+              console.log(error);
+            }
+          );
+        });
       }
     },
     execCommand(command, data = null) {
       if (command === "toLine") {
-        this.aceToolbarModal.data.allLine = this.aceEditor.session.getLength()
-        this.operateModal(command, true, '跳转到指定行')
-        return
+        this.aceToolbarModal.data.allLine = this.aceEditor.session.getLength();
+        this.operateModal(command, true, "跳转到指定行");
+        return;
       } else if (command === "search") {
-        this.aceEditor.commands.commands.find.exec(this.aceEditor)
-        return
-      } else if(command === "toc") {
-        this.$parent.switchToc()
-        return
-      } else if(command === "switchPreview") {
-        this.$parent.switchPreviewShow()
+        this.aceEditor.commands.commands.find.exec(this.aceEditor);
+        return;
+      } else if (command === "toc") {
+        this.$parent.switchToc();
+        return;
+      } else if (command === "switchPreview") {
+        this.$parent.switchPreviewShow();
         this.$nextTick(function() {
-          this.aceEditor.resize(this.aceEditor)
-        })
-        return
-      } else if(command === "fullPreview") {
-        this.$parent.switchPreviewFull()
+          this.aceEditor.resize(this.aceEditor);
+        });
+        return;
+      } else if (command === "fullPreview") {
+        this.$parent.switchPreviewFull();
         this.$nextTick(function() {
-          this.aceEditor.resize(this.aceEditor)
-        })
-        return
-      } else if(command === "fullScreen") {
-        this.operateFullScreen()
-        return
+          this.aceEditor.resize(this.aceEditor);
+        });
+        return;
+      } else if (command === "fullScreen") {
+        this.operateFullScreen();
+        return;
       } else if (command === "toHtmlEditor") {
-        this.switchEditorMode()
-        this.aceToolbarShow = false
-        return
-      } else if(command === "toTinyMCE") {
-        window.$switchEditor()
-        return
+        this.switchEditorMode();
+        this.aceToolbarShow = false;
+        return;
+      } else if (command === "toTinyMCE") {
+        window.XKEditor.switchEditor();
+        return;
       } else if (command === "empty") {
-        this.aceEditor.setValue("")
-        return
+        this.aceEditor.setValue("");
+        return;
       } else if (command === "setting") {
-        this.aceEditor.commands.commands.showSettingsMenu.exec(this.aceEditor)
-        return
-      } else if(command === "undo") {
-        this.aceEditor.undo()
-        return
-      } else if(command === "redo") {
-        this.aceEditor.redo()
-        return
-      } else if(command === "toolbar") {
-        this.aceToolbarShow = !this.aceToolbarShow
-        this.aceToolbarHtmlShow = !this.aceToolbarHtmlShow
-        return
-      } else if(command === "resize") {
+        this.aceEditor.commands.commands.showSettingsMenu.exec(this.aceEditor);
+        return;
+      } else if (command === "undo") {
+        this.aceEditor.undo();
+        return;
+      } else if (command === "redo") {
+        this.aceEditor.redo();
+        return;
+      } else if (command === "toolbar") {
+        this.aceToolbarShow = !this.aceToolbarShow;
+        this.aceToolbarHtmlShow = !this.aceToolbarHtmlShow;
+        return;
+      } else if (command === "resize") {
         this.$nextTick(function() {
-          this.aceEditor.resize(this.aceEditor)
-        })
-        return
-      } else if(command === "addKeys") {
-        for(let i = 0; i < data.length; i++) {
+          this.aceEditor.resize(this.aceEditor);
+        });
+        return;
+      } else if (command === "addKeys") {
+        for (let i = 0; i < data.length; i++) {
           this.aceEditor.commands.addCommand({
             name: data[i].name,
-            bindKey: {win: data[i].win,  mac: data[i].mac},
+            bindKey: { win: data[i].win, mac: data[i].mac },
             exec: data[i].exec,
             readOnly: true
-          })
+          });
         }
-      } else if(command === "removeKeys") {
-        for(let i = 0; i < data.length; i++) {
-          this.aceEditor.commands.removeCommand(data[i])
+      } else if (command === "removeKeys") {
+        for (let i = 0; i < data.length; i++) {
+          this.aceEditor.commands.removeCommand(data[i]);
         }
-      } else if(command === "typewriter") {
-        var isOne = true
-        var lastRow = window.$ace.selection.getCursor().row
-        if(!window.$typewriter) {
+      } else if (command === "typewriter") {
+        var isOne = true;
+        var lastRow = window.XKEditor.ace.selection.getCursor().row;
+        if (!window.$typewriter) {
           window.$typewriter = function() {
-            if(event && event.type && !/(mousedown|mouseup|touchstart|touchend|touchmove)/g.test(event.type)) {
-              var nowRow = window.$ace.selection.getCursor().row
-              let scroll = 0
-              if(isOne) {
-                scroll = window.$ace.session.getScrollTop() + (parseFloat(document.getElementsByClassName('ace_cursor')[0].style.top.replace('px', ''))
-                          - document.getElementsByClassName('ace-editor')[0].offsetHeight/3)
-                isOne = false
+            if (
+              event &&
+              event.type &&
+              !/(mousedown|mouseup|touchstart|touchend|touchmove)/g.test(
+                event.type
+              )
+            ) {
+              var nowRow = window.XKEditor.ace.selection.getCursor().row;
+              let scroll = 0;
+              if (isOne) {
+                scroll =
+                  window.XKEditor.ace.session.getScrollTop() +
+                  (parseFloat(
+                    document
+                      .getElementsByClassName("ace_cursor")[0]
+                      .style.top.replace("px", "")
+                  ) -
+                    document.getElementsByClassName("ace-editor")[0]
+                      .offsetHeight /
+                      3);
+                isOne = false;
               } else {
-                let rows = nowRow - lastRow
-                if(rows === 0) {
-                  if(event.key === 'ArrowDown') {
-                    rows = 1
-                  } else if(event.key === 'ArrowUp') {
-                    rows = -1
+                let rows = nowRow - lastRow;
+                if (rows === 0) {
+                  if (event.key === "ArrowDown") {
+                    rows = 1;
+                  } else if (event.key === "ArrowUp") {
+                    rows = -1;
                   }
                 }
-                scroll = window.$ace.session.getScrollTop() + rows * window.$ace.renderer.lineHeight
+                scroll =
+                  window.XKEditor.ace.session.getScrollTop() +
+                  rows * window.XKEditor.ace.renderer.lineHeight;
               }
-              if(scroll != 0) {
-                window.$ace.session.setScrollTop(scroll)
+              if (scroll != 0) {
+                window.XKEditor.ace.session.setScrollTop(scroll);
               }
-              lastRow = nowRow
+              lastRow = nowRow;
             }
-          }
+          };
         }
-        if(!this.typewriterMode) {
-          window.$ace.selection.on('changeCursor', window.$typewriter)
+        if (!this.typewriterMode) {
+          this.aceEditor.selection.on("changeCursor", window.$typewriter);
         } else {
-          window.$ace.selection.off('changeCursor', window.$typewriter)
+          this.aceEditor.selection.off("changeCursor", window.$typewriter);
         }
-        this.typewriterMode = !this.typewriterMode
-        return
+        this.typewriterMode = !this.typewriterMode;
+        return;
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -1314,9 +1502,9 @@ th {
   line-height: 1.5;
   text-align: center;
   white-space: nowrap;
-  border: 1px solid #C5D9E8;
+  border: 1px solid #c5d9e8;
   border-radius: 4px;
-  background-color: #FFF;
+  background-color: #fff;
   -webkit-transition: background 0.2s;
   transition: background 0.2s;
   -webkit-user-select: none;
@@ -1331,8 +1519,8 @@ th {
 }
 .ace-toolbar .xk-button {
   background: none;
-  color: #6190E8;
-  color: #3F536E;
+  color: #6190e8;
+  color: #3f536e;
   border: none;
   font-size: 1em;
   padding: 0.6em;
@@ -1347,18 +1535,18 @@ th {
   display: block;
   width: 100%;
   padding: 6px 32px 6px 12px;
-  color: #3F536E;
+  color: #3f536e;
   font-size: 12px;
-  background-color: #FFF;
-  border: 1px solid #C5D9E8;
+  background-color: #fff;
+  border: 1px solid #c5d9e8;
   border-radius: 4px;
-  -webkit-transition: border .2s;
-  transition: border .2s;
+  -webkit-transition: border 0.2s;
+  transition: border 0.2s;
   outline: none;
   box-sizing: border-box;
 }
 .xk-input input:hover {
-  border-color: #79A1EB;
+  border-color: #79a1eb;
 }
 .xk-input i {
   position: absolute;
@@ -1367,7 +1555,7 @@ th {
   margin: 0 6px 0 0;
   width: 20px;
   height: 100%;
-  color: #C5D9E8;
+  color: #c5d9e8;
   font-size: 15px;
   text-align: center;
 }
@@ -1390,8 +1578,8 @@ th {
   border: 1px solid #c5d9e8;
   border-radius: 50%;
   background-color: #fff;
-  -webkit-transition: border .2s;
-  transition: border .2s;
+  -webkit-transition: border 0.2s;
+  transition: border 0.2s;
   display: inline-block;
   vertical-align: middle;
   margin: 5px;
@@ -1415,18 +1603,19 @@ th {
   margin: 0 auto 0 10%;
   border: none;
   border-radius: 4px;
-  background-color: #FFF;
+  background-color: #fff;
   outline: none;
 }
 .xk-modal-header {
   padding: 12px 16px;
-  color: #2C405A;
+  color: #2c405a;
   font-size: 14px;
   font-weight: bold;
   line-height: 1.5;
-  border-bottom: 1px solid #ECECEC;
+  border-bottom: 1px solid #ececec;
 }
-.xk-modal-header p, .xk-modal-header .xk-modal-title {
+.xk-modal-header p,
+.xk-modal-header .xk-modal-title {
   display: inline-block;
   max-width: 100%;
   overflow: hidden;
@@ -1442,7 +1631,7 @@ th {
 }
 .xk-modal-footer {
   padding: 12px 16px;
-  border-top: 1px solid #ECECEC;
+  border-top: 1px solid #ececec;
   text-align: right;
 }
 .xk-modal-close {

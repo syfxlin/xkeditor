@@ -1,4 +1,4 @@
-<img class="graffiti" id="canvas-1" src="static/bg.jpg">
+[graff]{6b3117}
 
 # XK-Editor
 
@@ -94,10 +94,10 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 预格式化文本：
 
 ```
-| First Header  | Second Header |
-| ------------- | ------------- |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
+| First Header | Second Header |
+|--------------|---------------|
+| Content Cell | Content Cell  |
+| Content Cell | Content Cell  |
 ```
 
 #### JS代码　
@@ -180,20 +180,20 @@ if (workbox) {
 ### 绘制表格 Tables
 
 | First Header | Second Header |
-| --- | --- |
-| Content Cell | Content Cell |
-| Content Cell | Content Cell |
+|--------------|---------------|
+| Content Cell | Content Cell  |
+| Content Cell | Content Cell  |
 
-| Function name | Description |
-| --- | --- |
-| `help()` | Display the help window. |
-| `destroy()` | **Destroy your computer!** |
+| Function name | Description                |
+|---------------|----------------------------|
+| `help()`      | Display the help window.   |
+| `destroy()`   | **Destroy your computer!** |
 
-| Left-Aligned | Center Aligned | Right Aligned |
-| :-- | :-: | --: |
-| col 3 is | some wordy text | $1600 |
-| col 2 is | centered | $12 |
-| zebra stripes | are neat | $1 |
+| Left-Aligned  | Center Aligned  | Right Aligned |
+|---------------|-----------------|---------------|
+| col 3 is      | some wordy text | $1600         |
+| col 2 is      | centered        | $12           |
+| zebra stripes | are neat        | $1            |
 
 ---
 

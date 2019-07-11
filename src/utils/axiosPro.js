@@ -1,38 +1,38 @@
-import axios from 'axios'
-const qs = require('qs')
+import axios from "axios";
+const qs = require("qs");
 const axiosPro = {
-  async get (url, data) {
+  async get(url, data) {
     try {
-      let res = await axios.get(url, {params: data})
-      res = res.data
-      return new Promise((resolve) => {
+      let res = await axios.get(url, { params: data });
+      res = res.data;
+      return new Promise(resolve => {
         if (res.code === 0) {
-          resolve(res)
+          resolve(res);
         } else {
-          resolve(res)
+          resolve(res);
         }
-      })
+      });
     } catch (err) {
-      alert('服务器出错')
-      console.log(err)
+      alert("服务器出错");
+      console.log(err);
     }
   },
-  async post (url, data) {
+  async post(url, data) {
     try {
-      let res = await axios.post(url, qs.stringify(data))
-      res = res.data
+      let res = await axios.post(url, qs.stringify(data));
+      res = res.data;
       return new Promise((resolve, reject) => {
         if (res.code === 0) {
-          resolve(res)
+          resolve(res);
         } else {
-          reject(res)
+          reject(res);
         }
-      })
+      });
     } catch (err) {
       // return (e.message)
-      alert('服务器出错')
-      console.log(err)
+      alert("服务器出错");
+      console.log(err);
     }
-  },
-}
-export { axiosPro, axios }
+  }
+};
+export { axiosPro, axios };

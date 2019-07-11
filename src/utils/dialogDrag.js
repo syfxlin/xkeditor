@@ -1,4 +1,4 @@
-import Vue from 'vue'
+import Vue from "vue";
 Vue.directive("dialogDrag", {
   bind(el, binding, vnode, oldVnode) {
     const dialogHeaderEl = el.querySelector(".xk-modal-header");

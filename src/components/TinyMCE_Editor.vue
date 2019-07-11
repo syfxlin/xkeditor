@@ -62,104 +62,115 @@ export default {
   },
   data() {
     return {
-      tinymceValue: '',
+      tinymceValue: "",
       init: this.setting
-    }
+    };
   },
   created() {
     //设置目标div
-    this.init.selector = '#tinymce-textarea'
+    this.init.selector = "#tinymce-textarea";
     //上传功能
-    if(this.$parent.setting.xkSetting.imgUpload) {
+    if (this.$parent.setting.xkSetting.imgUpload) {
       this.init.images_upload_handler = function(blobInfo, success, failure) {
-        window.XKEditorAPI.imgUpload(blobInfo.blob(), function(response) {
-          success(response.data.path)
-          //TODO: 上传成功之后的提示
-        }, function(error) {
-          //TODO: 上传失败后的提示
-          failure(error)
-        })
-      }
+        window.XKEditorAPI.imgUpload(
+          blobInfo.blob(),
+          function(response) {
+            success(response.data.path);
+            //TODO: 上传成功之后的提示
+          },
+          function(error) {
+            //TODO: 上传失败后的提示
+            failure(error);
+          }
+        );
+      };
     }
     //添加自定义按钮
-    this.init.setup = function (editor) {
-      editor.ui.registry.addButton('tex-$', {
-        text: '行内公式',
+    this.init.setup = function(editor) {
+      editor.ui.registry.addButton("tex-$", {
+        text: "行内公式",
         onAction(_) {
-          editor.insertContent('<p>$$$$</p>')
+          editor.insertContent("<p>$$$$</p>");
         }
-      })
-      editor.ui.registry.addButton('tex-math', {
-        text: '块公式',
+      });
+      editor.ui.registry.addButton("tex-math", {
+        text: "块公式",
         onAction(_) {
-          editor.insertContent('<pre>&nbsp;```math&nbsp;```&nbsp;</pre>')
+          editor.insertContent("<pre>&nbsp;```math&nbsp;```&nbsp;</pre>");
         }
-      })
-      editor.ui.registry.addButton('flow', {
-        text: '流程图',
+      });
+      editor.ui.registry.addButton("flow", {
+        text: "流程图",
         onAction(_) {
-          editor.insertContent('<pre class="xkeditor-mermaid">graph </pre>')
+          editor.insertContent('<pre class="xkeditor-mermaid">graph </pre>');
         }
-      })
-      editor.ui.registry.addButton('seq', {
-        text: '时序图',
+      });
+      editor.ui.registry.addButton("seq", {
+        text: "时序图",
         onAction(_) {
-          editor.insertContent('<pre class="xkeditor-mermaid">sequenceDiagram&nbsp;</pre>')
+          editor.insertContent(
+            '<pre class="xkeditor-mermaid">sequenceDiagram&nbsp;</pre>'
+          );
         }
-      })
-      editor.ui.registry.addButton('gantt', {
-        text: '甘特图',
+      });
+      editor.ui.registry.addButton("gantt", {
+        text: "甘特图",
         onAction(_) {
-          editor.insertContent('<pre class="xkeditor-mermaid">gantt&nbsp;</pre>')
+          editor.insertContent(
+            '<pre class="xkeditor-mermaid">gantt&nbsp;</pre>'
+          );
         }
-      })
-      editor.ui.registry.addButton('mermaid', {
-        text: '添加图',
+      });
+      editor.ui.registry.addButton("mermaid", {
+        text: "添加图",
         onAction(_) {
-          editor.insertContent('<pre class="xkeditor-mermaid">&nbsp;</pre>')
+          editor.insertContent('<pre class="xkeditor-mermaid">&nbsp;</pre>');
         }
-      })
-      editor.ui.registry.addButton('prismjs', {
-        text: '代码块',
+      });
+      editor.ui.registry.addButton("prismjs", {
+        text: "代码块",
         onAction(_) {
-          editor.insertContent('<pre><code class="line-numbers language-javascript">&nbsp;</code></pre>')
+          editor.insertContent(
+            '<pre><code class="line-numbers language-javascript">&nbsp;</code></pre>'
+          );
         }
-      })
-      editor.ui.registry.addButton('toMarkdownEditor', {
-        text: '切换编辑器',
+      });
+      editor.ui.registry.addButton("toMarkdownEditor", {
+        text: "切换编辑器",
         onAction(_) {
-          window.$switchEditor()
+          window.XKEditor.switchEditor();
         }
-      })
-    }
+      });
+    };
   },
-  mounted () {
-    var _this = this
+  mounted() {
     //初始化tinymce编辑器
-    tinyMCE.init(this.init)
+    tinyMCE.init(this.init);
     //赋初值
-    this.tinymceValue = this.value
-    tinyMCE.editors['tinymce-textarea'].setContent(this.tinymceValue)
-    tinyMCE.editors['tinymce-textarea'].on('Change', function (e) {
-      _this.tinymceValue = tinyMCE.editors['tinymce-textarea'].getContent()
-    })
+    this.tinymceValue = this.value;
+    tinyMCE.editors["tinymce-textarea"].setContent(this.tinymceValue);
+    tinyMCE.editors["tinymce-textarea"].on("Change", function(e) {
+      window.eThis.t.tinymceValue = tinyMCE.editors[
+        "tinymce-textarea"
+      ].getContent();
+    });
   },
   methods: {
     setValue(val) {
-      this.tinymceValue = val
-      tinyMCE.editors['tinymce-textarea'].setContent(this.tinymceValue)
+      this.tinymceValue = val;
+      tinyMCE.editors["tinymce-textarea"].setContent(this.tinymceValue);
     },
     updateValue() {
-      tinyMCE.editors['tinymce-textarea'].setContent(this.tinymceValue)
-      this.$emit('input', this.tinymceValue)
+      tinyMCE.editors["tinymce-textarea"].setContent(this.tinymceValue);
+      this.$emit("input", this.tinymceValue);
     }
   },
   watch: {
     tinymceValue() {
-      this.updateValue()
+      this.updateValue();
     }
   }
-}
+};
 </script>
 
 <style scoped>

@@ -1,120 +1,125 @@
-<!--
-  /**
-
-  当前架构
-  ACE_Editor -> Editor(markdownContent)
-  TinyMCE_Editor -> Editor(htmlContent)
-  预览的HTML == htmlViewContent
-  markdownContent.toHtmlFull -> htmlViewContent
-  htmlContent -> htmlViewContent
-
-  Set:
-  switch时
-  htmlContent.toMarkdown -> markdownContent => ACE_Editor
-  markdownContent.toHtml -> htmlContent => TinyMCE_Editor
-
-  Render:
-  Prism.js 在转换时就渲染
-  Mermaid  在转换后推送到DOM后渲染
-  KaTex    在转换后推送到DOM后渲染
-  TOC      在转换后推送到DOM后渲染
-
-  滚动绑定 在每次输入推送到DOM后进行重新计算
-
-  TODO:
-  优化界面
-  提升TinyMCE编辑体验
-  重构，集中设置项
-  添加设置面板，存放部分设置
-  */
--->
-
 <template>
-<div class="xkeditor">
-  <template  v-if="isRenderEditor">
-  <div class="row">
-    <div :class="aceDivClass" v-show="editorModeShow&&previewShow!='full'">
-      <ace v-model="markdownContent" :setting="setting.aceSetting" ref="ace"></ace>
-    </div>
-    <div :class="aceDivClass" v-show="editorModeShow&&previewShow!='hide'">
-      <div :class="setting.xkSetting.previewClass" v-html="htmlViewContent" id="previewHtml" ref="htmlView"></div>
-    </div>
-    <div class="xk-col-24" v-show="!editorModeShow" v-if="setting.xkSetting.enableTinyMCE">
-      <tinymce v-model="htmlContent" :setting="setting.tinymceSetting" ref="tinymce"></tinymce>
-    </div>
-    <button class="xk-button close-preview-full" @click="switchPreviewFull()" v-show="editorModeShow&&previewShow=='full'">关闭</button>
-    <transition name="slide-fade">
-      <div id="toc" v-show="showToc"></div>
-    </transition>
-    <div id="toc-button" class="xk-button"><fa-icon icon="bars"/></div>
-  </div>
-  </template>
+  <div class="xkeditor">
+    <template v-if="isRenderEditor">
+      <div class="row">
+        <div :class="aceDivClass" v-show="editorModeShow&&previewShow!='full'">
+          <ace v-model="markdownContent" :setting="setting.aceSetting" ref="ace"></ace>
+        </div>
+        <div :class="aceDivClass" v-show="editorModeShow&&previewShow!='hide'">
+          <div
+            :class="setting.xkSetting.previewClass"
+            v-html="htmlViewContent"
+            id="previewHtml"
+            ref="htmlView"
+          ></div>
+        </div>
+        <div class="xk-col-24" v-show="!editorModeShow" v-if="setting.xkSetting.enableTinyMCE">
+          <tinymce v-model="htmlContent" :setting="setting.tinymceSetting" ref="tinymce"></tinymce>
+        </div>
+        <button
+          class="xk-button close-preview-full"
+          @click="switchPreviewFull()"
+          v-show="editorModeShow&&previewShow=='full'"
+        >关闭</button>
+        <transition name="slide-fade">
+          <div id="toc" v-show="showToc"></div>
+        </transition>
+        <div id="toc-button" class="xk-button">
+          <fa-icon icon="bars" />
+        </div>
+      </div>
+    </template>
 
-  <div class="canvas-main">
-    <div class="canvas-container">
-      <canvas id="canvas" width="800" height="500"></canvas>
-      <div id="auxiliary-ele"></div>
+    <div class="canvas-main">
+      <div class="canvas-container">
+        <canvas id="canvas" width="800" height="500"></canvas>
+        <div id="auxiliary-ele"></div>
+      </div>
+      <div class="canvas-button">
+        <h3>画笔</h3>
+        <ul class="can-pen">
+          <li class="can-btn fa fa-pencil-alt" data-type="pen">
+            <span>画笔</span>
+          </li>
+          <li class="can-btn fa fa-eraser" data-type="eraser">
+            <span>橡皮擦</span>
+          </li>
+          <li class="can-btn fa fa-font" data-type="text">
+            <span>文本</span>
+          </li>
+        </ul>
+        <h3>画笔颜色</h3>
+        <ul class="can-color">
+          <li class="can-btn black" data-type="color"></li>
+          <li class="can-btn red" data-type="color"></li>
+          <li class="can-btn blue" data-type="color"></li>
+          <li class="can-btn green" data-type="color"></li>
+          <li class="can-btn yellow" data-type="color"></li>
+          <li class="can-btn orange" data-type="color"></li>
+          <li class="can-btn gray" data-type="color"></li>
+          <li class="can-btn pink" data-type="color"></li>
+          <li class="can-btn purple" data-type="color"></li>
+        </ul>
+        <h3>画笔大小</h3>
+        <ul class="can-size">
+          <li class="can-btn fa fa-paint-brush small" data-type="size"></li>
+          <li class="can-btn fa fa-paint-brush middle" data-type="size"></li>
+          <li class="can-btn fa fa-paint-brush big" data-type="size"></li>
+        </ul>
+        <h3>形状</h3>
+        <ul class="can-shape">
+          <li class="can-btn fa fa-slash" data-type="line">
+            <span>直线</span>
+          </li>
+          <li class="can-btn fa fa-draw-polygon" data-type="polyline">
+            <span>多边形</span>
+          </li>
+          <li class="can-btn fa fa-square-full" data-type="rect">
+            <span>矩形</span>
+          </li>
+          <li class="can-btn fa fa-square" data-type="round-rect">
+            <span>圆角矩形</span>
+          </li>
+          <li class="can-btn fa fa-circle" data-type="ellipse">
+            <span>圆形</span>
+          </li>
+          <li class="can-btn fa fa-layer-group" data-type="diamond">
+            <span>菱形</span>
+          </li>
+        </ul>
+        <h3>操作</h3>
+        <ul class="can-operate">
+          <li class="can-btn fa fa-reply" data-type="to-prev-canvas">
+            <span>撤销</span>
+          </li>
+          <li class="can-btn fa fa-share" data-type="to-next-canvas">
+            <span>重做</span>
+          </li>
+          <li class="can-btn fa fa-trash" data-type="clean-canvas">
+            <span>清空画板</span>
+          </li>
+        </ul>
+        <h3>保存/取消</h3>
+        <ul class="can-output">
+          <li class="can-btn" data-type="save-canvas" id="save-canvas">保存</li>
+          <li class="can-btn" data-type="cancel-canvas" id="cancel-canvas">取消</li>
+        </ul>
+      </div>
     </div>
-    <div class="canvas-button">
-      <h3>画笔</h3>
-      <ul class="can-pen">
-        <li class="can-btn fa fa-pencil-alt" data-type="pen"><span> 画笔</span></li>
-        <li class="can-btn fa fa-eraser" data-type="eraser"><span> 橡皮擦</span></li>
-        <li class="can-btn fa fa-font" data-type="text"><span> 文本</span></li>
-      </ul>
-      <h3>画笔颜色</h3>
-      <ul class="can-color">
-        <li class="can-btn black" data-type="color"></li>
-        <li class="can-btn red" data-type="color"></li>
-        <li class="can-btn blue" data-type="color"></li>
-        <li class="can-btn green" data-type="color"></li>
-        <li class="can-btn yellow" data-type="color"></li>
-        <li class="can-btn orange" data-type="color"></li>
-        <li class="can-btn gray" data-type="color"></li>
-        <li class="can-btn pink" data-type="color"></li>
-        <li class="can-btn purple" data-type="color"></li>
-      </ul>
-      <h3>画笔大小</h3>
-      <ul class="can-size">
-        <li class="can-btn fa fa-paint-brush small" data-type="size"></li>
-        <li class="can-btn fa fa-paint-brush middle" data-type="size"></li>
-        <li class="can-btn fa fa-paint-brush big" data-type="size"></li>
-      </ul>
-      <h3>形状</h3>
-      <ul class="can-shape">
-        <li class="can-btn fa fa-slash" data-type="line"><span> 直线</span></li>
-        <li class="can-btn fa fa-draw-polygon" data-type="polyline"><span> 多边形</span></li>
-        <li class="can-btn fa fa-square-full" data-type="rect"><span> 矩形</span></li>
-        <li class="can-btn fa fa-square" data-type="round-rect"><span> 圆角矩形</span></li>
-        <li class="can-btn fa fa-circle" data-type="ellipse"><span> 圆形</span></li>
-        <li class="can-btn fa fa-layer-group" data-type="diamond"><span> 菱形</span></li>
-      </ul>
-      <h3>操作</h3>
-      <ul class="can-operate">
-        <li class="can-btn fa fa-reply" data-type="to-prev-canvas"><span> 撤销</span></li>
-        <li class="can-btn fa fa-share" data-type="to-next-canvas"><span> 重做</span></li>
-        <li class="can-btn fa fa-trash" data-type="clean-canvas"><span> 清空画板</span></li>
-      </ul>
-      <h3>生成图像</h3>
-      <ul class="can-output">
-        <li class="can-btn" data-type="get-canvas-url">生成Base编码</li>
-      </ul>
-    </div>
-</div>
-</div>
+  </div>
 </template>
 
 <script>
-import { initPaint } from '../utils/paint.js'
-import '../assets/paint.css'
+import { initPaint } from "../utils/paint.js";
+import "../assets/paint.css";
 //导入基础组件
-import '../utils/dialogDrag.js'
-import ACE from './ACE_Editor.vue'
-import TinyMCE from './TinyMCE_Editor.vue'
+import "../utils/dialogDrag.js";
+import ACE from "./ACE_Editor.vue";
+import TinyMCE from "./TinyMCE_Editor.vue";
 
-import { axiosPro, axios } from "../utils/axiosPro.js"
+import { axiosPro, axios } from "../utils/axiosPro.js";
 //HTML和Markdown互转
-import { toHtml, toMarkdown, getTocHtml } from '../utils/switchContent.js'
+import { toHtml, toMarkdown, getTocHtml } from "../utils/switchContent.js";
 
 // import katex from "katex"
 // import "katex/dist/katex.min.css"
@@ -122,16 +127,16 @@ import { toHtml, toMarkdown, getTocHtml } from '../utils/switchContent.js'
 // import mermaid from "mermaid"
 
 //fa icon
-import { library } from "@fortawesome/fontawesome-svg-core"
-import { fas } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
-library.add(fas)
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+library.add(fas);
 
 export default {
-  name: 'XK_Editor',
+  name: "XK_Editor",
   components: {
-    'ace': ACE,
-    'tinymce': TinyMCE,
+    ace: ACE,
+    tinymce: TinyMCE,
     "fa-icon": FontAwesomeIcon
   },
   props: {
@@ -140,35 +145,37 @@ export default {
     settingProps: Object,
     contentProps: String
   },
-  data () {
+  data() {
     return {
       isRenderEditor: false,
-      markdownContent: '',
-      htmlContent: '',
-      htmlViewContent: '',
-      toc: '',
+      markdownContent: "",
+      htmlContent: "",
+      htmlViewContent: "",
+      toc: "",
       showToc: false,
       editorMode: "ace",
-      previewShow: 'show',
+      previewShow: "show",
       aceDivClass: "xk-col-12",
       delayToHtml: null,
       setting: {
         tinymceSetting: {
-          language_url: '/static/tinymce/langs/zh_CN.js',
-          language: 'zh_CN',
-          skin_url: '/static/tinymce/skins/ui/oxide',
-          body_class: 'markdown-body',
-          content_css: '/static/github-markdown.css',
-          plugins: 'print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern',
-          toolbar: 'formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor prismjs | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | tex-$ tex-math flow seq gantt mermaid | removeformat code toMarkdownEditor | undo redo',
+          language_url: "/static/tinymce/langs/zh_CN.js",
+          language: "zh_CN",
+          skin_url: "/static/tinymce/skins/ui/oxide",
+          body_class: "markdown-body",
+          content_css: "/static/github-markdown.css",
+          plugins:
+            "print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern",
+          toolbar:
+            "formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor prismjs | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | tex-$ tex-math flow seq gantt mermaid | removeformat code toMarkdownEditor | undo redo",
           image_advtab: true,
           importcss_append: true,
-          height: '100%',
-          template_cdate_format: '[CDATE: %m/%d/%Y : %H:%M:%S]',
-          template_mdate_format: '[MDATE: %m/%d/%Y : %H:%M:%S]',
+          height: "100%",
+          template_cdate_format: "[CDATE: %m/%d/%Y : %H:%M:%S]",
+          template_mdate_format: "[MDATE: %m/%d/%Y : %H:%M:%S]",
           image_caption: true,
           spellchecker_dialog: true,
-          spellchecker_whitelist: ['Ephox', 'Moxiecode']
+          spellchecker_whitelist: ["Ephox", "Moxiecode"]
         },
         aceSetting: {
           minLines: 10,
@@ -187,482 +194,670 @@ export default {
           previewCss: "/static/github-markdown.css",
           previewClass: "markdown-body",
           delayToHtml: 500,
-          scrollBind: 'both',
-          imgUpload: true,
-          scrollMode: 'anchor',
+          scrollBind: "both",
+          imgUpload: false,
+          graffUrl: "static/",
+          graffUpload: false,
+          scrollMode: "anchor",
           pasteFormat: true,
           pasteImageUpload: true,
           enableTinyMCE: true
         }
       }
-    }
+    };
   },
   computed: {
     editorModeShow() {
-      if(this.editorMode === 'ace') {
-        return true
-      } else if(this.editorMode === 'tinymce') {
-        return false
+      if (this.editorMode === "ace") {
+        return true;
+      } else if (this.editorMode === "tinymce") {
+        return false;
       }
     },
     isMobile() {
-      return window.isMobile
+      return window.isMobile;
     }
   },
   async mounted() {
-    window.isMobile = /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i.test(navigator.userAgent)
-    await this.load()
-    this.htmlViewContent = toHtml(this.markdownContent, true)
+    window.isMobile = /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i.test(
+      navigator.userAgent
+    );
+    await this.load();
+    window.eSetting = this.setting;
+    this.htmlViewContent = toHtml(this.markdownContent, true);
     this.$nextTick(function() {
-      this.initEditor()
-    })
-    this.setInterface()
+      this.initEditor();
+    });
+    this.setInterface();
   },
   methods: {
     async load() {
-      let md = null
-      let setting = null
-      if(!this.contentProps) {
-        md = await axiosPro.get(this.contentApi)
+      let md = null;
+      let setting = null;
+      if (!this.contentProps) {
+        md = await axiosPro.get(this.contentApi);
       } else {
-        md = this.contentProps
+        md = this.contentProps;
       }
-      if(!this.settingProps) {
-        setting = await axiosPro.get(this.settingApi)
+      if (!this.settingProps) {
+        setting = await axiosPro.get(this.settingApi);
       } else {
-        setting = this.settingProps
+        setting = this.settingProps;
       }
-      this.markdownContent = md
-      this.setting = setting
-      this.loadCss(setting.xkSetting.previewCss)
-      this.isRenderEditor = true
+      this.markdownContent = md;
+      this.setting = setting;
+      this.loadCss(setting.xkSetting.previewCss);
+      this.isRenderEditor = true;
     },
     loadCss(url) {
-      let css = document.createElement('link')
-      css.href = url
-      css.rel = 'stylesheet'
-      css.type = 'text/css'
-      document.head.appendChild(css)
+      let css = document.createElement("link");
+      css.href = url;
+      css.rel = "stylesheet";
+      css.type = "text/css";
+      document.head.appendChild(css);
     },
     initEditor() {
-      var _this = this
-      mermaid.initialize({startOnLoad:true})
-      window.$ace = this.$refs.ace.aceEditor
-      window.$switchEditor = this.switchEditor
-      window.scrollBind = function(operate = null, bindType = 'both') {
-        var currentTab = 1
-        var editorDom = document.querySelector('.ace-editor')
-        var previewHtmlDom = document.querySelector('#previewHtml')
-        var aceContentHeight =  window.$ace.renderer.scrollBarV.scrollHeight - editorDom.offsetHeight
-        var previewHtmlHeight = previewHtmlDom.scrollHeight - previewHtmlDom.offsetHeight
-        window.scale = previewHtmlHeight/aceContentHeight
-        if(operate === 'init') {
-          if(bindType === 'left') {
-            currentTab = 1
-          } else if(bindType === 'right') {
-            currentTab = 2
-          } else {
-            editorDom.addEventListener('mouseover', function() {
-              currentTab = 1
-            })
-            previewHtmlDom.addEventListener('mouseover', function() {
-              currentTab = 2
-            })
-            //兼容触摸设备
-            editorDom.addEventListener('touchstart', function() {
-              currentTab = 1
-            })
-            previewHtmlDom.addEventListener('touchstart', function() {
-              currentTab = 2
-            })
-          }
-          window.$ace.session.on("changeScrollTop", function(data) {
-            if(currentTab === 1) {
-              previewHtmlDom.scrollTop = data * window.scale
-            }
-          })
-          previewHtmlDom.addEventListener('scroll', function() {
-            if (currentTab === 2) {
-              window.$ace.session.setScrollTop(previewHtmlDom.scrollTop / window.scale)
-            }
-          })
-          //兼容触摸设备
-          previewHtmlDom.addEventListener('touchmove', function() {
-            if (currentTab === 2) {
-              window.$ace.session.setScrollTop(previewHtmlDom.scrollTop / window.scale)
-            }
-          })
-          //惯性滚动
-          var inertiaScrollTime = null
-          editorDom.addEventListener('touchstart', function(event) {
-            clearTimeout(inertiaScrollTime)
-            var startY = event.changedTouches[0].pageY
-            var endY = 0
-            var startTime = Date.now()
-            var endTime = 0
-            editorDom.addEventListener('touchend', function(event) {
-              endY = event.changedTouches[0].pageY
-              endTime = Date.now()
-              var _v = (endY - startY) / (endTime - startTime) * 1.5
-              function scrollToTop(v, sTime, contentY) {
-                var dir = v > 0 ? -1 : 1
-                var deceleration = dir*0.0018
-                var duration = v / deceleration
-                function inertiaMove() {
-                  // if(stopInertia) return
-                  var nowTime = Date.now()
-                  var t = nowTime - sTime
-                  var nowV = v + t*deceleration
-                  // 速度方向变化表示速度达到0了
-                  if(dir*nowV > 0) {
-                    return
-                  }
-                  var moveY = - (v + nowV)/2 * t
-                  window.$ace.session.setScrollTop(contentY + moveY)
-                  inertiaScrollTime = setTimeout(inertiaMove, 10)
-                }
-                inertiaMove()
-              }
-              scrollToTop(_v, endTime, window.$ace.session.getScrollTop())
-            })
-          })
-        }
-      }
-      // 模拟锚点
-      window.scrollMode = this.setting.xkSetting.scrollMode
-      window.sta = function(anchorName) {
-        if (anchorName) {
-          let anchorElement = document.getElementById(anchorName);
-          if(anchorElement) {
-            anchorElement.scrollIntoView(true);
-          }
-        }
-      }
-      //初始化滚动绑定
-      this.$nextTick(function() {
-        setTimeout(function() {
-          window.scrollBind('init', _this.setting.xkSetting.scrollBind)
-        }, 1000)
-      })
+      mermaid.initialize({ startOnLoad: true });
+      //初始化scroll操作
+      this.initScroll();
       //初始化TOC
-      this.initTocTree()
-      window.toggleToc = this.toggleToc
-      //注册TOC按钮
-      document.getElementById('toc-button').addEventListener('click', function() {
-        _this.switchToc()
-      })
-      //粘贴格式化
-      if (this.setting.xkSetting.pasteFormat) {
-        window.$ace.on("paste", function(e) {
-          if (e.event.clipboardData.getData('text/html')) {
-            e.text = toMarkdown(e.event.clipboardData.getData('text/html'), false)
-          }
-        })
-      }
+      this.initTocTree();
       this.$nextTick(function() {
-        //图片粘贴上传
-        if (this.setting.xkSetting.pasteImageUpload && this.setting.xkSetting.imgUpload) {
-          document.getElementsByClassName('ace-container')[0].addEventListener("paste", function (e){
-            if ( !(e.clipboardData && e.clipboardData.items) ) {
-              return
-            }
-            for (var i = 0, len = e.clipboardData.items.length; i < len; i++) {
-              var item = e.clipboardData.items[i]
-              if (item.kind === "file") {
-                var pasteFile = item.getAsFile()
-                window.XKEditorAPI.imgUpload(pasteFile, function(response) {
-                  window.$ace.insert("[](" + response.data.path + ")")
-                  //TODO: 上传成功提示
-                }, function(error) {
-                  //TODO: 上传失败提示
-                  console.log(error)
-                })
-              }
-            }
-          });
-        }
-      })
-      // 注册涂鸦板
-      initPaint('canvas', true)
-      document.getElementById('previewHtml').addEventListener('click', function(e) {
-        let ele = e.target
-        if (ele.nodeName === 'IMG' && ele.className.indexOf('graffiti') !== -1) {
-          let canvas = document.getElementById('canvas');
-          document.getElementsByClassName('canvas-main')[0].style.display = 'block';
-          let canvasContext = canvas.getContext('2d');
-          canvasContext.drawImage(ele, 0, 0, canvasContext.canvas.width, canvasContext.canvas.height);
-        }
-      })
+        //注册粘贴操作
+        this.initPaste();
+        // 注册涂鸦板
+        this.initGraff();
+      });
     },
     switchEditor() {
-      if(!this.setting.xkSetting.enableTinyMCE) return false
-      if(this.editorMode !== 'ace') {
-        this.markdownContent = toMarkdown(this.htmlContent, true)
-        this.$refs.ace.setValue(this.markdownContent)
-        this.editorMode = 'ace'
-      } else if(this.editorMode !== 'tinymce') {
-        this.htmlContent = toHtml(this.markdownContent, false)
-        this.$refs.tinymce.setValue(this.htmlContent)
-        this.editorMode = 'tinymce'
+      if (!this.setting.xkSetting.enableTinyMCE) return false;
+      if (this.editorMode !== "ace") {
+        this.markdownContent = toMarkdown(this.htmlContent, true);
+        this.$refs.ace.setValue(this.markdownContent);
+        this.editorMode = "ace";
+      } else if (this.editorMode !== "tinymce") {
+        this.htmlContent = toHtml(this.markdownContent, false);
+        this.$refs.tinymce.setValue(this.htmlContent);
+        this.editorMode = "tinymce";
       }
     },
     switchPreviewShow() {
-      if(this.previewShow == 'show') {
-        this.previewShow = 'hide'
-        this.aceDivClass = "xk-col-24"
+      if (this.previewShow == "show") {
+        this.previewShow = "hide";
+        this.aceDivClass = "xk-col-24";
       } else {
-        this.previewShow = 'show'
-        this.aceDivClass = "xk-col-12"
+        this.previewShow = "show";
+        this.aceDivClass = "xk-col-12";
       }
     },
     switchPreviewFull() {
-      if(this.previewShow == 'full') {
-        this.previewShow = 'show'
-        this.aceDivClass = "xk-col-12"
-        document.getElementById('toc-button').style.display = 'block'
-        this.showToc = false
+      if (this.previewShow == "full") {
+        this.previewShow = "show";
+        this.aceDivClass = "xk-col-12";
+        document.getElementById("toc-button").style.display = "block";
+        this.showToc = false;
       } else {
-        this.previewShow = 'full'
-        this.aceDivClass = "xk-col-24"
+        this.previewShow = "full";
+        this.aceDivClass = "xk-col-24";
         this.$nextTick(function() {
-          var preEle = document.getElementById('previewHtml')
-          if (Math.round(preEle.offsetWidth / preEle.parentElement.offsetWidth * 100) <= 80) {
-            document.getElementById('toc-button').style.display = 'none'
-            this.showToc = true
+          var preEle = document.getElementById("previewHtml");
+          if (
+            Math.round(
+              (preEle.offsetWidth / preEle.parentElement.offsetWidth) * 100
+            ) <= 80
+          ) {
+            document.getElementById("toc-button").style.display = "none";
+            this.showToc = true;
           }
-        })
+        });
       }
     },
     renderNextTick() {
       this.$nextTick(function() {
         //制作TOC
         var tocHtml = getTocHtml();
-        document.getElementById('toc').innerHTML = tocHtml
+        document.getElementById("toc").innerHTML = tocHtml;
         //制作文章内TOC
-        for (let i = 0; i < document.getElementsByClassName('toc').length; i++) {
-          document.getElementsByClassName('toc')[i].innerHTML = tocHtml
+        for (
+          let i = 0;
+          i < document.getElementsByClassName("toc").length;
+          i++
+        ) {
+          document.getElementsByClassName("toc")[i].innerHTML = tocHtml;
         }
         //更新TOC icon
-        this.initTocTree()
+        this.updateTocTree();
         //转换Tex公式
-        renderMathInElement(document.getElementById('previewHtml'), {
+        renderMathInElement(document.getElementById("previewHtml"), {
           delimiters: [
-            {left: "$$", right: "$$"},
-            {left: "```math", right: "```"},
-            {left: "```tex", right: "```"}
+            { left: "$$", right: "$$" },
+            { left: "```math", right: "```" },
+            { left: "```tex", right: "```" }
           ],
           ignoredTags: ["script", "noscript", "style", "textarea", "code"]
-        })
+        });
         //转换Mermaid图
         try {
-          mermaid.init({noteMargin: 10}, ".xkeditor-mermaid")
+          mermaid.init({ noteMargin: 10 }, ".xkeditor-mermaid");
         } catch (error) {
-          console.log("May have errors")
+          console.log("May have errors");
         }
         //更新滚动绑定
-        if(window.scrollBind) {
-          window.scrollBind()
+        if (window.scrollBind) {
+          window.scrollBind();
         }
-      })
+      });
     },
     switchToc() {
-      this.showToc = (!this.showToc)
+      this.showToc = !this.showToc;
     },
     initTocTree() {
-      var items = document.querySelectorAll('#toc .toc-img ~ ul,.toc .toc-img ~ ul')
+      window.toggleToc = this.toggleToc;
+      //注册TOC按钮
+      document
+        .getElementById("toc-button")
+        .addEventListener("click", function() {
+          window.eThis.e.switchToc();
+        });
+      this.updateTocTree();
+    },
+    updateTocTree() {
+      var items = document.querySelectorAll(
+        "#toc .toc-img ~ ul,.toc .toc-img ~ ul"
+      );
       for (let i = 0; i < items.length; i++) {
-        items[i].parentNode.children[0].setAttribute('src', '/static/svg/minus-square.svg')
-        items[i].parentNode.children[0].setAttribute('onclick', 'toggleToc(this)')
+        items[i].parentNode.children[0].setAttribute(
+          "src",
+          "/static/svg/minus-square.svg"
+        );
+        items[i].parentNode.children[0].setAttribute(
+          "onclick",
+          "toggleToc(this)"
+        );
       }
     },
     toggleToc(ele) {
-      var display = ele.nextElementSibling.nextElementSibling.style.display
-      if(display === '' || display === 'block') {
-        ele.nextElementSibling.nextElementSibling.style.display = 'none'
-        ele.setAttribute('src', '/static/svg/plus-square.svg')
+      var display = ele.nextElementSibling.nextElementSibling.style.display;
+      if (display === "" || display === "block") {
+        ele.nextElementSibling.nextElementSibling.style.display = "none";
+        ele.setAttribute("src", "/static/svg/plus-square.svg");
       } else {
-        ele.nextElementSibling.nextElementSibling.style.display = 'block'
-        ele.setAttribute('src', '/static/svg/minus-square.svg')
+        ele.nextElementSibling.nextElementSibling.style.display = "block";
+        ele.setAttribute("src", "/static/svg/minus-square.svg");
+      }
+    },
+    initScroll() {
+      window.scrollBind = function(operate = null, bindType = "both") {
+        var currentTab = 1;
+        var editorDom = document.querySelector(".ace-editor");
+        var previewHtmlDom = document.querySelector("#previewHtml");
+        var aceContentHeight =
+          window.XKEditor.ace.renderer.scrollBarV.scrollHeight -
+          editorDom.offsetHeight;
+        var previewHtmlHeight =
+          previewHtmlDom.scrollHeight - previewHtmlDom.offsetHeight;
+        window.scale = previewHtmlHeight / aceContentHeight;
+        if (operate === "init") {
+          if (bindType === "left") {
+            currentTab = 1;
+          } else if (bindType === "right") {
+            currentTab = 2;
+          } else {
+            editorDom.addEventListener("mouseover", function() {
+              currentTab = 1;
+            });
+            previewHtmlDom.addEventListener("mouseover", function() {
+              currentTab = 2;
+            });
+            //兼容触摸设备
+            editorDom.addEventListener("touchstart", function() {
+              currentTab = 1;
+            });
+            previewHtmlDom.addEventListener("touchstart", function() {
+              currentTab = 2;
+            });
+          }
+          window.XKEditor.ace.session.on("changeScrollTop", function(data) {
+            if (currentTab === 1) {
+              previewHtmlDom.scrollTop = data * window.scale;
+            }
+          });
+          previewHtmlDom.addEventListener("scroll", function() {
+            if (currentTab === 2) {
+              window.XKEditor.ace.session.setScrollTop(
+                previewHtmlDom.scrollTop / window.scale
+              );
+            }
+          });
+          //兼容触摸设备
+          previewHtmlDom.addEventListener("touchmove", function() {
+            if (currentTab === 2) {
+              window.XKEditor.ace.session.setScrollTop(
+                previewHtmlDom.scrollTop / window.scale
+              );
+            }
+          });
+          //惯性滚动
+          var inertiaScrollTime = null;
+          editorDom.addEventListener("touchstart", function(event) {
+            clearTimeout(inertiaScrollTime);
+            var startY = event.changedTouches[0].pageY;
+            var endY = 0;
+            var startTime = Date.now();
+            var endTime = 0;
+            editorDom.addEventListener("touchend", function(event) {
+              endY = event.changedTouches[0].pageY;
+              endTime = Date.now();
+              var _v = ((endY - startY) / (endTime - startTime)) * 1.5;
+              function scrollToTop(v, sTime, contentY) {
+                var dir = v > 0 ? -1 : 1;
+                var deceleration = dir * 0.0018;
+                var duration = v / deceleration;
+                function inertiaMove() {
+                  // if(stopInertia) return
+                  var nowTime = Date.now();
+                  var t = nowTime - sTime;
+                  var nowV = v + t * deceleration;
+                  // 速度方向变化表示速度达到0了
+                  if (dir * nowV > 0) {
+                    return;
+                  }
+                  var moveY = (-(v + nowV) / 2) * t;
+                  window.XKEditor.ace.session.setScrollTop(contentY + moveY);
+                  inertiaScrollTime = setTimeout(inertiaMove, 10);
+                }
+                inertiaMove();
+              }
+              scrollToTop(
+                _v,
+                endTime,
+                window.XKEditor.ace.session.getScrollTop()
+              );
+            });
+          });
+        }
+      };
+      // 模拟锚点
+      window.scrollMode = this.setting.xkSetting.scrollMode;
+      window.sta = function(anchorName) {
+        if (anchorName) {
+          let anchorElement = document.getElementById(anchorName);
+          if (anchorElement) {
+            anchorElement.scrollIntoView(true);
+          }
+        }
+      };
+      //初始化滚动绑定
+      this.$nextTick(function() {
+        setTimeout(function() {
+          window.scrollBind(
+            "init",
+            window.eThis.e.setting.xkSetting.scrollBind
+          );
+        }, 1000);
+      });
+    },
+    initGraff() {
+      if (this.setting.xkSetting.graffUpload) {
+        initPaint("canvas", true, false, { x: 1, y: 1 });
+        document
+          .getElementById("previewHtml")
+          .addEventListener("click", function(e) {
+            let ele = e.target;
+            if (
+              ele.nodeName === "IMG" &&
+              ele.className.indexOf("graffiti") !== -1
+            ) {
+              let canvas = document.getElementById("canvas");
+              document.getElementsByClassName("canvas-main")[0].style.display =
+                "block";
+              let canvasContext = canvas.getContext("2d");
+              canvasContext.drawImage(
+                ele,
+                0,
+                0,
+                canvasContext.canvas.width,
+                canvasContext.canvas.height
+              );
+              let filename = ele.getAttribute("src");
+              if (filename.indexOf("/") > 0) {
+                filename = filename.substring(filename.lastIndexOf("/") + 1);
+              }
+              canvas.setAttribute("data-filename", filename);
+              window.setCanvasScale();
+            }
+          });
+        document
+          .getElementById("save-canvas")
+          .addEventListener("click", function() {
+            window.eThis.e.saveCanvas();
+          });
+        document
+          .getElementById("cancel-canvas")
+          .addEventListener("click", function() {
+            document.getElementsByClassName("canvas-main")[0].style.display =
+              "none";
+          });
+      }
+    },
+    saveCanvas() {
+      document.getElementById("canvas").toBlob(function(blob) {
+        let file = new window.File(
+          [blob],
+          document.getElementById("canvas").getAttribute("data-filename"),
+          { type: blob.type }
+        );
+        window.XKEditorAPI.graffUpload(
+          file,
+          function(response) {
+            if (response.data.error) {
+              //TODO: error
+            }
+            document.getElementsByClassName("canvas-main")[0].style.display =
+              "none";
+            window.eThis.e.htmlViewContent += " ";
+            //TODO: 上传成功提示
+          },
+          function(error) {
+            //TODO: 上传失败提示
+            console.log(error);
+          }
+        );
+      });
+    },
+    initPaste() {
+      if (this.setting.xkSetting.pasteFormat) {
+        window.XKEditor.ace.on("paste", function(e) {
+          if (e.event.clipboardData.getData("text/html")) {
+            e.text = toMarkdown(
+              e.event.clipboardData.getData("text/html"),
+              false
+            );
+          }
+        });
+      }
+      if (
+        this.setting.xkSetting.pasteImageUpload &&
+        this.setting.xkSetting.imgUpload
+      ) {
+        document
+          .getElementsByClassName("ace-container")[0]
+          .addEventListener("paste", function(e) {
+            if (!(e.clipboardData && e.clipboardData.items)) {
+              return;
+            }
+            for (var i = 0, len = e.clipboardData.items.length; i < len; i++) {
+              var item = e.clipboardData.items[i];
+              if (item.kind === "file") {
+                var pasteFile = item.getAsFile();
+                window.XKEditorAPI.imgUpload(
+                  pasteFile,
+                  function(response) {
+                    window.XKEditor.ace.insert(
+                      "[](" + response.data.path + ")"
+                    );
+                    //TODO: 上传成功提示
+                  },
+                  function(error) {
+                    //TODO: 上传失败提示
+                    console.log(error);
+                  }
+                );
+              }
+            }
+          });
       }
     },
     setInterface() {
-      var _this = this
+      var _this = this;
       var downloadFun = function(filename, data, type) {
-        var aLink = document.createElement('a')
-        var evt = document.createEvent("MouseEvents")
-        evt.initMouseEvent("click", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
-        aLink.download = filename + '.'+type
-        aLink.href = URL.createObjectURL(new Blob([data], {type: 'text/'+type}))
-        aLink.dispatchEvent(evt)
-      }
+        var aLink = document.createElement("a");
+        var evt = document.createEvent("MouseEvents");
+        evt.initMouseEvent(
+          "click",
+          true,
+          false,
+          window,
+          0,
+          0,
+          0,
+          0,
+          0,
+          false,
+          false,
+          false,
+          false,
+          0,
+          null
+        );
+        aLink.download = filename + "." + type;
+        aLink.href = URL.createObjectURL(
+          new Blob([data], { type: "text/" + type })
+        );
+        aLink.dispatchEvent(evt);
+      };
+      window.eThis = {
+        e: this,
+        a: this.$refs.ace,
+        t: this.$refs.tinymce
+      };
       window.XKEditorAPI = {
         //response: {"error":false,"path":"img url"}
         imgUpload: function(file, success, failure) {
-          if(_this.setting.xkSetting.imgUpload) {
-            let param = new FormData()
-            param.append('file', file)
+          if (_this.setting.xkSetting.imgUpload) {
+            let param = new FormData();
+            param.append("file", file);
             let config = {
-              headers:{'Content-Type':'multipart/form-data'}
-            }
+              headers: { "Content-Type": "multipart/form-data" }
+            };
             // success({"error":false,"path":"https://img.url"})
-            axios.post(_this.setting.xkSetting.imgUpload, param, config)
-              .then(function(response){
-                success(response)
+            axios
+              .post(_this.setting.xkSetting.imgUpload, param, config)
+              .then(function(response) {
+                success(response);
               })
               .catch(function(error) {
-                failure(error)
+                failure(error);
+              });
+          } else {
+            //TODO: 上传关闭提示
+          }
+        },
+        graffUpload: function(file, success, failure, filename = null) {
+          if (_this.setting.xkSetting.graffUpload) {
+            let param = new FormData();
+            if (filename) {
+              param.append("file", file, filename);
+            } else {
+              param.append("file", file);
+            }
+            let config = {
+              headers: { "Content-Type": "multipart/form-data" }
+            };
+            // success({"error":false,"path":"https://img.url"})
+            axios
+              .post(_this.setting.xkSetting.graffUpload, param, config)
+              .then(function(response) {
+                success(response);
               })
+              .catch(function(error) {
+                failure(error);
+              });
           } else {
             //TODO: 上传关闭提示
           }
         }
-      }
+      };
       window.XKEditor = {
+        ace: _this.$refs.ace.aceEditor,
+        tinymce: window.tinymce,
         getMarkdown: function() {
-          return _this.markdownContent
+          return _this.markdownContent;
         },
         getHTML: function() {
-          return _this.htmlViewContent
+          return _this.htmlViewContent;
         },
-        setMarkdown: function(val, valueType = 'markdown') { //默认设置时在ACE编辑界面
-          if(_this.editorMode !== 'ace') {
+        setMarkdown: function(val, valueType = "markdown") {
+          //默认设置时在ACE编辑界面
+          if (_this.editorMode !== "ace") {
             //TODO: 提示不可设置，因为不在ACE状态
-            return
+            return;
           }
-          if(valueType !== 'markdown') {
-            val = toMarkdown(val, true)
+          if (valueType !== "markdown") {
+            val = toMarkdown(val, true);
           }
-          _this.markdownContent = val
-          _this.$refs.ace.setValue(val)
+          _this.markdownContent = val;
+          _this.$refs.ace.setValue(val);
         },
-        setHTML: function(val, valueType = 'html') { //默认设置时在TinyMCE编辑界面
-          if(_this.editorMode !== 'tinymce') {
+        setHTML: function(val, valueType = "html") {
+          //默认设置时在TinyMCE编辑界面
+          if (_this.editorMode !== "tinymce") {
             //TODO: 提示不可设置，因为不在TinyMCE状态
-            return
+            return;
           }
-          if(valueType !== 'html') {
-            val = toHtml(val, false)
+          if (valueType !== "html") {
+            val = toHtml(val, false);
           }
-          _this.htmlContent = val
-          _this.$refs.tinymce.setValue(val)
+          _this.htmlContent = val;
+          _this.$refs.tinymce.setValue(val);
         },
         switchEditor: function() {
-          _this.switchEditor()
+          _this.switchEditor();
         },
         switchPreview: function() {
-          _this.$refs.ace.execCommand('switchPreview')
+          _this.$refs.ace.execCommand("switchPreview");
         },
         switchFullPreview: function() {
-          _this.$refs.ace.execCommand('fullPreview')
+          _this.$refs.ace.execCommand("fullPreview");
         },
         switchFullScreen: function() {
-          _this.$refs.ace.execCommand('fullScreen')
+          _this.$refs.ace.execCommand("fullScreen");
         },
         toLine: function() {
-          _this.$refs.ace.execCommand('toLine')
+          _this.$refs.ace.execCommand("toLine");
         },
         toc: function() {
-          _this.$refs.ace.execCommand('toc')
+          _this.$refs.ace.execCommand("toc");
         },
         toolbar: function() {
-          _this.$refs.ace.execCommand('toolbar')
+          _this.$refs.ace.execCommand("toolbar");
         },
         resize: function() {
-          _this.$refs.ace.execCommand('resize')
+          _this.$refs.ace.execCommand("resize");
         },
-        addKeys: function(keys) { // keys = [{name,win,mac,exec},{name,win,mac,exec}]
-          _this.$refs.ace.execCommand('addKeys', keys)
+        addKeys: function(keys) {
+          // keys = [{name,win,mac,exec},{name,win,mac,exec}]
+          _this.$refs.ace.execCommand("addKeys", keys);
         },
-        removeKeys: function(keys) { // keys = [name, name]
-          _this.$refs.ace.execCommand('removeKeys', keys)
+        removeKeys: function(keys) {
+          // keys = [name, name]
+          _this.$refs.ace.execCommand("removeKeys", keys);
         },
         getEditor: function(name) {
-          if(name === 'ace') {
-            return window.$ace
-          } else if(name === 'tinymce') {
-            return window.tinymce
+          if (name === "ace") {
+            return _this.$refs.ace.aceEditor;
+          } else if (name === "tinymce") {
+            return window.tinymce;
           }
         },
         switchTypewriter: function(data) {
-          _this.$refs.ace.execCommand('typewriter', true)
+          _this.$refs.ace.execCommand("typewriter", true);
         },
         setLocalStorage: function(filename) {
-          window.localStorage.setItem('xkeditor_' + filename, window.XKEditor.getMarkdown())
+          window.localStorage.setItem(
+            "xkeditor_" + filename,
+            window.XKEditor.getMarkdown()
+          );
         },
         getLocalStorage: function(filename) {
-          return window.localStorage.getItem('xkeditor_' + filename)
+          return window.localStorage.getItem("xkeditor_" + filename);
         },
         listLocalStorage: function() {
-          var list = {}
+          var list = {};
           for (const key in window.localStorage) {
-            if(key.indexOf('xkeditor_') != -1) {
-              list[key.substring(9)] = window.localStorage.getItem(key)
+            if (key.indexOf("xkeditor_") != -1) {
+              list[key.substring(9)] = window.localStorage.getItem(key);
             }
           }
-          return list
+          return list;
         },
         removeLocalStorage: function(filename) {
-          window.localStorage.removeItem('xkeditor_' + filename)
+          window.localStorage.removeItem("xkeditor_" + filename);
         },
-        download: async function(filename, type = 'markdown') {
-          var data = ''
-          if(type === 'markdown') {
-            data = _this.markdownContent
-            type = 'md'
-          } else if(type === 'html') {
-            data = _this.htmlViewContent
-          } else if(type === 'fullhtml') {
-            var d_t1 = '<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><title>'
-            var d_t2 = '</title>'
-            var d_t3 = '</head><body>'
-            var d_t4 = '</body></html>'
-            var style = await axiosPro.get(_this.setting.xkSetting.previewCss)
-            style += await axiosPro.get('/static/prism-okaidia.css')
-            style += await axiosPro.get('/static/prism-line-numbers.css')
-            style += await axiosPro.get('/static/prism-toolbar.css')
-            data = d_t1+filename+d_t2+'<style>'+style+'</style>'+d_t3+'<div class="markdown-body editormd-html-preview">'+_this.htmlViewContent+'</div>'+d_t4
-            type = 'html'
-            downloadFun(filename, data, type)
-            return
+        download: async function(filename, type = "markdown") {
+          var data = "";
+          if (type === "markdown") {
+            data = _this.markdownContent;
+            type = "md";
+          } else if (type === "html") {
+            data = _this.htmlViewContent;
+          } else if (type === "fullhtml") {
+            var d_t1 =
+              '<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><title>';
+            var d_t2 = "</title>";
+            var d_t3 = "</head><body>";
+            var d_t4 = "</body></html>";
+            var style = await axiosPro.get(_this.setting.xkSetting.previewCss);
+            style += await axiosPro.get("/static/prism-okaidia.css");
+            style += await axiosPro.get("/static/prism-line-numbers.css");
+            style += await axiosPro.get("/static/prism-toolbar.css");
+            data =
+              d_t1 +
+              filename +
+              d_t2 +
+              "<style>" +
+              style +
+              "</style>" +
+              d_t3 +
+              '<div class="markdown-body editormd-html-preview">' +
+              _this.htmlViewContent +
+              "</div>" +
+              d_t4;
+            type = "html";
+            downloadFun(filename, data, type);
+            return;
           }
-          downloadFun(filename, data, type)
-        },
-      }
+          downloadFun(filename, data, type);
+        }
+      };
     }
   },
   watch: {
-    markdownContent (val) {
-      var _this = this
+    markdownContent(val) {
+      var _this = this;
       //最少延迟250ms转换为html以保证性能，否则会造成输入卡顿
-      var delay = _this.setting.xkSetting.delayToHtml >= 250 ? _this.setting.xkSetting.delayToHtml : 250
-      if(_this.delayToHtml) {
-        clearTimeout(_this.delayToHtml)
+      var delay =
+        _this.setting.xkSetting.delayToHtml >= 250
+          ? _this.setting.xkSetting.delayToHtml
+          : 250;
+      if (_this.delayToHtml) {
+        clearTimeout(_this.delayToHtml);
       }
       _this.delayToHtml = setTimeout(function() {
-        _this.htmlViewContent = toHtml(val, true)
-        _this.renderNextTick()
-      }, delay)
+        _this.htmlViewContent = toHtml(val, true);
+        _this.renderNextTick();
+      }, delay);
     },
     htmlContent(val) {
-      this.htmlViewContent = val
-      this.renderNextTick()
+      this.htmlViewContent = val;
+      this.renderNextTick();
       this.$nextTick(function() {
-        Prism.highlightAll()
-      })
+        Prism.highlightAll();
+      });
     }
   }
-}
+};
 </script>
 
 <style>
 .xkeditor {
   height: 100%;
-    overflow-x: hidden;
-    overflow-y: hidden;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 .xkeditor .row {
   height: 100%;
-  transform:translate(0,0);
+  transform: translate(0, 0);
 }
 .xkeditor .row .xk-col-12 {
   height: 100%;
@@ -762,9 +957,9 @@ export default {
   line-height: 1.5;
   text-align: center;
   white-space: nowrap;
-  border: 1px solid #C5D9E8;
+  border: 1px solid #c5d9e8;
   border-radius: 4px;
-  background-color: #FFF;
+  background-color: #fff;
   -webkit-transition: background 0.2s;
   transition: background 0.2s;
   -webkit-user-select: none;
@@ -787,10 +982,10 @@ export default {
 /* 可以设置不同的进入和离开动画 */
 /* 设置持续时间和动画函数 */
 .slide-fade-enter-active {
-  transition: all .3s ease;
+  transition: all 0.3s ease;
 }
 .slide-fade-leave-active {
-  transition: all .5s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+  transition: all 0.5s cubic-bezier(1, 0.5, 0.8, 1);
 }
 .slide-fade-enter, .slide-fade-leave-to
 /* .slide-fade-leave-active for below version 2.1.8 */ {
