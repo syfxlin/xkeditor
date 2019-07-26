@@ -229,6 +229,7 @@ export default {
       this.initEditor();
     });
     this.setInterface();
+    this.$emit("loadHook", "componentLoad");
   },
   methods: {
     async load() {
@@ -820,6 +821,7 @@ export default {
           downloadFun(filename, data, type);
         }
       };
+      this.$emit("loadHook", "interfaceLoad");
     }
   },
   watch: {

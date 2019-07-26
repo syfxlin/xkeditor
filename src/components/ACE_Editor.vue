@@ -966,6 +966,7 @@ export default {
     },
     setValue(val) {
       this.aceEditor.setValue(val);
+      this.aceEditor.gotoLine(1);
     },
     updateValue() {
       this.$emit("input", this.aceEditor.getSession().getValue());
