@@ -568,14 +568,14 @@ export default {
     },
     initPaste() {
       if (this.setting.xkSetting.pasteFormat) {
-        window.XKEditor.ace.on("paste", function(e) {
-          if (e.event.clipboardData.getData("text/html")) {
-            e.text = toMarkdown(
-              e.event.clipboardData.getData("text/html"),
-              false
-            );
-          }
-        });
+        // window.XKEditor.ace.on("paste", function(e) {
+        //   if (e.event.clipboardData.getData("text/html")) {
+        //     e.text = toMarkdown(
+        //       e.event.clipboardData.getData("text/html"),
+        //       false
+        //     );
+        //   }
+        // });
       }
       if (
         this.setting.xkSetting.pasteImageUpload &&
@@ -692,6 +692,8 @@ export default {
       window.XKEditor = {
         ace: _this.$refs.ace.aceEditor,
         tinymce: window.tinymce,
+        toMarkdown: toMarkdown,
+        toHtml: toHtml,
         getMarkdown: function() {
           return _this.markdownContent;
         },

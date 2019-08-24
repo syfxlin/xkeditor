@@ -24,6 +24,7 @@
           :key="num.id"
           :title="'标题' + num"
           @click="toolbarClick('h' + num)"
+          :id="'toolbar-h' + num"
         >
           <b>H{{ num }}</b>
         </button>
@@ -39,6 +40,7 @@
             type="text"
             :title="item.title"
             @click="toolbarClick(item.operate)"
+            :id="'toolbar-' + item.operate"
           >
             <fa-icon :icon="item.icon" />
           </button>
@@ -1014,6 +1016,13 @@ export default {
       }
     },
     toolbarClick(operate) {
+      if (
+        /(toc|typewriter|switchPreview|fullPreview|fullScreen)/.test(operate)
+      ) {
+        document
+          .getElementById("toolbar-" + operate)
+          .classList.toggle("active");
+      }
       this.aceToolbarModal.data.operate = operate;
       let str = "";
       let isStart = false;
@@ -1536,6 +1545,7 @@ th {
   user-select: none;
   cursor: pointer;
 }
+
 .xk-button-primary {
   color: #fff;
   background: #6190e8;
@@ -1546,8 +1556,20 @@ th {
   color: #3f536e;
   border: none;
   font-size: 1em;
-  padding: 0.6em;
+  padding: 0.2em 0.4em;
+  margin: 0.2em;
 }
+
+.ace-toolbar .xk-button:hover {
+  color: #fff;
+  background: #6190e8a0;
+}
+
+.ace-toolbar .xk-button.active {
+  color: #fff;
+  background: #6190e8;
+}
+
 .xk-input {
   position: relative;
   font-size: 0.85em;
@@ -1628,6 +1650,7 @@ th {
   border-radius: 4px;
   background-color: #fff;
   outline: none;
+  box-shadow: 0 1px 20px -6px rgba(0, 0, 0, 0.2);
 }
 .xk-modal-header {
   padding: 12px 16px;
