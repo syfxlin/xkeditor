@@ -567,16 +567,20 @@ export default {
       });
     },
     initPaste() {
+      var _this = this;
       if (this.setting.xkSetting.pasteFormat) {
-        // window.XKEditor.ace.on("paste", function(e) {
-        //   if (e.event.clipboardData.getData("text/html")) {
-        //     e.text = toMarkdown(
-        //       e.event.clipboardData.getData("text/html"),
-        //       false
-        //     );
-        //   }
-        // });
+        document.getElementById("toolbar-pasteFormat").classList.add("active");
       }
+      window.XKEditor.ace.on("paste", function(e) {
+        if (_this.setting.xkSetting.pasteFormat) {
+          if (e.event.clipboardData.getData("text/html")) {
+            e.text = toMarkdown(
+              e.event.clipboardData.getData("text/html"),
+              false
+            );
+          }
+        }
+      });
       if (
         this.setting.xkSetting.pasteImageUpload &&
         this.setting.xkSetting.imgUpload

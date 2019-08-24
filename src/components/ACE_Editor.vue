@@ -713,6 +713,16 @@ export default {
           title: "关于",
           operate: "info",
           icon: "info-circle"
+        },
+        {
+          title: "",
+          operate: "|",
+          icon: "|"
+        },
+        {
+          title: "粘贴转化",
+          operate: "pasteFormat",
+          icon: "paste"
         }
       ]
     };
@@ -1017,7 +1027,9 @@ export default {
     },
     toolbarClick(operate) {
       if (
-        /(toc|typewriter|switchPreview|fullPreview|fullScreen)/.test(operate)
+        /(toc|typewriter|switchPreview|fullPreview|fullScreen|pasteFormat)/.test(
+          operate
+        )
       ) {
         document
           .getElementById("toolbar-" + operate)
@@ -1104,7 +1116,7 @@ export default {
         this.operateModal(operate, true, "上传涂鸦图");
         return;
       } else if (
-        /(toLine|search|toc|switchPreview|fullPreview|fullScreen|toHtmlEditor|toTinyMCE|empty|setting|undo|redo|typewriter|format)/g.test(
+        /(toLine|search|toc|switchPreview|fullPreview|fullScreen|toHtmlEditor|toTinyMCE|empty|setting|undo|redo|typewriter|format|pasteFormat)/g.test(
           operate
         )
       ) {
@@ -1465,6 +1477,9 @@ export default {
           plugins: prettierPlugins
         });
         this.setValue(formated);
+      } else if (command === "pasteFormat") {
+        this.$parent.setting.xkSetting.pasteFormat = !this.$parent.setting
+          .xkSetting.pasteFormat;
       }
     }
   }
