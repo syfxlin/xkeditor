@@ -340,6 +340,10 @@
                   <td>Ctrl + Shift + G</td>
                   <td>跳转到指定的行</td>
                 </tr>
+                <tr>
+                  <td>Ctrl + Shift + F</td>
+                  <td>格式化Markdown(美化)</td>
+                </tr>
               </table>
               <h3>Emoji表情</h3>
               <a href="https://www.webfx.com/tools/emoji-cheat-sheet/">EMOJI CHEAT SHEET</a>
@@ -642,6 +646,11 @@ export default {
           title: "转换为TinyMCE编辑器",
           operate: "toTinyMCE",
           icon: "sync-alt"
+        },
+        {
+          title: "格式化(美化)",
+          operate: "format",
+          icon: "atom"
         },
         {
           title: "清空",
@@ -960,6 +969,14 @@ export default {
           exec: function() {
             _this.toolbarClick("toLine");
           }
+        },
+        {
+          name: "format",
+          win: "Ctrl-Shift-F",
+          mac: "Command-Shift-F",
+          exec: function() {
+            _this.execCommand("format");
+          }
         }
       ];
       this.execCommand("addKeys", keys);
@@ -1078,12 +1095,10 @@ export default {
         this.operateModal(operate, true, "上传涂鸦图");
         return;
       } else if (
-        /(toLine|search|toc|switchPreview|fullPreview|fullScreen|toHtmlEditor|toTinyMCE|empty|setting|undo|redo)/g.test(
+        /(toLine|search|toc|switchPreview|fullPreview|fullScreen|toHtmlEditor|toTinyMCE|empty|setting|undo|redo|typewriter|format)/g.test(
           operate
         )
       ) {
-        this.execCommand(operate);
-      } else if (operate === "typewriter") {
         this.execCommand(operate);
       } else if (operate === "setLocalStorage") {
         this.operateModal("localStorage", true, "保存到本地");
@@ -1434,6 +1449,13 @@ export default {
         }
         this.typewriterMode = !this.typewriterMode;
         return;
+      } else if (command === "format") {
+        if (!prettier) return;
+        let formated = prettier.format(this.value, {
+          parser: "markdown",
+          plugins: prettierPlugins
+        });
+        this.setValue(formated);
       }
     }
   }
