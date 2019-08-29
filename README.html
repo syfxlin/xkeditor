@@ -60,6 +60,8 @@
 <li>[两种编辑器] 支持富文本编辑和Markdown编辑</li>
 <li>[两种格式互转] 支持Markdown和HTML互转</li>
 <li>[打字机模式] 支持打字机模式，编辑时无需使用鼠标滚轮，并可调节定位位置，满足各种屏幕和使用者的需求</li>
+<li>[粘贴自动格式化] 支持在粘贴HTML时自动将HTML格式化为Markdown</li>
+<li>[图片粘贴自动上传] 支持粘贴图片自动上传，并自动填充链接</li>
 <li>[下载] 支持导出下载Markdown和HTML格式的文件</li>
 <li>[即时保存] 支持即时保存到浏览器，无惧网络波动</li>
 <li>[移动端优化] 优化移动端的编辑体验，支持惯性滚动，并默认关闭实时预览</li>
@@ -84,6 +86,10 @@
 需要在index.html中添加一下script标签，若您不打算使用该方式加载，请将<code>node_modules/xkeditor/components</code>下的文件中s所有的<code>import</code>注释取消。</p>
 <pre><code class="language-html"><div><span class="hljs-comment">&lt;!-- ACE Editor --&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://cdn.jsdelivr.net/npm/ace-builds@1.4.4/src-noconflict/ace.min.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://cdn.jsdelivr.net/npm/ace-builds@1.4.4/src-noconflict/ext-language_tools.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-comment">&lt;!-- Preitter --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://cdn.jsdelivr.net/npm/prettier@1.18.2/standalone.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://cdn.jsdelivr.net/npm/prettier@1.18.2/parser-markdown.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-comment">&lt;!-- Prism.js --&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/static/prism.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"/static/prism-okaidia.css"</span>&gt;</span>
@@ -257,11 +263,17 @@ turndown-plugin-gfm
     },
     <span class="hljs-attr">"xkSetting"</span>:{
         <span class="hljs-attr">"apiBaseUrl"</span>: <span class="hljs-string">""</span>,
-        <span class="hljs-attr">"previewCss"</span>:<span class="hljs-string">"/static/github-markdown.css"</span>,
-        <span class="hljs-attr">"previewClass"</span>:<span class="hljs-string">"markdown-body"</span>,
-        <span class="hljs-attr">"delayToHtml"</span>:<span class="hljs-number">500</span>,
-        <span class="hljs-attr">"scrollBind"</span>:<span class="hljs-string">"both"</span>,
-        <span class="hljs-attr">"imgUpload"</span>:<span class="hljs-literal">false</span>
+        <span class="hljs-attr">"previewCss"</span>: <span class="hljs-string">"/static/github-markdown.css"</span>,
+        <span class="hljs-attr">"previewClass"</span>: <span class="hljs-string">"markdown-body"</span>,
+        <span class="hljs-attr">"delayToHtml"</span>: <span class="hljs-number">500</span>,
+        <span class="hljs-attr">"scrollBind"</span>: <span class="hljs-string">"both"</span>,
+        <span class="hljs-attr">"imgUpload"</span>: <span class="hljs-string">"http://test.ixk.me/upload.php"</span>,
+        <span class="hljs-attr">"graffUrl"</span>: <span class="hljs-string">"static/"</span>,
+        <span class="hljs-attr">"graffUpload"</span>: <span class="hljs-string">"http://test.ixk.me/upload.php"</span>,
+        <span class="hljs-attr">"scrollMode"</span>: <span class="hljs-string">"javascript"</span>,
+        <span class="hljs-attr">"pasteFormat"</span>: <span class="hljs-literal">true</span>,
+        <span class="hljs-attr">"pasteImageUpload"</span>: <span class="hljs-literal">true</span>,
+        <span class="hljs-attr">"enableTinyMCE"</span>: <span class="hljs-literal">true</span>
     }
 }
 </div></code></pre>

@@ -66,6 +66,10 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 ```html
 <!-- ACE Editor -->
 <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.4.4/src-noconflict/ace.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.4.4/src-noconflict/ext-language_tools.js"></script>
+<!-- Preitter -->
+<script src="https://cdn.jsdelivr.net/npm/prettier@1.18.2/standalone.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prettier@1.18.2/parser-markdown.js"></script>
 <!-- Prism.js -->
 <script src="/static/prism.js"></script>
 <link rel="stylesheet" href="/static/prism-okaidia.css">
@@ -236,11 +240,17 @@ turndown-plugin-gfm
     },
     "xkSetting":{
         "apiBaseUrl": "",
-        "previewCss":"/static/github-markdown.css",
-        "previewClass":"markdown-body",
-        "delayToHtml":500,
-        "scrollBind":"both",
-        "imgUpload":false
+        "previewCss": "/static/github-markdown.css",
+        "previewClass": "markdown-body",
+        "delayToHtml": 500,
+        "scrollBind": "both",
+        "imgUpload": "http://test.ixk.me/upload.php",
+        "graffUrl": "static/",
+        "graffUpload": "http://test.ixk.me/upload.php",
+        "scrollMode": "javascript",
+        "pasteFormat": true,
+        "pasteImageUpload": true,
+        "enableTinyMCE": true
     }
 }
 ```
