@@ -35,97 +35,20 @@
         </div>
       </div>
     </template>
-
-    <div class="canvas-main">
-      <div class="canvas-container">
-        <canvas id="canvas" width="800" height="500"></canvas>
-        <div id="auxiliary-ele"></div>
-      </div>
-      <div class="canvas-button">
-        <h3>画笔</h3>
-        <ul class="can-pen">
-          <li class="can-btn fa fa-pencil-alt" data-type="pen">
-            <span>画笔</span>
-          </li>
-          <li class="can-btn fa fa-eraser" data-type="eraser">
-            <span>橡皮擦</span>
-          </li>
-          <li class="can-btn fa fa-font" data-type="text">
-            <span>文本</span>
-          </li>
-        </ul>
-        <h3>画笔颜色</h3>
-        <ul class="can-color">
-          <li class="can-btn black" data-type="color"></li>
-          <li class="can-btn red" data-type="color"></li>
-          <li class="can-btn blue" data-type="color"></li>
-          <li class="can-btn green" data-type="color"></li>
-          <li class="can-btn yellow" data-type="color"></li>
-          <li class="can-btn orange" data-type="color"></li>
-          <li class="can-btn gray" data-type="color"></li>
-          <li class="can-btn pink" data-type="color"></li>
-          <li class="can-btn purple" data-type="color"></li>
-        </ul>
-        <h3>画笔大小</h3>
-        <ul class="can-size">
-          <li class="can-btn fa fa-paint-brush small" data-type="size"></li>
-          <li class="can-btn fa fa-paint-brush middle" data-type="size"></li>
-          <li class="can-btn fa fa-paint-brush big" data-type="size"></li>
-        </ul>
-        <h3>形状</h3>
-        <ul class="can-shape">
-          <li class="can-btn fa fa-slash" data-type="line">
-            <span>直线</span>
-          </li>
-          <li class="can-btn fa fa-draw-polygon" data-type="polyline">
-            <span>多边形</span>
-          </li>
-          <li class="can-btn fa fa-square-full" data-type="rect">
-            <span>矩形</span>
-          </li>
-          <li class="can-btn fa fa-square" data-type="round-rect">
-            <span>圆角矩形</span>
-          </li>
-          <li class="can-btn fa fa-circle" data-type="ellipse">
-            <span>圆形</span>
-          </li>
-          <li class="can-btn fa fa-layer-group" data-type="diamond">
-            <span>菱形</span>
-          </li>
-        </ul>
-        <h3>操作</h3>
-        <ul class="can-operate">
-          <li class="can-btn fa fa-reply" data-type="to-prev-canvas">
-            <span>撤销</span>
-          </li>
-          <li class="can-btn fa fa-share" data-type="to-next-canvas">
-            <span>重做</span>
-          </li>
-          <li class="can-btn fa fa-trash" data-type="clean-canvas">
-            <span>清空画板</span>
-          </li>
-        </ul>
-        <h3>保存/取消</h3>
-        <ul class="can-output">
-          <li class="can-btn" data-type="save-canvas" id="save-canvas">保存</li>
-          <li class="can-btn" data-type="cancel-canvas" id="cancel-canvas">取消</li>
-        </ul>
-      </div>
-    </div>
+    <graff-board></graff-board>
   </div>
 </template>
 
 <script>
-import { initPaint } from "../utils/paint.js";
-import "../assets/paint.css";
 //导入基础组件
-import "../utils/dialogDrag.js";
-import ACE from "./ACE_Editor.vue";
-import TinyMCE from "./TinyMCE_Editor.vue";
+import "../utils/dialogDrag";
+import Ace from "./ACE_Editor";
+import TinyMCE from "./TinyMCE_Editor";
+import GraffBoard from "./GraffBoard";
 
-import { axiosPro, axios } from "../utils/axiosPro.js";
+import axios from "axios";
 //HTML和Markdown互转
-import { toHtml, toMarkdown, getTocHtml } from "../utils/switchContent.js";
+import { toHtml, toMarkdown, getTocHtml } from "../utils/switchContent";
 
 // import katex from "katex"
 // import "katex/dist/katex.min.css"
@@ -143,9 +66,10 @@ import store, { mapState, mapActions } from "../store";
 export default {
   name: "XK_Editor",
   components: {
-    ace: ACE,
+    ace: Ace,
     tinymce: TinyMCE,
-    "fa-icon": FontAwesomeIcon
+    "fa-icon": FontAwesomeIcon,
+    "graff-board": GraffBoard
   },
   props: {
     settingApi: String,
@@ -156,55 +80,7 @@ export default {
   data() {
     return {
       isRenderEditor: false,
-      toc: "",
-      delayToHtml: null,
-      setting: {
-        tinymceSetting: {
-          language_url: "/static/tinymce/langs/zh_CN.js",
-          language: "zh_CN",
-          skin_url: "/static/tinymce/skins/ui/oxide",
-          body_class: "markdown-body",
-          content_css: "/static/github-markdown.css",
-          plugins:
-            "print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern",
-          toolbar:
-            "formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor prismjs | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | tex-$ tex-math flow seq gantt mermaid | removeformat code toMarkdownEditor | undo redo",
-          image_advtab: true,
-          importcss_append: true,
-          height: "100%",
-          template_cdate_format: "[CDATE: %m/%d/%Y : %H:%M:%S]",
-          template_mdate_format: "[MDATE: %m/%d/%Y : %H:%M:%S]",
-          image_caption: true,
-          spellchecker_dialog: true,
-          spellchecker_whitelist: ["Ephox", "Moxiecode"]
-        },
-        aceSetting: {
-          minLines: 10,
-          fontSize: 14,
-          theme: "ace/theme/solarized_light",
-          mode: "ace/mode/markdown",
-          tabSize: 4,
-          fontSize: "17px",
-          wrap: true,
-          enableSnippets: true,
-          enableLiveAutocompletion: true,
-          enableBasicAutocompletion: true
-        },
-        xkSetting: {
-          apiBaseUrl: "",
-          previewCss: "/static/github-markdown.css",
-          previewClass: "markdown-body",
-          delayToHtml: 500,
-          scrollBind: "both",
-          imgUpload: false,
-          graffUrl: "static/",
-          graffUpload: false,
-          scrollMode: "anchor",
-          pasteFormat: true,
-          pasteImageUpload: true,
-          enableTinyMCE: true
-        }
-      }
+      delayToHtml: null
     };
   },
   computed: {
@@ -215,49 +91,47 @@ export default {
         return false;
       }
     },
-    isMobile() {
-      return window.isMobile;
-    },
     ...mapState([
       "showToc",
       "previewShow",
       "editorMode",
       "markdownContent",
       "htmlContent",
-      "htmlViewContent"
+      "htmlViewContent",
+      "setting"
     ])
   },
   async mounted() {
-    window.isMobile = /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i.test(
-      navigator.userAgent
-    );
     await this.load();
-    window.eSetting = this.setting;
     this.htmlViewContent = toHtml(this.markdownContent, true);
     this.$nextTick(function() {
       this.initEditor();
     });
-    this.setInterface();
+    this.setInterface().then(() => {
+      this.$emit("loadHook", "interfaceLoad");
+    });
     this.$emit("loadHook", "componentLoad");
   },
   methods: {
     ...mapActions([
-      "switchToc",
       "switchPreviewFull",
-      "switchEditor",
-      "setAceValue",
-      "setTinyValue"
+      "initGraff",
+      "setInterface",
+      "initScroll",
+      "initPaste",
+      "updateTocTree",
+      "initTocTree"
     ]),
     async load() {
       let md = null;
       let setting = null;
       if (!this.contentProps) {
-        md = await axiosPro.get(this.contentApi);
+        md = (await axios.get(this.contentApi)).data;
       } else {
         md = this.contentProps;
       }
       if (!this.settingProps) {
-        setting = await axiosPro.get(this.settingApi);
+        setting = (await axios.get(this.settingApi)).data;
       } else {
         setting = this.settingProps;
       }
@@ -321,503 +195,27 @@ export default {
           window.scrollBind();
         }
       });
-    },
-    initTocTree() {
-      window.toggleToc = this.toggleToc;
-      //注册TOC按钮
-      document.getElementById("toc-button").addEventListener("click", () => {
-        this.switchToc();
-      });
-      this.updateTocTree();
-    },
-    updateTocTree() {
-      var items = document.querySelectorAll(
-        "#toc .toc-img ~ ul,.toc .toc-img ~ ul"
-      );
-      for (let i = 0; i < items.length; i++) {
-        items[i].parentNode.children[0].setAttribute(
-          "src",
-          "/static/svg/minus-square.svg"
-        );
-        items[i].parentNode.children[0].setAttribute(
-          "onclick",
-          "toggleToc(this)"
-        );
-      }
-    },
-    toggleToc(ele) {
-      var display = ele.nextElementSibling.nextElementSibling.style.display;
-      if (display === "" || display === "block") {
-        ele.nextElementSibling.nextElementSibling.style.display = "none";
-        ele.setAttribute("src", "/static/svg/plus-square.svg");
-      } else {
-        ele.nextElementSibling.nextElementSibling.style.display = "block";
-        ele.setAttribute("src", "/static/svg/minus-square.svg");
-      }
-    },
-    initScroll() {
-      window.scrollBind = function(operate = null, bindType = "both") {
-        var currentTab = 1;
-        var editorDom = document.querySelector(".ace-editor");
-        var previewHtmlDom = document.querySelector("#previewHtml");
-        var aceContentHeight =
-          window.XKEditor.ace.renderer.scrollBarV.scrollHeight -
-          editorDom.offsetHeight;
-        var previewHtmlHeight =
-          previewHtmlDom.scrollHeight - previewHtmlDom.offsetHeight;
-        window.scale = previewHtmlHeight / aceContentHeight;
-        if (operate === "init") {
-          if (bindType === "left") {
-            currentTab = 1;
-          } else if (bindType === "right") {
-            currentTab = 2;
-          } else {
-            editorDom.addEventListener("mouseover", function() {
-              currentTab = 1;
-            });
-            previewHtmlDom.addEventListener("mouseover", function() {
-              currentTab = 2;
-            });
-            //兼容触摸设备
-            editorDom.addEventListener("touchstart", function() {
-              currentTab = 1;
-            });
-            previewHtmlDom.addEventListener("touchstart", function() {
-              currentTab = 2;
-            });
-          }
-          window.XKEditor.ace.session.on("changeScrollTop", function(data) {
-            if (currentTab === 1) {
-              previewHtmlDom.scrollTop = data * window.scale;
-            }
-          });
-          previewHtmlDom.addEventListener("scroll", function() {
-            if (currentTab === 2) {
-              window.XKEditor.ace.session.setScrollTop(
-                previewHtmlDom.scrollTop / window.scale
-              );
-            }
-          });
-          //兼容触摸设备
-          previewHtmlDom.addEventListener("touchmove", function() {
-            if (currentTab === 2) {
-              window.XKEditor.ace.session.setScrollTop(
-                previewHtmlDom.scrollTop / window.scale
-              );
-            }
-          });
-          //惯性滚动
-          var inertiaScrollTime = null;
-          editorDom.addEventListener("touchstart", function(event) {
-            clearTimeout(inertiaScrollTime);
-            var startY = event.changedTouches[0].pageY;
-            var endY = 0;
-            var startTime = Date.now();
-            var endTime = 0;
-            editorDom.addEventListener("touchend", function(event) {
-              endY = event.changedTouches[0].pageY;
-              endTime = Date.now();
-              var _v = ((endY - startY) / (endTime - startTime)) * 1.5;
-              function scrollToTop(v, sTime, contentY) {
-                var dir = v > 0 ? -1 : 1;
-                var deceleration = dir * 0.0018;
-                var duration = v / deceleration;
-                function inertiaMove() {
-                  // if(stopInertia) return
-                  var nowTime = Date.now();
-                  var t = nowTime - sTime;
-                  var nowV = v + t * deceleration;
-                  // 速度方向变化表示速度达到0了
-                  if (dir * nowV > 0) {
-                    return;
-                  }
-                  var moveY = (-(v + nowV) / 2) * t;
-                  window.XKEditor.ace.session.setScrollTop(contentY + moveY);
-                  inertiaScrollTime = setTimeout(inertiaMove, 10);
-                }
-                inertiaMove();
-              }
-              scrollToTop(
-                _v,
-                endTime,
-                window.XKEditor.ace.session.getScrollTop()
-              );
-            });
-          });
-        }
-      };
-      // 模拟锚点
-      window.scrollMode = this.setting.xkSetting.scrollMode;
-      window.sta = function(anchorName) {
-        if (anchorName) {
-          let anchorElement = document.getElementById(anchorName);
-          if (anchorElement) {
-            anchorElement.scrollIntoView(true);
-          }
-        }
-      };
-      //初始化滚动绑定
-      this.$nextTick(function() {
-        setTimeout(function() {
-          window.scrollBind(
-            "init",
-            window.eThis.e.setting.xkSetting.scrollBind
-          );
-        }, 1000);
-      });
-    },
-    initGraff() {
-      if (this.setting.xkSetting.graffUpload) {
-        initPaint("canvas", true, false, { x: 1, y: 1 });
-        document
-          .getElementById("previewHtml")
-          .addEventListener("click", function(e) {
-            let ele = e.target;
-            if (
-              ele.nodeName === "IMG" &&
-              ele.className.indexOf("graffiti") !== -1
-            ) {
-              let canvas = document.getElementById("canvas");
-              document.getElementsByClassName("canvas-main")[0].style.display =
-                "block";
-              let canvasContext = canvas.getContext("2d");
-              canvasContext.drawImage(
-                ele,
-                0,
-                0,
-                canvasContext.canvas.width,
-                canvasContext.canvas.height
-              );
-              let filename = ele.getAttribute("src");
-              if (filename.indexOf("/") > 0) {
-                filename = filename.substring(filename.lastIndexOf("/") + 1);
-              }
-              canvas.setAttribute("data-filename", filename);
-              window.setCanvasScale();
-            }
-          });
-        document
-          .getElementById("save-canvas")
-          .addEventListener("click", function() {
-            window.eThis.e.saveCanvas();
-          });
-        document
-          .getElementById("cancel-canvas")
-          .addEventListener("click", function() {
-            document.getElementsByClassName("canvas-main")[0].style.display =
-              "none";
-          });
-      }
-    },
-    saveCanvas() {
-      document.getElementById("canvas").toBlob(function(blob) {
-        let file = new window.File(
-          [blob],
-          document.getElementById("canvas").getAttribute("data-filename"),
-          { type: blob.type }
-        );
-        window.XKEditorAPI.graffUpload(
-          file,
-          function(response) {
-            if (response.data.error) {
-              //TODO: error
-            }
-            document.getElementsByClassName("canvas-main")[0].style.display =
-              "none";
-            window.eThis.e.htmlViewContent += " ";
-            //TODO: 上传成功提示
-          },
-          function(error) {
-            //TODO: 上传失败提示
-            console.log(error);
-          }
-        );
-      });
-    },
-    initPaste() {
-      var _this = this;
-      if (this.setting.xkSetting.pasteFormat) {
-        document.getElementById("toolbar-pasteFormat").classList.add("active");
-      }
-      window.XKEditor.ace.on("paste", function(e) {
-        if (_this.setting.xkSetting.pasteFormat) {
-          if (e.event.clipboardData.getData("text/html")) {
-            e.text = toMarkdown(
-              e.event.clipboardData.getData("text/html"),
-              false
-            );
-          }
-        }
-      });
-      if (
-        this.setting.xkSetting.pasteImageUpload &&
-        this.setting.xkSetting.imgUpload
-      ) {
-        document
-          .getElementsByClassName("ace-container")[0]
-          .addEventListener("paste", function(e) {
-            if (!(e.clipboardData && e.clipboardData.items)) {
-              return;
-            }
-            for (var i = 0, len = e.clipboardData.items.length; i < len; i++) {
-              var item = e.clipboardData.items[i];
-              if (item.kind === "file") {
-                var pasteFile = item.getAsFile();
-                window.XKEditorAPI.imgUpload(
-                  pasteFile,
-                  function(response) {
-                    window.XKEditor.ace.insert(
-                      "[](" + response.data.path + ")"
-                    );
-                    //TODO: 上传成功提示
-                  },
-                  function(error) {
-                    //TODO: 上传失败提示
-                    console.log(error);
-                  }
-                );
-              }
-            }
-          });
-      }
-    },
-    setInterface() {
-      var _this = this;
-      var downloadFun = function(filename, data, type) {
-        var aLink = document.createElement("a");
-        var evt = document.createEvent("MouseEvents");
-        evt.initMouseEvent(
-          "click",
-          true,
-          false,
-          window,
-          0,
-          0,
-          0,
-          0,
-          0,
-          false,
-          false,
-          false,
-          false,
-          0,
-          null
-        );
-        aLink.download = filename + "." + type;
-        aLink.href = URL.createObjectURL(
-          new Blob([data], { type: "text/" + type })
-        );
-        aLink.dispatchEvent(evt);
-      };
-      window.eThis = {
-        e: this,
-        a: this.$refs.ace,
-        t: this.$refs.tinymce
-      };
-      window.XKEditorAPI = {
-        //response: {"error":false,"path":"img url"}
-        imgUpload: function(file, success, failure) {
-          if (_this.setting.xkSetting.imgUpload) {
-            let param = new FormData();
-            param.append("file", file);
-            let config = {
-              headers: { "Content-Type": "multipart/form-data" }
-            };
-            // success({"error":false,"path":"https://img.url"})
-            axios
-              .post(_this.setting.xkSetting.imgUpload, param, config)
-              .then(function(response) {
-                success(response);
-              })
-              .catch(function(error) {
-                failure(error);
-              });
-          } else {
-            //TODO: 上传关闭提示
-          }
-        },
-        graffUpload: function(file, success, failure, filename = null) {
-          if (_this.setting.xkSetting.graffUpload) {
-            let param = new FormData();
-            if (filename) {
-              param.append("file", file, filename);
-            } else {
-              param.append("file", file);
-            }
-            let config = {
-              headers: { "Content-Type": "multipart/form-data" }
-            };
-            // success({"error":false,"path":"https://img.url"})
-            axios
-              .post(_this.setting.xkSetting.graffUpload, param, config)
-              .then(function(response) {
-                success(response);
-              })
-              .catch(function(error) {
-                failure(error);
-              });
-          } else {
-            //TODO: 上传关闭提示
-          }
-        }
-      };
-      window.XKEditor = {
-        ace: _this.$refs.ace.aceEditor,
-        tinymce: window.tinymce,
-        toMarkdown: toMarkdown,
-        toHtml: toHtml,
-        getMarkdown: function() {
-          return _this.markdownContent;
-        },
-        getHTML: function() {
-          return _this.htmlViewContent;
-        },
-        setMarkdown: function(val, valueType = "markdown") {
-          //默认设置时在ACE编辑界面
-          if (_this.editorMode !== "ace") {
-            //TODO: 提示不可设置，因为不在ACE状态
-            return;
-          }
-          if (valueType !== "markdown") {
-            val = toMarkdown(val, true);
-          }
-          _this.markdownContent = val;
-          _this.setAceValue(val);
-        },
-        setHTML: function(val, valueType = "html") {
-          //默认设置时在TinyMCE编辑界面
-          if (_this.editorMode !== "tinymce") {
-            //TODO: 提示不可设置，因为不在TinyMCE状态
-            return;
-          }
-          if (valueType !== "html") {
-            val = toHtml(val, false);
-          }
-          _this.htmlContent = val;
-          _this.setTinyValue(val);
-        },
-        switchEditor: function() {
-          _this.switchEditor();
-        },
-        switchPreview: function() {
-          _this.$refs.ace.execCommand("switchPreview");
-        },
-        switchFullPreview: function() {
-          _this.$refs.ace.execCommand("fullPreview");
-        },
-        switchFullScreen: function() {
-          _this.$refs.ace.execCommand("fullScreen");
-        },
-        toLine: function() {
-          _this.$refs.ace.execCommand("toLine");
-        },
-        toc: function() {
-          _this.$refs.ace.execCommand("toc");
-        },
-        toolbar: function() {
-          _this.$refs.ace.execCommand("toolbar");
-        },
-        resize: function() {
-          _this.$refs.ace.execCommand("resize");
-        },
-        addKeys: function(keys) {
-          // keys = [{name,win,mac,exec},{name,win,mac,exec}]
-          _this.$refs.ace.execCommand("addKeys", keys);
-        },
-        removeKeys: function(keys) {
-          // keys = [name, name]
-          _this.$refs.ace.execCommand("removeKeys", keys);
-        },
-        getEditor: function(name) {
-          if (name === "ace") {
-            return _this.$refs.ace.aceEditor;
-          } else if (name === "tinymce") {
-            return window.tinymce;
-          }
-        },
-        switchTypewriter: function(data) {
-          _this.$refs.ace.execCommand("typewriter", true);
-        },
-        setLocalStorage: function(filename) {
-          window.localStorage.setItem(
-            "xkeditor_" + filename,
-            window.XKEditor.getMarkdown()
-          );
-        },
-        getLocalStorage: function(filename) {
-          return window.localStorage.getItem("xkeditor_" + filename);
-        },
-        listLocalStorage: function() {
-          var list = {};
-          for (const key in window.localStorage) {
-            if (key.indexOf("xkeditor_") != -1) {
-              list[key.substring(9)] = window.localStorage.getItem(key);
-            }
-          }
-          return list;
-        },
-        removeLocalStorage: function(filename) {
-          window.localStorage.removeItem("xkeditor_" + filename);
-        },
-        download: async function(filename, type = "markdown") {
-          var data = "";
-          if (type === "markdown") {
-            data = _this.markdownContent;
-            type = "md";
-          } else if (type === "html") {
-            data = _this.htmlViewContent;
-          } else if (type === "fullhtml") {
-            var d_t1 =
-              '<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><title>';
-            var d_t2 = "</title>";
-            var d_t3 = "</head><body>";
-            var d_t4 = "</body></html>";
-            var style = await axiosPro.get(_this.setting.xkSetting.previewCss);
-            style += await axiosPro.get("/static/prism-okaidia.css");
-            style += await axiosPro.get("/static/prism-line-numbers.css");
-            style += await axiosPro.get("/static/prism-toolbar.css");
-            data =
-              d_t1 +
-              filename +
-              d_t2 +
-              "<style>" +
-              style +
-              "</style>" +
-              d_t3 +
-              '<div class="markdown-body editormd-html-preview">' +
-              _this.htmlViewContent +
-              "</div>" +
-              d_t4;
-            type = "html";
-            downloadFun(filename, data, type);
-            return;
-          }
-          downloadFun(filename, data, type);
-        }
-      };
-      this.$emit("loadHook", "interfaceLoad");
     }
   },
   watch: {
     markdownContent(val) {
-      var _this = this;
       //最少延迟250ms转换为html以保证性能，否则会造成输入卡顿
       var delay =
-        _this.setting.xkSetting.delayToHtml >= 250
-          ? _this.setting.xkSetting.delayToHtml
+        this.setting.xkSetting.delayToHtml >= 250
+          ? this.setting.xkSetting.delayToHtml
           : 250;
-      if (_this.delayToHtml) {
-        clearTimeout(_this.delayToHtml);
+      if (this.delayToHtml) {
+        clearTimeout(this.delayToHtml);
       }
-      _this.delayToHtml = setTimeout(function() {
-        _this.htmlViewContent = toHtml(val, true);
-        _this.renderNextTick();
+      this.delayToHtml = setTimeout(() => {
+        this.htmlViewContent = toHtml(val, true);
+        this.renderNextTick();
       }, delay);
     },
     htmlContent(val) {
       this.htmlViewContent = val;
       this.renderNextTick();
-      this.$nextTick(function() {
+      this.$nextTick(() => {
         Prism.highlightAll();
       });
     }

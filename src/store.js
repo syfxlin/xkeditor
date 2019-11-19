@@ -1,5 +1,22 @@
 import Vue from 'vue';
 import { toHtml, toMarkdown } from './utils/switchContent';
+import { initPaint } from './utils/paint';
+import axios from 'axios';
+
+window.isMobile = /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i.test(
+  navigator.userAgent
+);
+
+window.toggleToc = ele => {
+  var display = ele.nextElementSibling.nextElementSibling.style.display;
+  if (display === '' || display === 'block') {
+    ele.nextElementSibling.nextElementSibling.style.display = 'none';
+    ele.setAttribute('src', '/static/svg/plus-square.svg');
+  } else {
+    ele.nextElementSibling.nextElementSibling.style.display = 'block';
+    ele.setAttribute('src', '/static/svg/minus-square.svg');
+  }
+};
 
 const state = Vue.observable({
   showToc: false,
@@ -195,6 +212,36 @@ const actions = {
       console.log('error');
     }
   },
+  initGraff() {
+    if (state.setting.xkSetting.graffUpload) {
+      initPaint('canvas', true, false, { x: 1, y: 1 });
+      document.getElementById('previewHtml').addEventListener('click', e => {
+        let ele = e.target;
+        if (
+          ele.nodeName === 'IMG' &&
+          ele.className.indexOf('graffiti') !== -1
+        ) {
+          let canvas = document.getElementById('canvas');
+          document.getElementsByClassName('canvas-main')[0].style.display =
+            'block';
+          let canvasContext = canvas.getContext('2d');
+          canvasContext.drawImage(
+            ele,
+            0,
+            0,
+            canvasContext.canvas.width,
+            canvasContext.canvas.height
+          );
+          let filename = ele.getAttribute('src');
+          if (filename.indexOf('/') > 0) {
+            filename = filename.substring(filename.lastIndexOf('/') + 1);
+          }
+          canvas.setAttribute('data-filename', filename);
+          window.setCanvasScale();
+        }
+      });
+    }
+  },
   graffUpload() {
     let hash = Math.random()
       .toString(36)
@@ -236,19 +283,33 @@ const actions = {
   },
   switchToc() {
     state.showToc = !state.showToc;
+    let ele = document.getElementById('toolbar-toc');
+    if (state.showToc) {
+      ele.classList.add('active');
+    } else {
+      ele.classList.remove('active');
+    }
   },
   switchPreviewShow(show = null) {
     let curr = show !== null ? show : state.previewShow === 'hide';
+    let ele1 = document.getElementById('toolbar-switchPreview');
+    let ele2 = document.getElementById('toolbar-fullPreview');
     if (!curr) {
       state.previewShow = 'hide';
+      ele1.classList.add('active');
     } else {
       state.previewShow = 'show';
+      ele1.classList.remove('active');
+      ele2.classList.remove();
     }
   },
   switchPreviewFull(show = null) {
     let curr = show !== null ? show : state.previewShow === 'full';
+    let ele1 = document.getElementById('toolbar-fullPreview');
+    let ele2 = document.getElementById('toolbar-switchPreview');
     if (!curr) {
       state.previewShow = 'full';
+      ele1.classList.add('active');
       Vue.nextTick(() => {
         var preEle = document.getElementById('previewHtml');
         if (
@@ -262,17 +323,21 @@ const actions = {
       });
     } else {
       state.previewShow = 'show';
+      ele1.classList.remove('active');
+      ele2.classList.remove('active');
       document.getElementById('toc-button').style.display = 'block';
       state.showToc = false;
     }
   },
   operateFullScreen() {
+    let ele = document.getElementById('toolbar-fullScreen');
     if (
       document.fullscreenElement ||
       document.msFullscreenElement ||
       document.mozFullScreenElement ||
       document.webkitFullscreenElement
     ) {
+      ele.classList.remove('active');
       if (document.exitFullscreen) {
         return document.exitFullscreen();
       } else if (document.webkitExitFullscreen) {
@@ -283,6 +348,7 @@ const actions = {
         return document.msExitFullscreen();
       }
     } else {
+      ele.classList.add('active');
       var root = document.documentElement;
       if (root.requestFullscreen) {
         return root.requestFullscreen();
@@ -342,6 +408,7 @@ const actions = {
       return;
     } else if (command === 'toc') {
       actions.switchToc();
+
       return;
     } else if (command === 'switchPreview') {
       actions.switchPreviewShow();
@@ -445,12 +512,15 @@ const actions = {
           }
         };
       }
-      if (!state.typewriterMode) {
+      state.typewriterMode = !state.typewriterMode;
+      let ele = document.getElementById('toolbar-typewriter');
+      if (state.typewriterMode) {
         state.aceEditor.selection.on('changeCursor', window.$typewriter);
+        ele.classList.add('active');
       } else {
         state.aceEditor.selection.off('changeCursor', window.$typewriter);
+        ele.classList.remove('active');
       }
-      state.typewriterMode = !state.typewriterMode;
       return;
     } else if (command === 'format') {
       if (!prettier) return;
@@ -458,20 +528,19 @@ const actions = {
         parser: 'markdown',
         plugins: prettierPlugins
       });
-      this.setAceValue(formated);
+      actions.setAceValue(formated);
     } else if (command === 'pasteFormat') {
       state.setting.xkSetting.pasteFormat = !state.setting.xkSetting
         .pasteFormat;
+      let ele = document.getElementById('toolbar-pasteFormat');
+      if (state.setting.xkSetting.pasteFormat) {
+        ele.classList.add('active');
+      } else {
+        ele.classList.remove('active');
+      }
     }
   },
   toolbarClick(operate) {
-    if (
-      /(toc|typewriter|switchPreview|fullPreview|fullScreen|pasteFormat)/.test(
-        operate
-      )
-    ) {
-      document.getElementById('toolbar-' + operate).classList.toggle('active');
-    }
     state.aceToolbarModal.data.operate = operate;
     let str = '';
     let isStart = false;
@@ -835,6 +904,392 @@ const actions = {
       }
     ];
     actions.execCommand('addKeys', keys);
+  },
+  setInterface() {
+    return new Promise((resolve, reject) => {
+      var downloadFun = (filename, data, type) => {
+        var aLink = document.createElement('a');
+        var evt = document.createEvent('MouseEvents');
+        evt.initMouseEvent(
+          'click',
+          true,
+          false,
+          window,
+          0,
+          0,
+          0,
+          0,
+          0,
+          false,
+          false,
+          false,
+          false,
+          0,
+          null
+        );
+        aLink.download = filename + '.' + type;
+        aLink.href = URL.createObjectURL(
+          new Blob([data], { type: 'text/' + type })
+        );
+        aLink.dispatchEvent(evt);
+      };
+      window.XKEditorAPI = {
+        //response: {"error":false,"path":"img url"}
+        imgUpload: (file, success, failure) => {
+          if (state.setting.xkSetting.imgUpload) {
+            let param = new FormData();
+            param.append('file', file);
+            let config = {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            };
+            // success({"error":false,"path":"https://img.url"})
+            axios
+              .post(state.setting.xkSetting.imgUpload, param, config)
+              .then(response => {
+                success(response);
+              })
+              .catch(error => {
+                failure(error);
+              });
+          } else {
+            //TODO: 上传关闭提示
+          }
+        },
+        graffUpload: (file, success, failure, filename = null) => {
+          if (state.setting.xkSetting.graffUpload) {
+            let param = new FormData();
+            if (filename) {
+              param.append('file', file, filename);
+            } else {
+              param.append('file', file);
+            }
+            let config = {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            };
+            // success({"error":false,"path":"https://img.url"})
+            axios
+              .post(state.setting.xkSetting.graffUpload, param, config)
+              .then(response => {
+                success(response);
+              })
+              .catch(error => {
+                failure(error);
+              });
+          } else {
+            //TODO: 上传关闭提示
+          }
+        }
+      };
+      window.XKEditor = {
+        ace: state.aceEditor,
+        tinymce: window.tinymce,
+        toMarkdown: toMarkdown,
+        toHtml: toHtml,
+        getMarkdown: () => {
+          return state.markdownContent;
+        },
+        getHTML: () => {
+          return state.htmlViewContent;
+        },
+        setMarkdown: (val, valueType = 'markdown') => {
+          //默认设置时在ACE编辑界面
+          if (state.editorMode !== 'ace') {
+            //TODO: 提示不可设置，因为不在ACE状态
+            return;
+          }
+          if (valueType !== 'markdown') {
+            val = toMarkdown(val, true);
+          }
+          state.markdownContent = val;
+          actions.setAceValue(val);
+        },
+        setHTML: (val, valueType = 'html') => {
+          //默认设置时在TinyMCE编辑界面
+          if (state.editorMode !== 'tinymce') {
+            //TODO: 提示不可设置，因为不在TinyMCE状态
+            return;
+          }
+          if (valueType !== 'html') {
+            val = toHtml(val, false);
+          }
+          state.htmlContent = val;
+          actions.setTinyValue(val);
+        },
+        switchEditor: () => {
+          actions.switchEditor();
+        },
+        switchPreview: () => {
+          state.aceEditor.execCommand('switchPreview');
+        },
+        switchFullPreview: () => {
+          state.aceEditor.execCommand('fullPreview');
+        },
+        switchFullScreen: () => {
+          state.aceEditor.execCommand('fullScreen');
+        },
+        toLine: () => {
+          state.aceEditor.execCommand('toLine');
+        },
+        toc: () => {
+          state.aceEditor.execCommand('toc');
+        },
+        toolbar: () => {
+          state.aceEditor.execCommand('toolbar');
+        },
+        resize: () => {
+          state.aceEditor.execCommand('resize');
+        },
+        addKeys: keys => {
+          // keys = [{name,win,mac,exec},{name,win,mac,exec}]
+          state.aceEditor.execCommand('addKeys', keys);
+        },
+        removeKeys: keys => {
+          // keys = [name, name]
+          state.aceEditor.execCommand('removeKeys', keys);
+        },
+        getEditor: name => {
+          if (name === 'ace') {
+            return state.aceEditor.aceEditor;
+          } else if (name === 'tinymce') {
+            return window.tinymce;
+          }
+        },
+        switchTypewriter: data => {
+          state.aceEditor.execCommand('typewriter', true);
+        },
+        setLocalStorage: filename => {
+          window.localStorage.setItem(
+            'xkeditor_' + filename,
+            window.XKEditor.getMarkdown()
+          );
+        },
+        getLocalStorage: filename => {
+          return window.localStorage.getItem('xkeditor_' + filename);
+        },
+        listLocalStorage: () => {
+          var list = {};
+          for (const key in window.localStorage) {
+            if (key.indexOf('xkeditor_') != -1) {
+              list[key.substring(9)] = window.localStorage.getItem(key);
+            }
+          }
+          return list;
+        },
+        removeLocalStorage: filename => {
+          window.localStorage.removeItem('xkeditor_' + filename);
+        },
+        download: async (filename, type = 'markdown') => {
+          var data = '';
+          if (type === 'markdown') {
+            data = state.markdownContent;
+            type = 'md';
+          } else if (type === 'html') {
+            data = state.htmlViewContent;
+          } else if (type === 'fullhtml') {
+            var d_t1 =
+              '<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><title>';
+            var d_t2 = '</title>';
+            var d_t3 = '</head><body>';
+            var d_t4 = '</body></html>';
+            var style = await axios.get(state.setting.xkSetting.previewCss);
+            style += await axios.get('/static/prism-okaidia.css');
+            style += await axios.get('/static/prism-line-numbers.css');
+            style += await axios.get('/static/prism-toolbar.css');
+            data =
+              d_t1 +
+              filename +
+              d_t2 +
+              '<style>' +
+              style +
+              '</style>' +
+              d_t3 +
+              '<div class="markdown-body editormd-html-preview">' +
+              state.htmlViewContent +
+              '</div>' +
+              d_t4;
+            type = 'html';
+            downloadFun(filename, data, type);
+            return;
+          }
+          downloadFun(filename, data, type);
+        }
+      };
+      resolve();
+    });
+  },
+  initScroll() {
+    window.scrollBind = (operate = null, bindType = 'both') => {
+      var currentTab = 1;
+      var editorDom = document.querySelector('.ace-editor');
+      var previewHtmlDom = document.querySelector('#previewHtml');
+      var aceContentHeight =
+        window.XKEditor.ace.renderer.scrollBarV.scrollHeight -
+        editorDom.offsetHeight;
+      var previewHtmlHeight =
+        previewHtmlDom.scrollHeight - previewHtmlDom.offsetHeight;
+      window.scale = previewHtmlHeight / aceContentHeight;
+      if (operate === 'init') {
+        if (bindType === 'left') {
+          currentTab = 1;
+        } else if (bindType === 'right') {
+          currentTab = 2;
+        } else {
+          editorDom.addEventListener('mouseover', () => {
+            currentTab = 1;
+          });
+          previewHtmlDom.addEventListener('mouseover', () => {
+            currentTab = 2;
+          });
+          //兼容触摸设备
+          editorDom.addEventListener('touchstart', () => {
+            currentTab = 1;
+          });
+          previewHtmlDom.addEventListener('touchstart', () => {
+            currentTab = 2;
+          });
+        }
+        window.XKEditor.ace.session.on('changeScrollTop', data => {
+          if (currentTab === 1) {
+            previewHtmlDom.scrollTop = data * window.scale;
+          }
+        });
+        previewHtmlDom.addEventListener('scroll', () => {
+          if (currentTab === 2) {
+            window.XKEditor.ace.session.setScrollTop(
+              previewHtmlDom.scrollTop / window.scale
+            );
+          }
+        });
+        //兼容触摸设备
+        previewHtmlDom.addEventListener('touchmove', () => {
+          if (currentTab === 2) {
+            window.XKEditor.ace.session.setScrollTop(
+              previewHtmlDom.scrollTop / window.scale
+            );
+          }
+        });
+        //惯性滚动
+        var inertiaScrollTime = null;
+        editorDom.addEventListener('touchstart', event => {
+          clearTimeout(inertiaScrollTime);
+          var startY = event.changedTouches[0].pageY;
+          var endY = 0;
+          var startTime = Date.now();
+          var endTime = 0;
+          editorDom.addEventListener('touchend', event => {
+            endY = event.changedTouches[0].pageY;
+            endTime = Date.now();
+            var _v = ((endY - startY) / (endTime - startTime)) * 1.5;
+            function scrollToTop(v, sTime, contentY) {
+              var dir = v > 0 ? -1 : 1;
+              var deceleration = dir * 0.0018;
+              var duration = v / deceleration;
+              function inertiaMove() {
+                // if(stopInertia) return
+                var nowTime = Date.now();
+                var t = nowTime - sTime;
+                var nowV = v + t * deceleration;
+                // 速度方向变化表示速度达到0了
+                if (dir * nowV > 0) {
+                  return;
+                }
+                var moveY = (-(v + nowV) / 2) * t;
+                window.XKEditor.ace.session.setScrollTop(contentY + moveY);
+                inertiaScrollTime = setTimeout(inertiaMove, 10);
+              }
+              inertiaMove();
+            }
+            scrollToTop(
+              _v,
+              endTime,
+              window.XKEditor.ace.session.getScrollTop()
+            );
+          });
+        });
+      }
+    };
+    // 模拟锚点
+    window.scrollMode = state.setting.xkSetting.scrollMode;
+    window.sta = anchorName => {
+      if (anchorName) {
+        let anchorElement = document.getElementById(anchorName);
+        if (anchorElement) {
+          anchorElement.scrollIntoView(true);
+        }
+      }
+    };
+    //初始化滚动绑定
+    Vue.nextTick(() => {
+      setTimeout(() => {
+        window.scrollBind('init', state.setting.xkSetting.scrollBind);
+      }, 1000);
+    });
+  },
+  initPaste() {
+    if (state.setting.xkSetting.pasteFormat) {
+      document.getElementById('toolbar-pasteFormat').classList.add('active');
+    }
+    state.aceEditor.on('paste', e => {
+      if (state.setting.xkSetting.pasteFormat) {
+        if (e.event.clipboardData.getData('text/html')) {
+          e.text = toMarkdown(
+            e.event.clipboardData.getData('text/html'),
+            false
+          );
+        }
+      }
+    });
+    if (
+      state.setting.xkSetting.pasteImageUpload &&
+      state.setting.xkSetting.imgUpload
+    ) {
+      document
+        .getElementsByClassName('ace-container')[0]
+        .addEventListener('paste', e => {
+          if (!(e.clipboardData && e.clipboardData.items)) {
+            return;
+          }
+          for (var i = 0, len = e.clipboardData.items.length; i < len; i++) {
+            var item = e.clipboardData.items[i];
+            if (item.kind === 'file') {
+              var pasteFile = item.getAsFile();
+              window.XKEditorAPI.imgUpload(
+                pasteFile,
+                response => {
+                  state.aceEditor.insert('[](' + response.data.path + ')');
+                  //TODO: 上传成功提示
+                },
+                error => {
+                  //TODO: 上传失败提示
+                  console.log(error);
+                }
+              );
+            }
+          }
+        });
+    }
+  },
+  initTocTree() {
+    //注册TOC按钮
+    document.getElementById('toc-button').addEventListener('click', () => {
+      actions.switchToc();
+    });
+    actions.updateTocTree();
+  },
+  updateTocTree() {
+    var items = document.querySelectorAll(
+      '#toc .toc-img ~ ul,.toc .toc-img ~ ul'
+    );
+    for (let i = 0; i < items.length; i++) {
+      items[i].parentNode.children[0].setAttribute(
+        'src',
+        '/static/svg/minus-square.svg'
+      );
+      items[i].parentNode.children[0].setAttribute(
+        'onclick',
+        'toggleToc(this)'
+      );
+    }
   }
 };
 

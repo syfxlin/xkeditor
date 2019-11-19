@@ -405,6 +405,15 @@ export function initPaint(
     canvasContext.drawImage(img, 0, 0);
   }
 
+  window.setCanvasScale = function(auto = true, s = { x: 1, y: 1 }) {
+    if (auto) {
+      scale.x = canvasEle.width / canvasEle.clientWidth;
+      scale.y = canvasEle.height / canvasEle.clientHeight;
+    } else {
+      scale = s;
+    }
+  };
+
   function toPrevCanvas() {
     if (prevCanvas.length == 0) {
       document.getElementsByClassName('fa-reply')[0].classList.remove('active');

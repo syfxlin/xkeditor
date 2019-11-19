@@ -94,11 +94,9 @@ export default {
   },
   computed: {
     ...mapState([
-      "aceToolbarModal",
       "aceEditor",
       "aceToolbarShow",
       "aceToolbarHtmlShow",
-      "typewriterMode",
       "markdownContent",
       "setting"
     ])
