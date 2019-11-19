@@ -12,10 +12,9 @@ export function initPaint(
     paints.push(canvasId);
   }
   var canvasEle = document.getElementById(canvasId);
-  var canvasContext = canvasEle.getContext("2d");
+  var canvasContext = canvasEle.getContext('2d');
   var canvasMoveOpen = false;
-  var auxEle = document.getElementById("auxiliary-ele");
-  var container = document.getElementsByClassName("canvas-container")[0];
+  var auxEle = document.getElementById('auxiliary-ele');
   var point = {
     s: [],
     e: []
@@ -25,7 +24,7 @@ export function initPaint(
 
   var prevCanvas = [];
   var nextCanvas = [];
-  var inputStatus = "mid";
+  var inputStatus = 'mid';
   // 存入初始状态，即空白状态，或者有图像的状态
   prevCanvas.push(
     canvasContext.getImageData(
@@ -36,14 +35,14 @@ export function initPaint(
     )
   );
 
-  var type = "pen";
+  var type = 'pen';
   var config = {
-    lineColor: "#5ab639",
+    lineColor: '#5ab639',
     lineWidth: 0.5,
     shadowBlur: 0.7,
     eraserSize: 15,
     fontSize: 14,
-    fontFamily: "Arial"
+    fontFamily: 'Arial'
   };
   //初始化绘制比例
   if (autoScale) {
@@ -93,27 +92,27 @@ export function initPaint(
   }
 
   // 停止绘制不规则边形
-  document.addEventListener("keydown", function(e) {
-    if (e.key === "Escape") {
-      if (type === "polyline") {
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (type === 'polyline') {
         firstPoint = null;
         lastPoint = null;
       }
     }
   });
 
-  auxEle.addEventListener("keydown", function(e) {
-    if (e.key === "Enter") {
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
       operateCanvasText();
     }
   });
 
   function operateCanvasText() {
-    let text = document.getElementById("canvas-text").value;
-    auxEle.innerHTML = "";
-    auxEle.style.display = "none";
-    auxEle.style.pointerEvents = "none";
-    canvasContext.font = config.fontSize + "px " + config.fontFamily;
+    let text = document.getElementById('canvas-text').value;
+    auxEle.innerHTML = '';
+    auxEle.style.display = 'none';
+    auxEle.style.pointerEvents = 'none';
+    canvasContext.font = config.fontSize + 'px ' + config.fontFamily;
     canvasContext.fillText(
       text,
       point.s.x * scale.x + 3,
@@ -126,19 +125,20 @@ export function initPaint(
       canvasContext.canvas.height
     );
     prevCanvas.push(prevData);
-    inputStatus = "mid";
+    inputStatus = 'mid';
   }
 
   function canvasDown(e) {
+    if (e.buttons === 32) {
+      type = 'eraser';
+    }
+    if (e.pointerType === 'pen' && type === 'eraser' && e.buttons === 1) {
+      type = 'pen';
+    }
     let clientX = 0;
     let clientY = 0;
-    if (!isMobile) {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    } else {
-      clientX = e.changedTouches[0].clientX;
-      clientY = e.changedTouches[0].clientY;
-    }
+    clientX = e.clientX;
+    clientY = e.clientY;
     let offsetCanvas = canvasEle.getBoundingClientRect();
     clientX -= offsetCanvas.left;
     clientY -= offsetCanvas.top;
@@ -146,42 +146,42 @@ export function initPaint(
     point.s.x = clientX;
     point.s.y = clientY;
     // 若不是 pen 状态就显示辅助线
-    if (type !== "pen") {
-      auxEle.style.left = clientX + container.offsetLeft - 1 + "px";
-      auxEle.style.top = clientY + container.offsetTop - 1 + "px";
-      auxEle.style.width = "0px";
-      auxEle.style.height = "0px";
-      auxEle.style.display = "block";
+    if (type !== 'pen') {
+      auxEle.style.left = clientX + 'px';
+      auxEle.style.top = clientY + 'px';
+      auxEle.style.width = '0px';
+      auxEle.style.height = '0px';
+      auxEle.style.display = 'block';
     }
     // 橡皮擦
-    if (type === "eraser") {
+    if (type === 'eraser') {
       drawEraser(point.s);
-      auxEle.style.width = config.eraserSize * 2 + "px";
-      auxEle.style.height = config.eraserSize * 2 + "px";
-      auxEle.style.borderRadius = "50%";
+      auxEle.style.width = config.eraserSize * 2 + 'px';
+      auxEle.style.height = config.eraserSize * 2 + 'px';
+      auxEle.style.borderRadius = '50%';
       auxEle.style.transform =
-        "translate(-" + config.eraserSize + "px, -" + config.eraserSize + "px)";
+        'translate(-' + config.eraserSize + 'px, -' + config.eraserSize + 'px)';
     }
-    if (type === "text") {
+    if (type === 'text') {
       auxEle.innerHTML = '<input type="text" id="canvas-text" autofocus>';
-      auxEle.style.pointerEvents = "auto";
+      auxEle.style.pointerEvents = 'auto';
     }
     // 为不同的输入状态调整辅助线
-    if (type === "round-rect") {
-      auxEle.style.borderRadius = "10px";
+    if (type === 'round-rect') {
+      auxEle.style.borderRadius = '10px';
     }
-    if (type === "ellipse") {
-      auxEle.style.borderRadius = "50%";
+    if (type === 'ellipse') {
+      auxEle.style.borderRadius = '50%';
     }
     // 激活移动事件
-    if (type !== "text") {
+    if (type !== 'text') {
       canvasMoveOpen = true;
     }
     // 初始化
     canvasContext.beginPath();
     // 设置样式
     canvasContext.strokeStyle = config.lineColor;
-    if (type === "pen") {
+    if (type === 'pen') {
       canvasContext.lineWidth = config.lineWidth;
     } else {
       canvasContext.lineWidth = config.lineWidth + config.shadowBlur * 2;
@@ -192,18 +192,14 @@ export function initPaint(
 
   function canvasMove(e) {
     // 若未激活就直接return
+    if (e.buttons === 0) return;
     if (!canvasMoveOpen) return;
     // 获取当前坐标
     let t = e.target;
     let clientX = 0;
     let clientY = 0;
-    if (!isMobile) {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    } else {
-      clientX = e.changedTouches[0].clientX;
-      clientY = e.changedTouches[0].clientY;
-    }
+    clientX = e.clientX;
+    clientY = e.clientY;
     let offsetCanvas = canvasEle.getBoundingClientRect();
     clientX -= offsetCanvas.left;
     clientY -= offsetCanvas.top;
@@ -215,35 +211,37 @@ export function initPaint(
     if (canvasX - point.s.x < 0 || canvasY - point.s.y < 0) {
       width = -width;
       height = -height;
-      auxEle.style.left = clientX + container.offsetLeft - 1 + "px";
-      auxEle.style.top = clientY + container.offsetTop - 1 + "px";
+      auxEle.style.left = clientX + 'px';
+      auxEle.style.top = clientY + 'px';
     }
     // 各种状态的绘制
-    if (type === "pen") {
+    if (type === 'pen') {
+      // 通过压力重置线宽
+      canvasContext.lineWidth = config.lineWidth * e.pressure * 2;
       canvasContext.lineTo(canvasX * scale.x, canvasY * scale.y);
       canvasContext.stroke();
     }
     // 橡皮擦
-    if (type === "eraser") {
+    if (type === 'eraser') {
       drawEraser({ x: canvasX, y: canvasY });
-      auxEle.style.left = clientX + container.offsetLeft - 1 + "px";
-      auxEle.style.top = clientY + container.offsetTop - 1 + "px";
+      auxEle.style.left = clientX + 'px';
+      auxEle.style.top = clientY + 'px';
     }
-    if (type === "line") {
+    if (type === 'line') {
       let length = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
       let angle = (Math.atan(height / width) / Math.PI) * 180;
       // 修复向右上角滑动显示不正确的情况
       if (canvasX - point.s.x >= 0 && canvasY - point.s.y <= 0) {
         angle = (Math.acos(width / length) / Math.PI) * 180;
       }
-      auxEle.style.width = length + "px";
-      auxEle.style.height = "0px";
-      auxEle.style.transform = "rotate(" + angle + "deg)";
-      auxEle.style.transformOrigin = "top left";
+      auxEle.style.width = length + 'px';
+      auxEle.style.height = '0px';
+      auxEle.style.transform = 'rotate(' + angle + 'deg)';
+      auxEle.style.transformOrigin = 'top left';
     }
-    if (type !== "pen" && type !== "line" && type !== "eraser") {
-      auxEle.style.width = width + "px";
-      auxEle.style.height = height + "px";
+    if (type !== 'pen' && type !== 'line' && type !== 'eraser') {
+      auxEle.style.width = width + 'px';
+      auxEle.style.height = height + 'px';
     }
   }
 
@@ -252,13 +250,8 @@ export function initPaint(
     let clientY = 0;
     // 关闭移动事件
     canvasMoveOpen = false;
-    if (!isMobile) {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    } else {
-      clientX = e.changedTouches[0].clientX;
-      clientY = e.changedTouches[0].clientY;
-    }
+    clientX = e.clientX;
+    clientY = e.clientY;
     let offsetCanvas = canvasEle.getBoundingClientRect();
     clientX -= offsetCanvas.left;
     clientY -= offsetCanvas.top;
@@ -272,12 +265,12 @@ export function initPaint(
       point.e = temp;
     }
     // 各种状态的绘制
-    if (type === "line") {
+    if (type === 'line') {
       canvasContext.moveTo(point.s.x * scale.x, point.s.y * scale.y);
       canvasContext.lineTo(point.e.x * scale.x, point.e.y * scale.y);
-      auxEle.style.transform = "none";
+      auxEle.style.transform = 'none';
     }
-    if (type === "polyline") {
+    if (type === 'polyline') {
       if (lastPoint === null) {
         canvasContext.moveTo(point.s.x * scale.x, point.s.y * scale.y);
         canvasContext.lineTo(point.e.x * scale.x, point.e.y * scale.y);
@@ -300,7 +293,7 @@ export function initPaint(
         }
       }
     }
-    if (type === "rect") {
+    if (type === 'rect') {
       canvasContext.rect(
         point.s.x * scale.x,
         point.s.y * scale.y,
@@ -308,7 +301,7 @@ export function initPaint(
         (point.e.y - point.s.y) * scale.y
       );
     }
-    if (type === "round-rect") {
+    if (type === 'round-rect') {
       // 上
       canvasContext.moveTo(point.s.x * scale.x + 10, point.s.y * scale.y);
       canvasContext.lineTo(point.e.x * scale.x - 10, point.s.y * scale.y);
@@ -350,7 +343,7 @@ export function initPaint(
         Math.PI / 2
       );
     }
-    if (type === "ellipse") {
+    if (type === 'ellipse') {
       let radiusX = (point.e.x - point.s.x) / 2;
       let radiusY = (point.e.y - point.s.y) / 2;
       canvasContext.ellipse(
@@ -362,9 +355,9 @@ export function initPaint(
         0,
         2 * Math.PI
       );
-      auxEle.style.borderRadius = "0";
+      auxEle.style.borderRadius = '0';
     }
-    if (type === "diamond") {
+    if (type === 'diamond') {
       canvasContext.moveTo(
         ((point.s.x + point.e.x) / 2) * scale.x,
         point.s.y * scale.y
@@ -387,10 +380,10 @@ export function initPaint(
       );
     }
     // 隐藏辅助线并开始绘制
-    if (type !== "text") {
-      auxEle.style.display = "none";
+    if (type !== 'text') {
+      auxEle.style.display = 'none';
     }
-    if (type !== "eraser") {
+    if (type !== 'eraser') {
       canvasContext.stroke();
     }
     // 保存状态
@@ -401,7 +394,7 @@ export function initPaint(
       canvasContext.canvas.height
     );
     prevCanvas.push(prevData);
-    inputStatus = "mid";
+    inputStatus = 'mid';
   }
 
   function switchType(typeStr) {
@@ -412,47 +405,38 @@ export function initPaint(
     canvasContext.drawImage(img, 0, 0);
   }
 
-  window.setCanvasScale = function(auto = true, s = { x: 1, y: 1 }) {
-    if (auto) {
-      scale.x = canvasEle.width / canvasEle.clientWidth;
-      scale.y = canvasEle.height / canvasEle.clientHeight;
-    } else {
-      scale = s;
-    }
-  };
-
   function toPrevCanvas() {
     if (prevCanvas.length == 0) {
-      document.getElementsByClassName("fa-reply")[0].classList.remove("active");
-      document.getElementsByClassName("fa-share")[0].classList.add("active");
+      document.getElementsByClassName('fa-reply')[0].classList.remove('active');
+      document.getElementsByClassName('fa-share')[0].classList.add('active');
       return;
     }
-    if (inputStatus !== "prev") {
+    if (inputStatus !== 'prev') {
       nextCanvas.push(prevCanvas.pop());
     }
     let data = prevCanvas.pop();
     canvasContext.putImageData(data, 0, 0);
     nextCanvas.push(data);
-    inputStatus = "prev";
+    inputStatus = 'prev';
   }
 
   function toNextCanvas() {
     if (nextCanvas.length == 0) {
-      document.getElementsByClassName("fa-reply")[0].classList.add("active");
-      document.getElementsByClassName("fa-share")[0].classList.remove("active");
+      document.getElementsByClassName('fa-reply')[0].classList.add('active');
+      document.getElementsByClassName('fa-share')[0].classList.remove('active');
       return;
     }
-    if (inputStatus !== "next") {
+    if (inputStatus !== 'next') {
       prevCanvas.push(nextCanvas.pop());
     }
     let data = nextCanvas.pop();
     canvasContext.putImageData(data, 0, 0);
     prevCanvas.push(data);
-    inputStatus = "next";
+    inputStatus = 'next';
   }
 
   function cleanCanvas() {
-    inputStatus = "mid";
+    inputStatus = 'mid';
     nextCanvas = [];
     prevCanvas = [];
     canvasContext.clearRect(
@@ -483,87 +467,87 @@ export function initPaint(
     return canvasEle.toDataURL();
   }
 
-  canvasEle.addEventListener("mousedown", canvasDown);
-  canvasEle.addEventListener("mousemove", canvasMove);
-  canvasEle.addEventListener("mouseup", canvasUp);
+  canvasEle.addEventListener('pointerdown', canvasDown);
+  canvasEle.addEventListener('pointermove', canvasMove);
+  canvasEle.addEventListener('pointerup', canvasUp);
 
-  canvasEle.addEventListener("touchstart", canvasDown);
-  canvasEle.addEventListener("touchmove", canvasMove);
-  canvasEle.addEventListener("touchend", canvasUp);
+  // canvasEle.addEventListener('touchstart', canvasDown);
+  // canvasEle.addEventListener('touchmove', canvasMove);
+  // canvasEle.addEventListener('touchend', canvasUp);
 
   if (initBtn) {
-    var canBtns = document.getElementsByClassName("can-btn");
+    var canBtns = document.getElementsByClassName('can-btn');
     for (let i = 0; i < canBtns.length; i++) {
       const ele = canBtns[i];
-      ele.addEventListener("click", function(e) {
+      ele.addEventListener('click', function(e) {
         let target = null;
         let type = null;
-        if (e.target.tagName === "SPAN") {
+        if (e.target.tagName === 'SPAN') {
           target = e.target.parentElement;
         } else {
           target = e.target;
         }
-        type = target.getAttribute("data-type");
-        if (type === "color") {
-          if (document.querySelector(".can-color .active")) {
+        type = target.getAttribute('data-type');
+        if (type === 'color') {
+          if (document.querySelector('.can-color .active')) {
             document
-              .querySelector(".can-color .active")
-              .classList.remove("active");
+              .querySelector('.can-color .active')
+              .classList.remove('active');
           }
           config.lineColor = window.getComputedStyle(target).backgroundColor;
-          target.classList.add("active");
+          target.classList.add('active');
           return;
         }
-        if (type === "size") {
-          if (document.querySelector(".can-size .active")) {
+        if (type === 'size') {
+          if (document.querySelector('.can-size .active')) {
             document
-              .querySelector(".can-size .active")
-              .classList.remove("active");
+              .querySelector('.can-size .active')
+              .classList.remove('active');
           }
           let size = target.classList[target.classList.length - 1];
-          if (size === "big") {
+          if (size === 'big') {
             config.lineWidth = 3.5;
             config.shadowBlur = 5;
-          } else if (size === "middle") {
+          } else if (size === 'middle') {
             config.lineWidth = 2;
             config.shadowBlur = 3;
           } else {
             config.lineWidth = 0.5;
             config.shadowBlur = 0.7;
           }
-          target.classList.add("active");
+          target.classList.add('active');
           return;
         }
-        if (type === "to-prev-canvas") {
+        if (type === 'to-prev-canvas') {
           toPrevCanvas();
           return;
         }
-        if (type === "to-next-canvas") {
+        if (type === 'to-next-canvas') {
           toNextCanvas();
           return;
         }
-        if (type === "clean-canvas") {
+        if (type === 'clean-canvas') {
           cleanCanvas();
           return;
         }
-        if (type === "save-canvas" || type === "cancel-canvas") {
+        if (type === 'save-canvas' || type === 'cancel-canvas') {
           return;
         }
-        if (document.querySelector(".can-pen .active")) {
-          document.querySelector(".can-pen .active").classList.remove("active");
+        if (document.querySelector('.can-pen .active')) {
+          document.querySelector('.can-pen .active').classList.remove('active');
         }
-        if (document.querySelector(".can-shape .active")) {
+        if (document.querySelector('.can-shape .active')) {
           document
-            .querySelector(".can-shape .active")
-            .classList.remove("active");
+            .querySelector('.can-shape .active')
+            .classList.remove('active');
         }
-        if (document.querySelector(".can-operate .active")) {
+        if (document.querySelector('.can-operate .active')) {
           document
-            .querySelector(".can-operate .active")
-            .classList.remove("active");
+            .querySelector('.can-operate .active')
+            .classList.remove('active');
         }
         switchType(type);
-        target.classList.add("active");
+        target.classList.add('active');
       });
     }
   }
