@@ -132,6 +132,8 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 library.add(fas);
 
+import store from "../store";
+
 export default {
   name: "XK_Editor",
   components: {

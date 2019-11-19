@@ -58,344 +58,7 @@
       </button>
     </div>
     <div class="ace-editor" ref="ace"></div>
-    <div class="ace-toolbar-modal" v-show="aceToolbarModal.base.isShowModal" v-dialogDrag>
-      <div class="xk-modal-wrapper">
-        <div class="xk-modal">
-          <div class="xk-modal-header">
-            <div class="xk-modal-title">
-              <p>{{ aceToolbarModal.data.modalTitle }}</p>
-            </div>
-          </div>
-          <div class="xk-modal-body">
-            <div v-show="aceToolbarModal.link">
-              <label>链接</label>
-              <div class="xk-input">
-                <input v-model="aceToolbarModal.data.href" placeholder="请输入链接" autofocus />
-              </div>
-              <label>标题</label>
-              <div class="xk-input">
-                <input v-model="aceToolbarModal.data.title" placeholder="请输入标题" />
-              </div>
-            </div>
-            <div v-show="aceToolbarModal.image">
-              <label>图片链接</label>
-              <div class="xk-input">
-                <input v-model="aceToolbarModal.data.src" placeholder="请输入图片链接" autofocus />
-              </div>
-              <label>图片描述</label>
-              <div class="xk-input">
-                <input v-model="aceToolbarModal.data.art" placeholder="请输入图片描述" />
-              </div>
-              <template v-if="openImgUpload">
-                <div class="xk-input xk-col-12">
-                  <input id="img-upload" type="file" />
-                </div>
-                <div class="xk-input xk-col-12 img-upload-sub">
-                  <button class="xk-button" @click="imgUpload">上传</button>
-                </div>
-              </template>
-            </div>
-            <div v-show="aceToolbarModal.video">
-              <label>视频链接</label>
-              <div class="xk-input">
-                <input v-model="aceToolbarModal.data.src" placeholder="请输入视频链接" autofocus />
-              </div>
-              <div class="xk-row">
-                <div class="xk-input xk-col-12">
-                  <input v-model="aceToolbarModal.data.width" placeholder="请输入宽" />
-                </div>
-                <div class="xk-input xk-col-12">
-                  <input v-model="aceToolbarModal.data.height" placeholder="请输入高" />
-                </div>
-              </div>
-            </div>
-            <div v-show="aceToolbarModal.toLine">
-              <label>行号(1-{{ aceToolbarModal.data.allLine }})</label>
-              <div class="xk-input">
-                <input v-model="aceToolbarModal.data.line" placeholder="请输入行号" autofocus />
-              </div>
-            </div>
-            <div v-show="aceToolbarModal.localStorage">
-              <label>保存的标记(Filename)</label>
-              <div class="xk-input">
-                <input
-                  v-model="aceToolbarModal.data.locationStorage"
-                  placeholder="请输入保存的标记"
-                  autofocus
-                />
-              </div>
-            </div>
-            <div v-show="aceToolbarModal.table">
-              <label>单元格数</label>
-              <div class="xk-row">
-                <div class="xk-input xk-col-12">
-                  <input v-model="aceToolbarModal.data.row" placeholder="请输入行数" autofocus />
-                </div>
-                <div class="xk-input xk-col-12">
-                  <input v-model="aceToolbarModal.data.column" placeholder="请输入列数" />
-                </div>
-              </div>
-              <label>对齐方式</label>
-              <div>
-                <div class="xk-radio-group">
-                  <div class="xk-radio">
-                    <input
-                      type="radio"
-                      value="normal"
-                      v-model="aceToolbarModal.data.type"
-                      id="xk-type-normal"
-                    />
-                    <label for="xk-type-normal">
-                      <div class="advice"></div>
-                      <fa-icon icon="align-justify" />
-                    </label>
-                  </div>
-                  <div class="xk-radio">
-                    <input
-                      type="radio"
-                      value="left"
-                      v-model="aceToolbarModal.data.type"
-                      id="xk-type-left"
-                    />
-                    <label for="xk-type-left">
-                      <div class="advice"></div>
-                      <fa-icon icon="align-left" />
-                    </label>
-                  </div>
-                  <div class="xk-radio">
-                    <input
-                      type="radio"
-                      value="center"
-                      v-model="aceToolbarModal.data.type"
-                      id="xk-type-center"
-                    />
-                    <label for="xk-type-center">
-                      <div class="advice"></div>
-                      <fa-icon icon="align-center" />
-                    </label>
-                  </div>
-                  <div class="xk-radio">
-                    <input
-                      type="radio"
-                      value="right"
-                      v-model="aceToolbarModal.data.type"
-                      id="xk-type-right"
-                    />
-                    <label for="xk-type-right">
-                      <div class="advice"></div>
-                      <fa-icon icon="align-right" />
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div v-show="aceToolbarModal.help" class="markdown-body help">
-              <h3>Markdown语法</h3>
-              <ul>
-                <li>
-                  <a href="http://www.markdown.cn/">Markdown 语法说明</a>
-                </li>
-                <li>
-                  <a
-                    href="https://help.github.com/articles/github-flavored-markdown/"
-                  >GitHub Flavored Markdown</a>
-                </li>
-              </ul>
-              <h3>XK-Editor独有的语法</h3>
-              <table>
-                <tr>
-                  <th>语法格式</th>
-                  <th>参数</th>
-                  <th>样例</th>
-                </tr>
-                <tr>
-                  <td>[text]{style|label}</td>
-                  <td>text:内容，style:样式(css)，label:包裹的标签(span,p,font)默认为p</td>
-                  <td>[这是蓝色的字]{color:blue} [灰色背景]{background:#ddd|span}</td>
-                </tr>
-                <tr>
-                  <td>[TOC]</td>
-                  <td>null</td>
-                  <td>在[TOC]位置填充目录</td>
-                </tr>
-              </table>
-              <h3>键盘快捷键</h3>
-              <blockquote>当编辑器取得焦点的时候才能使用快捷键</blockquote>
-              <table>
-                <tr>
-                  <th>快捷键</th>
-                  <th>说明</th>
-                </tr>
-                <tr>
-                  <td>F1</td>
-                  <td>转换为HTML编辑</td>
-                </tr>
-                <tr>
-                  <td>F2</td>
-                  <td>转换为TinyMCE</td>
-                </tr>
-                <tr>
-                  <td>F7</td>
-                  <td>显示隐藏目录</td>
-                </tr>
-                <tr>
-                  <td>F8</td>
-                  <td>开启/关闭打字机模式</td>
-                </tr>
-                <tr>
-                  <td>F9</td>
-                  <td>开启/关闭实时预览</td>
-                </tr>
-                <tr>
-                  <td>F10</td>
-                  <td>切换全窗口预览</td>
-                </tr>
-                <tr>
-                  <td>F11</td>
-                  <td>切换全屏</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + 1~6 / Command + 1~6</td>
-                  <td>插入标题1~6</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + A / Command + A</td>
-                  <td>全选</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + B / Command + B</td>
-                  <td>粗体</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + D / Command + D</td>
-                  <td>插入时间</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + F / Command + F</td>
-                  <td>搜索</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + G / Command + G</td>
-                  <td>匹配下一项</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + H / Command + H</td>
-                  <td>插入水平线</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + I / Command + I</td>
-                  <td>斜体</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + K / Command + K</td>
-                  <td>插入行内代码</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + L / Command + L</td>
-                  <td>插入链接</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + U / Command + U</td>
-                  <td>插入无序列表</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + Z / Command + Z</td>
-                  <td>撤销</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + Y / Command + Y</td>
-                  <td>重做</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + Shift + I</td>
-                  <td>插入图片</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + Shift + K</td>
-                  <td>插入TeX(KaTeX)公式符号</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + Shift + O</td>
-                  <td>插入有序列表</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + Shift + P</td>
-                  <td>插入Code块</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + Shift + Q</td>
-                  <td>插入引用</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + Shift + S</td>
-                  <td>插入删除线</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + Shift + T</td>
-                  <td>插入表格</td>
-                </tr>
-                <tr>
-                  <td>Shift + Shift + H</td>
-                  <td>打开使用帮助对话框</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + Shift + G</td>
-                  <td>跳转到指定的行</td>
-                </tr>
-                <tr>
-                  <td>Ctrl + Shift + F</td>
-                  <td>格式化Markdown(美化)</td>
-                </tr>
-              </table>
-              <h3>Emoji表情</h3>
-              <a href="https://www.webfx.com/tools/emoji-cheat-sheet/">EMOJI CHEAT SHEET</a>
-              <h3>流程图/时序图/甘特图</h3>
-              <a href="https://mermaidjs.github.io/">mermaid - GitBook</a>
-              <h3>Tex数学公式</h3>
-              <a href="https://juejin.im/post/5af93ec6518825428b38e7f4">markdown 数学公式Latex语法 - 掘金</a>
-            </div>
-            <div v-show="aceToolbarModal.info" class="markdown-body info">
-              <h2>XK-Editor</h2>
-              <p>开源的Markdown和富文本编辑器。基于Vue开发</p>
-              <p>支持Markdown和HTML互转</p>
-              <p>
-                <strong>项目地址：</strong>
-                <a href="https://github.com/syfxlin/xkeditor">https://github.com/syfxlin/xkeditor</a>
-              </p>
-              <p>
-                <a href="https://github.com/syfxlin/xkeditor">XK-Editor</a> 由
-                <a href="https://github.com/syfxlin">Otstar Lin</a>和下列
-                <a href="https://github.com/syfxlin/xkeditor/graphs/contributors">贡献者</a>的帮助下撰写和维护。
-              </p>
-              <blockquote>
-                Otstar Lin -
-                <a href="https://ixk.me/">Personal Website</a> ·
-                <a href="https://blog.ixk.me/">Blog</a> ·
-                <a href="https://github.com/syfxlin">Github</a>
-              </blockquote>
-              <p style="font-size:0.8em">Copyright © 2019 Otstar Lin, 根据 Apache License 2.0 许可证开源。</p>
-            </div>
-            <div v-show="aceToolbarModal.graff">
-              <label>若涂鸦板要使用基础图像，请上传图片，若不使用请直接点击上传。</label>
-              <div class="xk-input xk-col-12">
-                <input id="graff-upload" type="file" accept="image/png" />
-              </div>
-              <div class="xk-input xk-col-12 graff-upload-sub">
-                <button class="xk-button" @click="graffUpload">上传</button>
-              </div>
-            </div>
-          </div>
-          <div class="xk-clear"></div>
-          <div class="xk-modal-footer">
-            <button class="xk-button" @click="aceToolbarCancer">取消</button>
-            <button class="xk-button xk-button-primary" @click="aceToolbarSubmit">确定</button>
-          </div>
-          <span class="xk-modal-close" @click="aceToolbarCancer">
-            <fa-icon icon="times" />
-          </span>
-        </div>
-      </div>
-    </div>
+    <toolbar-modal></toolbar-modal>
   </div>
 </template>
 
@@ -414,13 +77,16 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 library.add(fas);
+import ToolBarModal from "./ToolbarModal";
 
 //switch markdown and html
 import { toHtml, toMarkdown } from "../utils/switchContent";
+import store from "../store";
 
 export default {
   components: {
-    "fa-icon": FontAwesomeIcon
+    "fa-icon": FontAwesomeIcon,
+    "toolbar-modal": ToolBarModal
   },
   props: {
     value: String,
@@ -433,26 +99,27 @@ export default {
       aceToolbarShow: true,
       aceToolbarHtmlShow: true,
       typewriterMode: false,
-      aceToolbarModal: {
-        base: {
-          isShowModal: false
-        },
-        data: {
-          modalTitle: " ",
-          allLine: 1
-        },
-        link: false,
-        image: false,
-        video: false,
-        toLine: false,
-        search: false,
-        table: false,
-        info: false,
-        help: false,
-        setLocalStorage: false,
-        getLocalStorage: false,
-        graff: false
-      },
+      aceToolbarModal: store.state.aceToolbarModal,
+      // {
+      //   base: {
+      //     isShowModal: false
+      //   },
+      //   data: {
+      //     modalTitle: " ",
+      //     allLine: 1
+      //   },
+      //   link: false,
+      //   image: false,
+      //   video: false,
+      //   toLine: false,
+      //   search: false,
+      //   table: false,
+      //   info: false,
+      //   help: false,
+      //   setLocalStorage: false,
+      //   getLocalStorage: false,
+      //   graff: false
+      // },
       aceToolbarButtons: [
         {
           title: "",
@@ -1140,13 +807,14 @@ export default {
       this.operateAceContent(isStart, toLeft, str);
     },
     operateModal(operate, isShow, title = "") {
-      if (!isShow) {
-        this.aceToolbarModal[operate] = false;
-        return;
-      }
-      this.aceToolbarModal[operate] = true;
+      // if (!isShow) {
+      //   this.aceToolbarModal[operate] = false;
+      //   return;
+      // }
+      // this.aceToolbarModal[operate] = true;
+      this.aceToolbarModal.content = operate;
       this.aceToolbarModal.data.modalTitle = title;
-      this.aceToolbarModal.base.isShowModal = true;
+      this.aceToolbarModal.show = true;
     },
     operateAceContent(isStart, toLeft, str) {
       let range = this.aceEditor.getSelectionRange();
@@ -1239,17 +907,18 @@ export default {
       this.aceToolbarCancer();
     },
     aceToolbarCancer() {
-      this.aceToolbarModal.link = false;
-      this.aceToolbarModal.image = false;
-      this.aceToolbarModal.video = false;
-      this.aceToolbarModal.toLine = false;
-      this.aceToolbarModal.search = false;
-      this.aceToolbarModal.table = false;
-      this.aceToolbarModal.help = false;
-      this.aceToolbarModal.info = false;
-      this.aceToolbarModal.localStorage = false;
-      this.aceToolbarModal.graff = false;
-      this.aceToolbarModal.base.isShowModal = false;
+      // this.aceToolbarModal.link = false;
+      // this.aceToolbarModal.image = false;
+      // this.aceToolbarModal.video = false;
+      // this.aceToolbarModal.toLine = false;
+      // this.aceToolbarModal.search = false;
+      // this.aceToolbarModal.table = false;
+      // this.aceToolbarModal.help = false;
+      // this.aceToolbarModal.info = false;
+      // this.aceToolbarModal.localStorage = false;
+      // this.aceToolbarModal.graff = false;
+      this.aceToolbarModal.content = "";
+      this.aceToolbarModal.show = false;
     },
     operateFullScreen() {
       if (
@@ -1583,144 +1252,5 @@ th {
 .ace-toolbar .xk-button.active {
   color: #fff;
   background: #6190e8;
-}
-
-.xk-input {
-  position: relative;
-  font-size: 0.85em;
-  line-height: 1.5;
-  outline: 0;
-}
-.xk-input input {
-  display: block;
-  width: 100%;
-  padding: 6px 32px 6px 12px;
-  color: #3f536e;
-  font-size: 12px;
-  background-color: #fff;
-  border: 1px solid #c5d9e8;
-  border-radius: 4px;
-  -webkit-transition: border 0.2s;
-  transition: border 0.2s;
-  outline: none;
-  box-sizing: border-box;
-}
-.xk-input input:hover {
-  border-color: #79a1eb;
-}
-.xk-input i {
-  position: absolute;
-  top: 0;
-  right: 0;
-  margin: 0 6px 0 0;
-  width: 20px;
-  height: 100%;
-  color: #c5d9e8;
-  font-size: 15px;
-  text-align: center;
-}
-.xk-radio {
-  display: inline-block;
-  padding: 2px 5px;
-}
-.xk-radio input {
-  display: none;
-}
-.xk-radio input + label {
-  font-size: 1.1em;
-}
-.xk-radio input + label svg {
-  vertical-align: middle;
-}
-.xk-radio input[type="radio"] + label .advice {
-  width: 1.1em;
-  height: 1.1em;
-  border: 1px solid #c5d9e8;
-  border-radius: 50%;
-  background-color: #fff;
-  -webkit-transition: border 0.2s;
-  transition: border 0.2s;
-  display: inline-block;
-  vertical-align: middle;
-  margin: 5px;
-}
-.xk-radio input[type="radio"]:checked + label .advice {
-  background: #79a1eb;
-}
-.xk-modal-wrapper {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  outline: 0;
-  z-index: 1000;
-}
-.xk-modal {
-  position: relative;
-  top: 100px;
-  width: 520px;
-  margin: 0 auto 0 10%;
-  border: none;
-  border-radius: 4px;
-  background-color: #fff;
-  outline: none;
-  box-shadow: 0 1px 20px -6px rgba(0, 0, 0, 0.2);
-}
-.xk-modal-header {
-  padding: 12px 16px;
-  color: #2c405a;
-  font-size: 14px;
-  font-weight: bold;
-  line-height: 1.5;
-  border-bottom: 1px solid #ececec;
-}
-.xk-modal-header p,
-.xk-modal-header .xk-modal-title {
-  display: inline-block;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  word-wrap: normal;
-  vertical-align: middle;
-}
-.xk-modal-body {
-  padding: 16px;
-  font-size: 13px;
-  line-height: 1.5;
-}
-.xk-modal-footer {
-  padding: 12px 16px;
-  border-top: 1px solid #ececec;
-  text-align: right;
-}
-.xk-modal-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  font-size: 13px;
-  line-height: 1;
-  overflow: hidden;
-  cursor: pointer;
-}
-.xk-row {
-  display: block;
-  width: 100%;
-}
-.xk-col-12 {
-  width: 50%;
-  float: left;
-}
-.xk-clear {
-  clear: both;
-}
-.img-upload-sub {
-  padding-left: 10px;
-}
-@media (max-width: 991px) {
-  .xk-modal {
-    width: 80%;
-  }
 }
 </style>
