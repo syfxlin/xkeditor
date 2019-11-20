@@ -41,6 +41,8 @@ const state = Vue.observable({
       spellchecker_whitelist: ['Ephox', 'Moxiecode']
     },
     aceSetting: {
+      toolbar:
+        'h1 h2 h3 h4 h5 h6 | bold italic underline strikethrough quote mark code | sup sub tex-$ tex-math | flow seq gantt mermaid | ul ol minus table time | link image video graff | toLine search toc typewriter switchPreview fullPreview fullScreen toHtmlEditor toTinyMCE format empty setting | undo redo | setLocalStorage getLocalStorage removeLocalStorage | help info | pasteFormat',
       minLines: 10,
       fontSize: 14,
       theme: 'ace/theme/solarized_light',
@@ -1226,7 +1228,10 @@ const actions = {
     });
   },
   initPaste() {
-    if (state.setting.xkSetting.pasteFormat) {
+    if (
+      state.setting.xkSetting.pasteFormat &&
+      document.getElementById('toolbar-pasteFormat')
+    ) {
       document.getElementById('toolbar-pasteFormat').classList.add('active');
     }
     state.aceEditor.on('paste', e => {

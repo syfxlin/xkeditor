@@ -1,4 +1,34 @@
-const aceToolbarButtons = [
+const allButtons = [
+  {
+    title: '标题1',
+    operate: 'h1',
+    icon: 1
+  },
+  {
+    title: '标题2',
+    operate: 'h2',
+    icon: 2
+  },
+  {
+    title: '标题3',
+    operate: 'h3',
+    icon: 3
+  },
+  {
+    title: '标题4',
+    operate: 'h4',
+    icon: 4
+  },
+  {
+    title: '标题5',
+    operate: 'h5',
+    icon: 5
+  },
+  {
+    title: '标题6',
+    operate: 'h6',
+    icon: 6
+  },
   {
     title: '',
     operate: '|',
@@ -271,4 +301,4 @@ const aceToolbarButtons = [
   }
 ];
 
-export default aceToolbarButtons;
+export default allButtons;

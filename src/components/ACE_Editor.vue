@@ -17,22 +17,8 @@
 <template>
   <div class="ace-container">
     <div class="ace-toolbar" v-show="aceToolbarShow">
-      <template v-for="num in 6">
-        <button
-          class="xk-button"
-          type="text"
-          :key="num.id"
-          :title="'标题' + num"
-          @click="toolbarClick('h' + num)"
-          :id="'toolbar-h' + num"
-        >
-          <b>H{{ num }}</b>
-        </button>
-      </template>
       <template v-for="item in aceToolbarButtons">
-        <template v-if="item.icon === '|'">
-          <span :key="item.id">|</span>
-        </template>
+        <span v-if="item.icon === '|'" :key="item.id">|</span>
         <template v-else>
           <button
             class="xk-button"
@@ -42,7 +28,8 @@
             @click="toolbarClick(item.operate)"
             :id="'toolbar-' + item.operate"
           >
-            <fa-icon :icon="item.icon" />
+            <b v-if="typeof item.icon==='number'">H{{ item.icon }}</b>
+            <fa-icon v-else :icon="item.icon" />
           </button>
         </template>
       </template>
@@ -79,18 +66,13 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 library.add(fas);
 import ToolBarModal from "./ToolbarModal";
 
-import iAceToolbarButtons from "../utils/aceToolbarButtons";
+import aceAllButtons from "../utils/aceAllButtons";
 import store, { mapState, mapActions } from "../store";
 
 export default {
   components: {
     "fa-icon": FontAwesomeIcon,
     "toolbar-modal": ToolBarModal
-  },
-  data() {
-    return {
-      aceToolbarButtons: iAceToolbarButtons
-    };
   },
   computed: {
     ...mapState([
@@ -99,7 +81,15 @@ export default {
       "aceToolbarHtmlShow",
       "markdownContent",
       "setting"
-    ])
+    ]),
+    aceToolbarButtons() {
+      const buttons = [];
+      const selectButtons = this.setting.aceSetting.toolbar.split(" ");
+      for (const operate of selectButtons) {
+        buttons.push(aceAllButtons.find(item => item.operate === operate));
+      }
+      return buttons;
+    }
   },
   mounted() {
     //初始化Value
