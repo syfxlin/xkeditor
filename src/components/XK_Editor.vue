@@ -4,14 +4,14 @@
       <div class="row">
         <div
           :class="'xkeditor-left ' + (previewShow==='show' ? 'xk-col-12' : 'xk-col-24')"
-          v-show="editorModeShow&&previewShow!='full'"
+          v-show="editorModeShow&&previewShow!=='full'"
         >
           <ace ref="ace"></ace>
         </div>
-        <div id="resizor" title="拖动我"></div>
+        <div id="resizor" title="拖动我" v-show="editorModeShow&&previewShow==='show'"></div>
         <div
           :class="'xkeditor-right ' + (previewShow==='show' ? 'xk-col-12' : 'xk-col-24')"
-          v-show="editorModeShow&&previewShow!='hide'"
+          v-show="editorModeShow&&previewShow!=='hide'"
         >
           <div
             :class="setting.xkSetting.previewClass"
@@ -26,7 +26,7 @@
         <button
           class="xk-button close-preview-full"
           @click="switchPreviewFull()"
-          v-show="editorModeShow&&previewShow=='full'"
+          v-show="editorModeShow&&previewShow==='full'"
         >关闭</button>
         <transition name="slide-fade">
           <div id="toc" v-show="showToc"></div>
@@ -226,6 +226,16 @@ export default {
       this.$nextTick(() => {
         Prism.highlightAll();
       });
+    },
+    setting: {
+      handler: function(val) {
+        if (window.XKEditor) {
+          window.XKEditor.tinymce.remove();
+          window.XKEditor.tinymce.init(val.tinymceSetting);
+          window.XKEditor.ace.setOptions(val.aceSetting);
+        }
+      },
+      deep: true
     }
   }
 };

@@ -1002,6 +1002,7 @@ const actions = {
       window.XKEditor = {
         ace: state.aceEditor,
         tinymce: window.tinymce,
+        setting: state.setting,
         toMarkdown: toMarkdown,
         toHtml: toHtml,
         getMarkdown: () => {
