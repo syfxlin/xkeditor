@@ -3,13 +3,14 @@
     <template v-if="isRenderEditor">
       <div class="row">
         <div
-          :class="previewShow==='show' ? 'xk-col-12' : 'xk-col-24'"
+          :class="'xkeditor-left ' + (previewShow==='show' ? 'xk-col-12' : 'xk-col-24')"
           v-show="editorModeShow&&previewShow!='full'"
         >
           <ace ref="ace"></ace>
         </div>
+        <div id="resizor" title="拖动我"></div>
         <div
-          :class="previewShow==='show' ? 'xk-col-12' : 'xk-col-24'"
+          :class="'xkeditor-right ' + (previewShow==='show' ? 'xk-col-12' : 'xk-col-24')"
           v-show="editorModeShow&&previewShow!='hide'"
         >
           <div
@@ -120,7 +121,8 @@ export default {
       "initScroll",
       "initPaste",
       "updateTocTree",
-      "initTocTree"
+      "initTocTree",
+      "initResizor"
     ]),
     async load() {
       let md = null;
@@ -158,6 +160,7 @@ export default {
         this.initPaste();
         // 注册涂鸦板
         this.initGraff();
+        this.initResizor();
       });
     },
     renderNextTick() {
@@ -343,6 +346,21 @@ export default {
   cursor: pointer;
 }
 
+#resizor {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  cursor: w-resize;
+  background-color: #666;
+  border-radius: 5px;
+  margin-top: -10px;
+  width: 6px;
+  height: 30px;
+  background-size: cover;
+  background-position: center;
+  z-index: 99999;
+}
+
 @media (max-width: 991px) {
   .xk-col-24 #previewHtml {
     float: left;
@@ -350,6 +368,9 @@ export default {
   }
   #toc {
     width: 80%;
+  }
+  #resizor {
+    display: none;
   }
 }
 

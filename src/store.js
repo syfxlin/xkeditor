@@ -1261,7 +1261,7 @@ const actions = {
               window.XKEditorAPI.imgUpload(
                 pasteFile,
                 response => {
-                  state.aceEditor.insert('[](' + response.data.path + ')');
+                  state.aceEditor.insert('![](' + response.data.path + ')');
                   //TODO: 上传成功提示
                 },
                 error => {
@@ -1295,6 +1295,37 @@ const actions = {
         'toggleToc(this)'
       );
     }
+  },
+  initResizor() {
+    let isResizing = false;
+    let resizor = document.getElementById('resizor');
+    let left = document.querySelector('.xkeditor-left');
+    let right = document.querySelector('.xkeditor-right');
+    let container = document.querySelector('.xkeditor');
+    resizor.addEventListener('mousedown', e => {
+      isResizing = true;
+      right.style.userSelect = 'none';
+    });
+    document.addEventListener('mousemove', e => {
+      if (!isResizing) return true;
+      var offsetLeft = e.clientX - container.clientLeft;
+      // 判断左右拖动范围
+      if (
+        offsetLeft < container.clientWidth * 0.2 ||
+        offsetLeft >= container.clientWidth * 0.8
+      ) {
+        isResizing = false;
+        return true;
+      }
+      left.style.width = offsetLeft + 'px';
+      resizor.style.left = offsetLeft + 'px';
+      right.style.width = container.clientWidth - offsetLeft + 'px';
+    });
+    document.addEventListener('mouseup', e => {
+      isResizing = false;
+      state.aceEditor.resize();
+      right.style.userSelect = 'unset';
+    });
   }
 };
 
