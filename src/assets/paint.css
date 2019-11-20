@@ -1,32 +1,3 @@
-body {
-  overscroll-behavior: none;
-  color: #585858;
-  margin: 0px;
-  padding: 0px;
-}
-
-html {
-  margin: 0px;
-  padding: 0px;
-}
-
-/* 滚动槽 */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.06);
-  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.08);
-}
-/* 滚动条滑块 */
-::-webkit-scrollbar-thumb {
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.12);
-  -webkit-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
 .title {
   left: 50%;
   transform: translateX(-50%);
@@ -110,6 +81,7 @@ html {
   padding: 0px;
   width: 100%;
   height: 100%;
+  touch-action: none;
 }
 
 .graffiti {
