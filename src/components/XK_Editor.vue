@@ -226,16 +226,6 @@ export default {
       this.$nextTick(() => {
         Prism.highlightAll();
       });
-    },
-    setting: {
-      handler: function(val) {
-        if (window.XKEditor) {
-          window.XKEditor.tinymce.remove();
-          window.XKEditor.tinymce.init(val.tinymceSetting);
-          window.XKEditor.ace.setOptions(val.aceSetting);
-        }
-      },
-      deep: true
     }
   }
 };

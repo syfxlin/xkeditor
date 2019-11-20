@@ -638,13 +638,6 @@ const actions = {
     } else if (operate === "graff") {
       actions.showAceToolbarModal(operate, "上传涂鸦图");
       return;
-    } else if (
-      /(toLine|search|toc|switchPreview|fullPreview|fullScreen|toHtmlEditor|toTinyMCE|empty|setting|undo|redo|typewriter|format|pasteFormat)/g.test(
-        operate
-      )
-    ) {
-      actions.execCommand(operate);
-      return;
     } else if (operate === "setLocalStorage") {
       actions.showAceToolbarModal("localStorage", "保存到本地");
       return;
@@ -659,6 +652,13 @@ const actions = {
       return;
     } else if (operate === "info") {
       actions.showAceToolbarModal(operate, "关于");
+      return;
+    } else if (
+      /(toLine|search|toc|switchPreview|fullPreview|fullScreen|toHtmlEditor|toTinyMCE|empty|setting|undo|redo|typewriter|format|pasteFormat)/g.test(
+        operate
+      )
+    ) {
+      actions.execCommand(operate);
       return;
     }
     actions.operateAceContent(isStart, toLeft, str);
@@ -1005,6 +1005,14 @@ const actions = {
         setting: state.setting,
         toMarkdown: toMarkdown,
         toHtml: toHtml,
+        setSetting: setting => {
+          Vue.set(state, "setting", setting);
+          if (window.XKEditor) {
+            window.XKEditor.tinymce.remove();
+            window.XKEditor.tinymce.init(setting.tinymceSetting);
+            window.XKEditor.ace.setOptions(setting.aceSetting);
+          }
+        },
         getMarkdown: () => {
           return state.markdownContent;
         },
