@@ -97,15 +97,13 @@ export default {
           file,
           response => {
             if (response.data.error) {
-              //TODO: error
+              actions.timeToast("错误：" + response.data.error, "error");
             }
             document.getElementsByClassName("canvas-main")[0].style.display =
               "none";
             this.htmlViewContent += " ";
-            //TODO: 上传成功提示
           },
           error => {
-            //TODO: 上传失败提示
             console.log(error);
           }
         );

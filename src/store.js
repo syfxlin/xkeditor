@@ -83,6 +83,12 @@ const state = Vue.observable({
     show: false,
     data: {},
     content: ''
+  },
+  toast: {
+    show: false,
+    message: '',
+    status: '',
+    loading: false
   }
 });
 
@@ -116,6 +122,23 @@ const actions = {
     state.aceToolbarModal.content = '';
     state.aceToolbarModal.show = false;
   },
+  showToast(message, status = '', loading = false) {
+    state.toast.message = message;
+    state.toast.status = status;
+    state.toast.loading = loading;
+    state.toast.show = true;
+  },
+  hideToast() {
+    state.toast.message = '';
+    state.toast.loading = false;
+    state.toast.show = false;
+  },
+  timeToast(message, status = '', loading = false, delay = 1000) {
+    actions.showToast(message, status, loading);
+    setTimeout(() => {
+      actions.hideToast();
+    }, delay);
+  },
   aceToolbarSubmit() {
     let str = '';
     let data = state.aceToolbarModal.data;
@@ -145,8 +168,7 @@ const actions = {
       str = '![' + data.art + '](' + data.src + ')';
     } else if (data.operate === 'video') {
       if (!/\w+\.(\w+)$/.test(data.src)) {
-        //TODO: 移除AT-UI后的依赖
-        this.$Message.error('地址输入有误！请重新输入(无法识别扩展名)');
+        actions.timeToast('地址输入有误！请重新输入(无法识别扩展名)', 'error');
         return;
       }
       let type = data.src.match(/\w+\.(\w+)$/);
@@ -202,16 +224,13 @@ const actions = {
         file,
         response => {
           Vue.set(state.aceToolbarModal.data, 'src', response.data.path);
-          //TODO: 上传成功提示
         },
         error => {
-          //TODO: 上传失败提示
           console.log(error);
         }
       );
     } else {
-      //TODO: 未选择文件提示
-      console.log('error');
+      actions.timeToast('当前未选择文件！', 'error');
     }
   },
   initGraff() {
@@ -254,10 +273,8 @@ const actions = {
         file,
         response => {
           Vue.set(state.aceToolbarModal.data, 'hash', hash);
-          //TODO: 上传成功提示
         },
         error => {
-          //TODO: 上传失败提示
           console.log(error);
         },
         'graff-' + hash + '.png'
@@ -273,10 +290,8 @@ const actions = {
           file,
           response => {
             Vue.set(state.aceToolbarModal.data, 'hash', hash);
-            //TODO: 上传成功提示
           },
           error => {
-            //TODO: 上传失败提示
             console.log(error);
           }
         );
@@ -945,16 +960,17 @@ const actions = {
               headers: { 'Content-Type': 'multipart/form-data' }
             };
             // success({"error":false,"path":"https://img.url"})
+            actions.showToast('上传中...', '', true);
             axios
               .post(state.setting.xkSetting.imgUpload, param, config)
               .then(response => {
+                actions.timeToast('上传成功！', 'success');
                 success(response);
               })
               .catch(error => {
+                actions.timeToast('上传失败！', 'error');
                 failure(error);
               });
-          } else {
-            //TODO: 上传关闭提示
           }
         },
         graffUpload: (file, success, failure, filename = null) => {
@@ -969,16 +985,17 @@ const actions = {
               headers: { 'Content-Type': 'multipart/form-data' }
             };
             // success({"error":false,"path":"https://img.url"})
+            actions.showToast('上传中...', '', true);
             axios
               .post(state.setting.xkSetting.graffUpload, param, config)
               .then(response => {
+                actions.timeToast('上传成功！', 'success');
                 success(response);
               })
               .catch(error => {
+                actions.timeToast('上传失败！', 'error');
                 failure(error);
               });
-          } else {
-            //TODO: 上传关闭提示
           }
         }
       };
@@ -996,7 +1013,7 @@ const actions = {
         setMarkdown: (val, valueType = 'markdown') => {
           //默认设置时在ACE编辑界面
           if (state.editorMode !== 'ace') {
-            //TODO: 提示不可设置，因为不在ACE状态
+            actions.timeToast('当前不在Markdown编辑器！', 'error');
             return;
           }
           if (valueType !== 'markdown') {
@@ -1008,7 +1025,7 @@ const actions = {
         setHTML: (val, valueType = 'html') => {
           //默认设置时在TinyMCE编辑界面
           if (state.editorMode !== 'tinymce') {
-            //TODO: 提示不可设置，因为不在TinyMCE状态
+            actions.timeToast('当前不在富文本编辑器！', 'error');
             return;
           }
           if (valueType !== 'html') {
@@ -1262,10 +1279,8 @@ const actions = {
                 pasteFile,
                 response => {
                   state.aceEditor.insert('![](' + response.data.path + ')');
-                  //TODO: 上传成功提示
                 },
                 error => {
-                  //TODO: 上传失败提示
                   console.log(error);
                 }
               );

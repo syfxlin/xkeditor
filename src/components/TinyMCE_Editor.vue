@@ -66,22 +66,20 @@ export default {
     init.selector = "#tinymce-textarea";
     //上传功能
     if (this.setting.xkSetting.imgUpload) {
-      init.images_upload_handler = function(blobInfo, success, failure) {
+      init.images_upload_handler = (blobInfo, success, failure) => {
         window.XKEditorAPI.imgUpload(
           blobInfo.blob(),
-          function(response) {
+          response => {
             success(response.data.path);
-            //TODO: 上传成功之后的提示
           },
-          function(error) {
-            //TODO: 上传失败后的提示
+          error => {
             failure(error);
           }
         );
       };
     }
     //添加自定义按钮
-    init.setup = function(editor) {
+    init.setup = editor => {
       editor.ui.registry.addButton("tex-$", {
         text: "行内公式",
         onAction(_) {

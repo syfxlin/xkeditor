@@ -37,6 +37,10 @@
       </div>
     </template>
     <graff-board></graff-board>
+    <div :class="'xkeditor-toast ' + (toast.status!=='' ? toast.status : '')" v-show="toast.show">
+      <i v-show="toast.loading"></i>
+      <p>{{ toast.message }}</p>
+    </div>
   </div>
 </template>
 
@@ -99,7 +103,8 @@ export default {
       "markdownContent",
       "htmlContent",
       "htmlViewContent",
-      "setting"
+      "setting",
+      "toast"
     ])
   },
   async mounted() {
@@ -361,6 +366,54 @@ export default {
   z-index: 99999;
 }
 
+.xkeditor-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #03b8cf;
+  color: #fff;
+  border-radius: 20px;
+}
+
+.xkeditor-toast.error {
+  background-color: #ea644a;
+}
+
+.xkeditor-toast.success {
+  background-color: #38b03f;
+}
+
+.xkeditor-toast p {
+  padding: 10px 15px;
+  display: inline-block;
+}
+
+.xkeditor-toast i {
+  width: 0.8rem;
+  height: 0.8rem;
+  display: inline-block;
+  padding: 0 0 0 15px;
+}
+
+.xkeditor-toast i:after {
+  animation: loading 0.5s infinite linear;
+  border: 0.1rem solid #fff;
+  border-radius: 50%;
+  border-right-color: transparent;
+  border-top-color: transparent;
+  content: "";
+  display: block;
+  height: 0.8rem;
+  left: 50%;
+  margin-left: -0.4rem;
+  margin-top: -0.4rem;
+  position: relative;
+  top: 50%;
+  width: 0.8rem;
+  z-index: 1;
+}
+
 @media (max-width: 991px) {
   .xk-col-24 #previewHtml {
     float: left;
@@ -386,5 +439,14 @@ export default {
 /* .slide-fade-leave-active for below version 2.1.8 */ {
   transform: translateX(10px);
   opacity: 0;
+}
+
+@keyframes loading {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
