@@ -73,6 +73,7 @@ import GraffBoard from "./GraffBoard";
 import axios from "axios";
 //HTML和Markdown互转
 import { toHtml, toMarkdown, getTocHtml } from "../utils/switchContent";
+import runCode from "../utils/runCode";
 
 // import katex from "katex"
 // import "katex/dist/katex.min.css"
@@ -222,6 +223,15 @@ export default {
         if (window.scrollBind) {
           window.scrollBind();
         }
+        document.querySelectorAll(".run-code-btn").forEach(item => {
+          item.addEventListener("click", () => {
+            runCode(
+              item.previousElementSibling.children[0].textContent,
+              item.getAttribute("language"),
+              item.nextElementSibling.children[0]
+            );
+          });
+        });
       });
     }
   },
@@ -432,6 +442,30 @@ export default {
   top: 50%;
   width: 0.8rem;
   z-index: 1;
+}
+
+.run-code-output {
+  display: flex;
+  flex: 10 150px;
+  align-items: center;
+  position: relative;
+  background-color: #fff;
+  margin: 0;
+  padding: 0.8em;
+  border: 1px solid #eaf2f4;
+  box-shadow: 2px 2px 5px -2px rgba(0, 0, 0, 0.1);
+  width: 91%;
+  height: 120px;
+  font-family: courier;
+}
+
+.run-code-output code {
+  width: 100%;
+  height: 100px;
+  white-space: pre;
+  vertical-align: middle;
+  word-break: break-word;
+  overflow-y: auto;
 }
 
 @media (max-width: 991px) {

@@ -271,6 +271,14 @@ export function toHtml(val, isFull) {
     if (language === "mermaid") {
       return '<pre class="xkeditor-mermaid">' + code + "</pre>";
     }
+    var runExt = "";
+    if (language.indexOf("run-") === 0) {
+      language = language.substring(4);
+      runExt =
+        "<button language=" +
+        language +
+        ' class="run-code-btn">运行</button><div class="run-code-output"><code></code></div>';
+    }
     if (isFull) {
       var langTitle =
         Languages[language] ||
@@ -297,7 +305,8 @@ export function toHtml(val, isFull) {
           lineNums +
           '</code></pre><div class="toolbar"><div class="toolbar-item"><a>Copy</a></div><div class="toolbar-item"><span>' +
           langTitle +
-          "</span></div></div></div>"
+          "</span></div></div></div>" +
+          runExt
         );
       } else {
         return (
