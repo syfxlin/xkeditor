@@ -136,12 +136,14 @@ export default {
       });
     };
     //初始化tinymce编辑器
-    tinyMCE.init(init);
+    window.tinyMCE.init(init);
     //赋初值
     this.htmlContent = this.value;
-    tinyMCE.editors["tinymce-textarea"].setContent(this.htmlContent);
-    tinyMCE.editors["tinymce-textarea"].on("KeyUp", e => {
-      this.htmlContent = tinyMCE.editors["tinymce-textarea"].getContent();
+    window.tinyMCE.editors["tinymce-textarea"].setContent(this.htmlContent);
+    window.tinyMCE.editors["tinymce-textarea"].on("KeyUp", e => {
+      this.htmlContent = window.tinyMCE.editors[
+        "tinymce-textarea"
+      ].getContent();
     });
   }
 };

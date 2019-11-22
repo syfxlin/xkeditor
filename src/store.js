@@ -44,7 +44,6 @@ const state = Vue.observable({
       toolbar:
         "h1 h2 h3 h4 h5 h6 | bold italic underline strikethrough quote mark code | sup sub tex-$ tex-math | flow seq gantt mermaid | ul ol minus table time | link image video graff | toLine search toc typewriter switchPreview fullPreview fullScreen toHtmlEditor toTinyMCE format empty setting | undo redo | setLocalStorage getLocalStorage removeLocalStorage | help info | pasteFormat",
       minLines: 10,
-      fontSize: 14,
       theme: "ace/theme/solarized_light",
       mode: "ace/mode/markdown",
       tabSize: 4,
@@ -99,15 +98,15 @@ const actions = {
   },
   setTinyValue(val) {
     state.htmlContent = val;
-    tinyMCE.editors["tinymce-textarea"].setContent(state.htmlContent);
+    window.tinyMCE.editors["tinymce-textarea"].setContent(state.htmlContent);
   },
   initAceEditor(value, setting, ele) {
     setting.value = value ? value : "";
-    ace.config.set(
+    window.ace.config.set(
       "basePath",
       "https://cdn.jsdelivr.net/npm/ace-builds@1.4.4/src-noconflict/"
     );
-    state.aceEditor = ace.edit(ele, setting);
+    state.aceEditor = window.ace.edit(ele, setting);
     if (window.isMobile) {
       actions.execCommand("switchPreview");
     }
@@ -540,10 +539,10 @@ const actions = {
       }
       return;
     } else if (command === "format") {
-      if (!prettier) return;
-      let formated = prettier.format(state.markdownContent, {
+      if (!window.prettier) return;
+      let formated = window.prettier.format(state.markdownContent, {
         parser: "markdown",
-        plugins: prettierPlugins
+        plugins: window.prettierPlugins
       });
       actions.setAceValue(formated);
     } else if (command === "pasteFormat") {
@@ -667,7 +666,7 @@ const actions = {
     let range = state.aceEditor.getSelectionRange();
     if (isStart) {
       for (let i = range.start.row; i <= range.end.row; i++) {
-        state.aceEditor.session.replace(new ace.Range(i, 0, i, 0), str);
+        state.aceEditor.session.replace(new window.ace.Range(i, 0, i, 0), str);
       }
     } else {
       state.aceEditor.session.replace(range, str);

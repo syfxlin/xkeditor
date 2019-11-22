@@ -8,20 +8,49 @@
           </div>
         </div>
         <div class="xk-modal-body">
-          <link-item v-if="modal.content==='link'" :data="modal.data"></link-item>
-          <image-item v-if="modal.content==='image'" :data="modal.data"></image-item>
-          <video-item v-if="modal.content==='video'" :data="modal.data"></video-item>
-          <toline-item v-if="modal.content==='toLine'" :data="modal.data"></toline-item>
-          <localstorage-item v-if="modal.content==='localStorage'" :data="modal.data"></localstorage-item>
-          <table-item v-if="modal.content==='table'" :data="modal.data"></table-item>
-          <help-item v-if="modal.content==='help'" :data="modal.data"></help-item>
-          <info-item v-if="modal.content==='info'" :data="modal.data"></info-item>
-          <graff-item v-if="modal.content==='graff'" :data="modal.data"></graff-item>
+          <link-item
+            v-if="modal.content === 'link'"
+            :data="modal.data"
+          ></link-item>
+          <image-item
+            v-if="modal.content === 'image'"
+            :data="modal.data"
+          ></image-item>
+          <video-item
+            v-if="modal.content === 'video'"
+            :data="modal.data"
+          ></video-item>
+          <toline-item
+            v-if="modal.content === 'toLine'"
+            :data="modal.data"
+          ></toline-item>
+          <localstorage-item
+            v-if="modal.content === 'localStorage'"
+            :data="modal.data"
+          ></localstorage-item>
+          <table-item
+            v-if="modal.content === 'table'"
+            :data="modal.data"
+          ></table-item>
+          <help-item
+            v-if="modal.content === 'help'"
+            :data="modal.data"
+          ></help-item>
+          <info-item
+            v-if="modal.content === 'info'"
+            :data="modal.data"
+          ></info-item>
+          <graff-item
+            v-if="modal.content === 'graff'"
+            :data="modal.data"
+          ></graff-item>
         </div>
         <div class="xk-clear"></div>
         <div class="xk-modal-footer">
           <button class="xk-button" @click="cancel()">取消</button>
-          <button class="xk-button xk-button-primary" @click="submit()">确定</button>
+          <button class="xk-button xk-button-primary" @click="submit()">
+            确定
+          </button>
         </div>
         <span class="xk-modal-close" @click="cancel()">
           <fa-icon icon="times" />
@@ -42,7 +71,7 @@ import TableItem from "./modal/Table";
 import ToLineItem from "./modal/ToLine";
 import VideoItem from "./modal/Video";
 
-import store, { mapState, mapActions } from "../store";
+import { mapState, mapActions } from "../store";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";

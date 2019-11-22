@@ -70,8 +70,22 @@
       </ul>
       <h3>保存/取消</h3>
       <ul class="can-output">
-        <li class="can-btn" data-type="save-canvas" id="save-canvas" @click="save()">保存</li>
-        <li class="can-btn" data-type="cancel-canvas" id="cancel-canvas" @click="cancel()">取消</li>
+        <li
+          class="can-btn"
+          data-type="save-canvas"
+          id="save-canvas"
+          @click="save()"
+        >
+          保存
+        </li>
+        <li
+          class="can-btn"
+          data-type="cancel-canvas"
+          id="cancel-canvas"
+          @click="cancel()"
+        >
+          取消
+        </li>
       </ul>
     </div>
   </div>
@@ -83,7 +97,7 @@ import { mapState } from "../store";
 export default {
   name: "graff-board",
   computed: {
-    ...mapState(["htmlViewContent"])
+    ...mapState(["htmlViewContent", "timeToast"])
   },
   methods: {
     save() {
@@ -97,7 +111,7 @@ export default {
           file,
           response => {
             if (response.data.error) {
-              actions.timeToast("错误：" + response.data.error, "error");
+              this.timeToast("错误：" + response.data.error, "error");
             }
             document.getElementsByClassName("canvas-main")[0].style.display =
               "none";
@@ -116,5 +130,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

@@ -28,18 +28,21 @@
             @click="toolbarClick(item.operate)"
             :id="'toolbar-' + item.operate"
           >
-            <b v-if="typeof item.icon==='number'">H{{ item.icon }}</b>
+            <b v-if="typeof item.icon === 'number'">H{{ item.icon }}</b>
             <fa-icon v-else :icon="item.icon" />
           </button>
         </template>
       </template>
     </div>
-    <div class="ace-toolbar-html ace-toolbar" v-show="!aceToolbarShow&&aceToolbarHtmlShow">
+    <div
+      class="ace-toolbar-html ace-toolbar"
+      v-show="!aceToolbarShow && aceToolbarHtmlShow"
+    >
       <button
         class="xk-button"
         type="text"
         title="转换为Markdown模式"
-        @click="function(){aceToolbarShow = true;switchEditorMode()}"
+        @click="switchToHtml()"
       >
         <fa-icon icon="file-code" />转换为Markdown模式
       </button>
@@ -67,7 +70,7 @@ library.add(fas);
 import ToolBarModal from "./ToolbarModal";
 
 import aceAllButtons from "../utils/aceAllButtons";
-import store, { mapState, mapActions } from "../store";
+import { mapState, mapActions } from "../store";
 
 export default {
   components: {
@@ -103,7 +106,11 @@ export default {
     });
   },
   methods: {
-    ...mapActions(["initAceEditor", "switchEditorMode", "toolbarClick"])
+    ...mapActions(["initAceEditor", "switchEditorMode", "toolbarClick"]),
+    switchToHtml() {
+      this.aceToolbarShow = true;
+      this.switchEditorMode();
+    }
   }
 };
 </script>
