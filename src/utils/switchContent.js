@@ -277,7 +277,7 @@ export function toHtml(val, isFull) {
       runExt =
         "<button language=" +
         language +
-        ' class="run-code-btn">运行</button><div class="run-code-output"><code></code></div>';
+        ' class="run-code-btn">运行</button><button class="reset-code-btn">重置</button><div class="run-code-output"><code></code></div>';
     }
     if (isFull) {
       var langTitle =
