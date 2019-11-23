@@ -67,7 +67,7 @@ const state = Vue.observable({
       pasteFormat: true,
       pasteImageUpload: true,
       enableTinyMCE: true,
-      judge0API: "https://api.judge0.com"
+      judge0API: "https://run-code.lincdn.top"
     }
   },
   aceEditor: null,
