@@ -7,22 +7,23 @@
 ## 目录 Contents
 
 - [XK-Editor](#xk-editor)
-  - [目录 Contents](#%E7%9B%AE%E5%BD%95-contents)
-  - [简介 Introduction](#%E7%AE%80%E4%BB%8B-introduction)
-  - [特性 Feature](#%E7%89%B9%E6%80%A7-feature)
-  - [演示 Demo](#%E6%BC%94%E7%A4%BA-demo)
-  - [安装 Install](#%E5%AE%89%E8%A3%85-install)
-    - [注意事项](#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9)
-    - [从 NPM 安装](#%E4%BB%8E-npm-%E5%AE%89%E8%A3%85)
-    - [从本项目上构建](#%E4%BB%8E%E6%9C%AC%E9%A1%B9%E7%9B%AE%E4%B8%8A%E6%9E%84%E5%BB%BA)
-    - [组件方式使用](#%E7%BB%84%E4%BB%B6%E6%96%B9%E5%BC%8F%E4%BD%BF%E7%94%A8)
-    - [调用方法](#%E8%B0%83%E7%94%A8%E6%96%B9%E6%B3%95)
-    - [所需依赖](#%E6%89%80%E9%9C%80%E4%BE%9D%E8%B5%96)
+  - [目录 Contents](#%e7%9b%ae%e5%bd%95-contents)
+  - [简介 Introduction](#%e7%ae%80%e4%bb%8b-introduction)
+  - [特性 Feature](#%e7%89%b9%e6%80%a7-feature)
+  - [演示 Demo](#%e6%bc%94%e7%a4%ba-demo)
+  - [安装 Install](#%e5%ae%89%e8%a3%85-install)
+    - [注意事项](#%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a1%b9)
+    - [从 NPM 安装](#%e4%bb%8e-npm-%e5%ae%89%e8%a3%85)
+    - [从本项目上构建](#%e4%bb%8e%e6%9c%ac%e9%a1%b9%e7%9b%ae%e4%b8%8a%e6%9e%84%e5%bb%ba)
+    - [组件方式使用](#%e7%bb%84%e4%bb%b6%e6%96%b9%e5%bc%8f%e4%bd%bf%e7%94%a8)
+    - [调用方法](#%e8%b0%83%e7%94%a8%e6%96%b9%e6%b3%95)
+    - [所需依赖](#%e6%89%80%e9%9c%80%e4%be%9d%e8%b5%96)
     - [setting.json](#settingjson)
-  - [文档 Doc](#%E6%96%87%E6%A1%A3-doc)
-  - [维护者 Maintainer](#%E7%BB%B4%E6%8A%A4%E8%80%85-maintainer)
-  - [许可证 License](#%E8%AE%B8%E5%8F%AF%E8%AF%81-license)
-  - [渲染 Render](#%E6%B8%B2%E6%9F%93-render)
+  - [运行代码块](#%e8%bf%90%e8%a1%8c%e4%bb%a3%e7%a0%81%e5%9d%97)
+  - [文档 Doc](#%e6%96%87%e6%a1%a3-doc)
+  - [维护者 Maintainer](#%e7%bb%b4%e6%8a%a4%e8%80%85-maintainer)
+  - [许可证 License](#%e8%ae%b8%e5%8f%af%e8%af%81-license)
+  - [渲染 Render](#%e6%b8%b2%e6%9f%93-render)
 
 ## 简介 Introduction
 
@@ -37,6 +38,7 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 - [打字机模式] 支持打字机模式，编辑时无需使用鼠标滚轮，并可调节定位位置，满足各种屏幕和使用者的需求
 - [粘贴自动格式化] 支持在粘贴HTML时自动将HTML格式化为Markdown
 - [图片粘贴自动上传] 支持粘贴图片自动上传，并自动填充链接
+- [嵌入运行块] 支持嵌入可运行的代码块，通过与后端交互可以支持多种语言
 - [下载] 支持导出下载Markdown和HTML格式的文件
 - [即时保存] 支持即时保存到浏览器，无惧网络波动
 - [移动端优化] 优化移动端的编辑体验，支持惯性滚动，并默认关闭实时预览
@@ -254,6 +256,13 @@ turndown-plugin-gfm
     }
 }
 ```
+
+## 运行代码块
+
+运行代码块除javascript不需要使用后端，其他语言都需要有后端负责执行代码。
+后端执行器基于 [judge0/api](https://github.com/judge0/api) 重新build而来，支持的语言详见 [run-code](https://github.com/syfxlin/run-code) ，若您有其他语言的需求，您可以自行参照教程重新build
+
+[run-code](https://github.com/syfxlin/run-code)
 
 ## 文档 Doc
 

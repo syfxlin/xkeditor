@@ -257,3 +257,97 @@ Future task in critical line        :crit, 5d
 Create tests for renderer           :2d
 Add to mermaid                      :1d
 ```
+
+### 运行代码
+
+> 本功能除javascript不需要使用后端，其他语言都需要有后端负责执行代码。
+> 后端执行器基于 [judge0/api](https://github.com/judge0/api) 重新build而来，支持以下的语言，若您有其他语言的需求，您可以自行参照教程重新build
+
+> [run-code](https://github.com/syfxlin/run-code)
+
+```run-javascript
+console.log("Hello, World!")
+```
+
+```run-c
+#include <stdio.h>
+
+int main() {
+    printf("Hello, World!");
+    return 0;
+}
+```
+
+```run-cpp
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    cout << "Hello, World!";
+    return 0;
+}
+```
+
+```run-csharp
+using System;
+namespace HelloWorldApplication
+{
+    class HelloWorld
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Hello, World!");
+        }
+    }
+}
+```
+
+```run-go
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, World!")
+}
+```
+
+```run-java
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+```
+
+```run-node
+console.log("Hello, World!");
+```
+
+```run-php
+<?php
+echo "Hello, World!";
+```
+
+```run-python
+print ("Hello, World!")
+```
+
+```run-python2
+print "Hello, World!"
+```
+
+```run-ruby
+puts "Hello, World!";
+```
+
+```run-rust
+fn main() {
+    println!("Hello, World!");
+}
+```
+
+```run-typescript
+console.log("Hello, World!")
+```

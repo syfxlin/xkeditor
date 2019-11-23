@@ -34,15 +34,15 @@ export default function runJudge0(code, languageId, input, outputEle) {
               return;
             }
             if (
-              count < 20 &&
-              (res.data.status.id === 1 || res.data.status.id === 2)
+              (count < 30 && res.data.status.id === 1) ||
+              res.data.status.id === 2
             ) {
-              fetchOut();
+              setTimeout(fetchOut, 500);
               return;
             }
           })
           .catch(err => {
-            clearInterval(timer);
+            clearTimeout(timer);
             outputEle.textContent = err;
           });
       };

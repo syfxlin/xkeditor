@@ -285,6 +285,9 @@ export function toHtml(val, isFull) {
       if (language === "node") {
         language = "javascript";
       }
+      if (language === "python2") {
+        language = "python";
+      }
     }
     if (isFull) {
       var langTitle =
