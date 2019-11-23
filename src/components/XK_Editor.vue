@@ -11,11 +11,7 @@
         >
           <ace ref="ace"></ace>
         </div>
-        <div
-          id="resizor"
-          title="拖动我"
-          v-show="editorModeShow && previewShow === 'show'"
-        ></div>
+        <div id="resizor" title="拖动我" v-show="editorModeShow && previewShow === 'show'"></div>
         <div
           :class="
             'xkeditor-right ' +
@@ -30,20 +26,14 @@
             ref="htmlView"
           ></div>
         </div>
-        <div
-          class="xk-col-24"
-          v-show="!editorModeShow"
-          v-if="setting.xkSetting.enableTinyMCE"
-        >
+        <div class="xk-col-24" v-show="!editorModeShow" v-if="setting.xkSetting.enableTinyMCE">
           <tinymce ref="tinymce"></tinymce>
         </div>
         <button
           class="xk-button close-preview-full"
           @click="switchPreviewFull()"
           v-show="editorModeShow && previewShow === 'full'"
-        >
-          关闭
-        </button>
+        >关闭</button>
         <transition name="slide-fade">
           <div id="toc" v-show="showToc"></div>
         </transition>
@@ -53,10 +43,7 @@
       </div>
     </template>
     <graff-board></graff-board>
-    <div
-      :class="'xkeditor-toast ' + (toast.status !== '' ? toast.status : '')"
-      v-show="toast.show"
-    >
+    <div :class="'xkeditor-toast ' + (toast.status !== '' ? toast.status : '')" v-show="toast.show">
       <i v-show="toast.loading"></i>
       <p>{{ toast.message }}</p>
     </div>
@@ -73,7 +60,6 @@ import GraffBoard from "./GraffBoard";
 import axios from "axios";
 //HTML和Markdown互转
 import { toHtml, toMarkdown, getTocHtml } from "../utils/switchContent";
-import runCode from "../utils/runCode";
 
 // import katex from "katex"
 // import "katex/dist/katex.min.css"
@@ -148,7 +134,8 @@ export default {
       "initPaste",
       "updateTocTree",
       "initTocTree",
-      "initResizor"
+      "initResizor",
+      "updateRunCode"
     ]),
     async load() {
       let md = null;
@@ -223,20 +210,7 @@ export default {
         if (window.scrollBind) {
           window.scrollBind();
         }
-        document.querySelectorAll(".run-code-btn").forEach(item => {
-          item.addEventListener("click", () => {
-            runCode(
-              item.previousElementSibling.children[0].textContent,
-              item.getAttribute("language"),
-              item.nextElementSibling.nextElementSibling.children[0]
-            );
-          });
-        });
-        document.querySelectorAll(".reset-code-btn").forEach(item => {
-          item.addEventListener("click", () => {
-            item.nextElementSibling.children[0].textContent = "";
-          });
-        });
+        this.updateRunCode();
       });
     }
   },
@@ -449,7 +423,8 @@ export default {
   z-index: 1;
 }
 
-.run-code-output {
+.run-code-output,
+.run-code-input {
   display: flex;
   align-items: center;
   position: relative;
@@ -457,10 +432,10 @@ export default {
   font-family: courier;
 }
 
-.run-code-output code {
+.run-code-output code,
+.run-code-input textarea {
   width: 100%;
   height: 100px;
-  padding: 0.8rem !important;
   margin: 0 0.8rem;
   white-space: pre;
   vertical-align: middle;
@@ -468,8 +443,14 @@ export default {
   overflow-y: auto;
   background-color: #fff !important;
   margin: 0;
-  border: 1px solid #eaf2f4;
+  border: 0.05rem solid #bcc3ce;
   box-shadow: 2px 2px 5px -2px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0.7rem !important;
+}
+
+.run-code-input textarea {
+  height: 3rem;
+  display: none;
 }
 
 .run-code-output code:empty {
@@ -478,7 +459,8 @@ export default {
 }
 
 .run-code-btn,
-.reset-code-btn {
+.reset-code-btn,
+.input-code-btn {
   display: inline-block;
   background-color: #fff;
   color: #333;
@@ -494,7 +476,8 @@ export default {
 }
 
 .run-code-btn:hover,
-.reset-code-btn:hover {
+.reset-code-btn:hover,
+.input-code-btn:hover {
   background-color: #333;
   color: #fff;
 }

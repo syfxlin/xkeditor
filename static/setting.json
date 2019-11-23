@@ -41,6 +41,7 @@
     "scrollMode": "javascript",
     "pasteFormat": true,
     "pasteImageUpload": true,
-    "enableTinyMCE": true
+    "enableTinyMCE": true,
+    "judge0API": "https://api.judge0.com"
   }
 }

@@ -277,7 +277,14 @@ export function toHtml(val, isFull) {
       runExt =
         "<button language=" +
         language +
-        ' class="run-code-btn">运行</button><button class="reset-code-btn">重置</button><div class="run-code-output"><code></code></div>';
+        ' class="run-code-btn">运行</button>' +
+        '<button class="reset-code-btn">重置</button>' +
+        '<button class="input-code-btn">输入</button>' +
+        '<div class="run-code-input"><textarea></textarea></div>' +
+        '<div class="run-code-output"><code></code></div>';
+      if (language === "node") {
+        language = "javascript";
+      }
     }
     if (isFull) {
       var langTitle =

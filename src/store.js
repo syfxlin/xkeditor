@@ -2,6 +2,7 @@ import Vue from "vue";
 import { toHtml, toMarkdown } from "./utils/switchContent";
 import { initPaint } from "./utils/paint";
 import axios from "axios";
+import runCode from "./utils/runCode";
 
 window.isMobile = /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i.test(
   navigator.userAgent
@@ -65,7 +66,8 @@ const state = Vue.observable({
       scrollMode: "anchor",
       pasteFormat: true,
       pasteImageUpload: true,
-      enableTinyMCE: true
+      enableTinyMCE: true,
+      judge0API: "https://api.judge0.com"
     }
   },
   aceEditor: null,
@@ -1348,6 +1350,32 @@ const actions = {
       isResizing = false;
       state.aceEditor.resize();
       right.style.userSelect = "unset";
+    });
+  },
+  updateRunCode() {
+    document.querySelectorAll(".run-code-btn").forEach(item => {
+      item.addEventListener("click", () => {
+        runCode(
+          item.previousElementSibling.children[0].textContent,
+          item.getAttribute("language"),
+          item.nextElementSibling.nextElementSibling.nextElementSibling
+            .children[0].value,
+          item.nextElementSibling.nextElementSibling.nextElementSibling
+            .nextElementSibling.children[0]
+        );
+      });
+    });
+    document.querySelectorAll(".reset-code-btn").forEach(item => {
+      item.addEventListener("click", () => {
+        item.nextElementSibling.nextElementSibling.nextElementSibling.children[0].textContent =
+          "";
+      });
+    });
+    document.querySelectorAll(".input-code-btn").forEach(item => {
+      item.addEventListener("click", () => {
+        let area = item.nextElementSibling.children[0];
+        area.style.display = area.style.display === "block" ? "none" : "block";
+      });
     });
   }
 };
