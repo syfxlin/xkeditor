@@ -1048,43 +1048,43 @@ const actions = {
           actions.switchEditor();
         },
         switchPreview: () => {
-          state.aceEditor.execCommand("switchPreview");
+          actions.execCommand("switchPreview");
         },
         switchFullPreview: () => {
-          state.aceEditor.execCommand("fullPreview");
+          actions.execCommand("fullPreview");
         },
         switchFullScreen: () => {
-          state.aceEditor.execCommand("fullScreen");
+          actions.execCommand("fullScreen");
         },
         toLine: () => {
-          state.aceEditor.execCommand("toLine");
+          actions.execCommand("toLine");
         },
         toc: () => {
-          state.aceEditor.execCommand("toc");
+          actions.execCommand("toc");
         },
         toolbar: () => {
-          state.aceEditor.execCommand("toolbar");
+          actions.execCommand("toolbar");
         },
         resize: () => {
-          state.aceEditor.execCommand("resize");
+          actions.execCommand("resize");
         },
         addKeys: keys => {
           // keys = [{name,win,mac,exec},{name,win,mac,exec}]
-          state.aceEditor.execCommand("addKeys", keys);
+          actions.execCommand("addKeys", keys);
         },
         removeKeys: keys => {
           // keys = [name, name]
-          state.aceEditor.execCommand("removeKeys", keys);
+          actions.execCommand("removeKeys", keys);
         },
         getEditor: name => {
           if (name === "ace") {
-            return state.aceEditor.aceEditor;
+            return actions.aceEditor;
           } else if (name === "tinymce") {
             return window.tinymce;
           }
         },
         switchTypewriter: data => {
-          state.aceEditor.execCommand("typewriter", true);
+          actions.execCommand("typewriter", true);
         },
         setLocalStorage: filename => {
           window.localStorage.setItem(
