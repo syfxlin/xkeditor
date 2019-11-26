@@ -313,17 +313,16 @@ const actions = {
       ele.classList.remove("active");
     }
   },
-  switchResizor() {
+  switchResizor(curr) {
     let left = document.querySelector(".xkeditor-left");
     let right = document.querySelector(".xkeditor-right");
-    if (!state.resizor.enable) {
+    if (curr) {
       left.style.width = state.resizor.left;
       right.style.width = state.resizor.right;
     } else {
       left.style.width = "";
       right.style.width = "";
     }
-    state.resizor.enable = !state.resizor.enable;
   },
   switchPreviewShow(show = null) {
     let curr = show !== null ? show : state.previewShow === "hide";
@@ -337,7 +336,7 @@ const actions = {
       ele1.classList.remove("active");
       ele2.classList.remove();
     }
-    actions.switchResizor();
+    actions.switchResizor(curr);
   },
   switchPreviewFull(show = null) {
     let curr = show !== null ? show : state.previewShow === "full";
@@ -364,7 +363,7 @@ const actions = {
       document.getElementById("toc-button").style.display = "block";
       state.showToc = false;
     }
-    actions.switchResizor();
+    actions.switchResizor(curr);
   },
   operateFullScreen() {
     let ele = document.getElementById("toolbar-fullScreen");
