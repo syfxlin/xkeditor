@@ -90,6 +90,11 @@ const state = Vue.observable({
     message: "",
     status: "",
     loading: false
+  },
+  resizor: {
+    enable: true,
+    left: "",
+    right: ""
   }
 });
 
@@ -308,6 +313,18 @@ const actions = {
       ele.classList.remove("active");
     }
   },
+  switchResizor() {
+    let left = document.querySelector(".xkeditor-left");
+    let right = document.querySelector(".xkeditor-right");
+    if (!state.resizor.enable) {
+      left.style.width = state.resizor.left;
+      right.style.width = state.resizor.right;
+    } else {
+      left.style.width = "";
+      right.style.width = "";
+    }
+    state.resizor.enable = !state.resizor.enable;
+  },
   switchPreviewShow(show = null) {
     let curr = show !== null ? show : state.previewShow === "hide";
     let ele1 = document.getElementById("toolbar-switchPreview");
@@ -320,6 +337,7 @@ const actions = {
       ele1.classList.remove("active");
       ele2.classList.remove();
     }
+    actions.switchResizor();
   },
   switchPreviewFull(show = null) {
     let curr = show !== null ? show : state.previewShow === "full";
@@ -346,6 +364,7 @@ const actions = {
       document.getElementById("toc-button").style.display = "block";
       state.showToc = false;
     }
+    actions.switchResizor();
   },
   operateFullScreen() {
     let ele = document.getElementById("toolbar-fullScreen");
@@ -1345,6 +1364,8 @@ const actions = {
       left.style.width = offsetLeft + "px";
       resizor.style.left = offsetLeft + "px";
       right.style.width = container.clientWidth - offsetLeft + "px";
+      state.resizor.left = offsetLeft + "px";
+      state.resizor.right = container.clientWidth - offsetLeft + "px";
     });
     container.addEventListener("mouseup", e => {
       isResizing = false;
