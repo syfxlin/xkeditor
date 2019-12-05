@@ -458,6 +458,22 @@ export default {
   margin: 0;
 }
 
+.run-code-output code span.process {
+  color: #3280fc;
+}
+
+.run-code-output code span.success {
+  color: #32b643;
+}
+
+.run-code-output code span.error {
+  color: #ea644a;
+}
+
+.run-code-output code span.o1 {
+  color: #f1a325;
+}
+
 .run-code-btn,
 .reset-code-btn,
 .input-code-btn {

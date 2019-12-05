@@ -1,7 +1,7 @@
 import axios from "axios";
 import store from "../../store";
 export default function runJudge0(code, languageId, input, outputEle) {
-  outputEle.textContent = "Loading";
+  outputEle.innerHTML = '<span class="process"># Processing...</span>';
   axios
     .post(
       store.state.setting.xkSetting.judge0API +
@@ -29,8 +29,14 @@ export default function runJudge0(code, languageId, input, outputEle) {
           .then(res => {
             count++;
             if (res.data.status.id == 3) {
-              outputEle.textContent =
-                "> " + res.data.stdout.replace("\n", "\n> ");
+              outputEle.innerHTML =
+                '<span class="success"># Accepted Time: ' +
+                res.data.time +
+                " Memory: " +
+                res.data.memory +
+                "KB</span>\n" +
+                "> " +
+                res.data.stdout.replace(/\n/g, "\n  ");
               return;
             }
             if (
@@ -39,11 +45,23 @@ export default function runJudge0(code, languageId, input, outputEle) {
             ) {
               setTimeout(fetchOut, 500);
               return;
+            } else {
+              outputEle.innerHTML =
+                '<span class="error"># ' +
+                res.data.status.description +
+                " Time: " +
+                res.data.time +
+                " Memory: " +
+                res.data.memory +
+                'KB</span>\n<span class="o1">compile_output: </span>' +
+                res.data.compile_output +
+                '\n<span class="o1">stderr: </span>' +
+                res.data.stderr;
             }
           })
           .catch(err => {
             clearTimeout(timer);
-            outputEle.textContent = err;
+            outputEle.innerHTML = '<span class="error"># ' + err + "</span>";
           });
       };
       fetchOut();
