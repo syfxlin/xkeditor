@@ -14,8 +14,6 @@
   - [安装 Install](#%e5%ae%89%e8%a3%85-install)
     - [注意事项](#%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a1%b9)
     - [从 NPM 安装](#%e4%bb%8e-npm-%e5%ae%89%e8%a3%85)
-    - [从本项目上构建](#%e4%bb%8e%e6%9c%ac%e9%a1%b9%e7%9b%ae%e4%b8%8a%e6%9e%84%e5%bb%ba)
-    - [组件方式使用](#%e7%bb%84%e4%bb%b6%e6%96%b9%e5%bc%8f%e4%bd%bf%e7%94%a8)
     - [调用方法](#%e8%b0%83%e7%94%a8%e6%96%b9%e6%b3%95)
     - [所需依赖](#%e6%89%80%e9%9c%80%e4%be%9d%e8%b5%96)
     - [setting.json](#settingjson)
@@ -64,32 +62,59 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 ### 注意事项
 
 从 Version 1.0.8 开始，为了减小Vendor体积，防止加载时间过长，XK-Editor默认使用`jsDelivr CDN`加载部分`node_modules`
-需要在index.html中添加一下script标签，若您不打算使用该方式加载，请将`node_modules/xkeditor/components`下的文件中s所有的`import`注释取消。
+需要在index.html中添加以下script标签，若您不打算使用该方式加载，请将`node_modules/xkeditor/components`下的文件中s所有的`import`注释取消。
+
+从 Version 1.4.6 开始，模块默认通过`webpack externals`方式导入，所以您需要修改`webpack`的配置文件，添加对应的配置，如下
+
 ```html
 <!-- ACE Editor -->
 <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.4.4/src-noconflict/ace.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.4.4/src-noconflict/ext-language_tools.js"></script>
+<!-- Marked -->
+<script src="https://cdn.jsdelivr.net/npm/marked@0.7.0/lib/marked.min.js"></script>
+<!-- Turndown -->
+<script src="https://cdn.jsdelivr.net/npm/turndown@5.0.3/dist/turndown.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/turndown-plugin-gfm@1.0.2/dist/turndown-plugin-gfm.min.js"></script>
 <!-- Preitter -->
 <script src="https://cdn.jsdelivr.net/npm/prettier@1.18.2/standalone.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/prettier@1.18.2/parser-markdown.js"></script>
 <!-- Prism.js -->
 <script src="/static/prism.js"></script>
-<link rel="stylesheet" href="/static/prism-okaidia.css">
-<link rel="stylesheet" href="/static/prism-line-numbers.css">
-<link rel="stylesheet" href="/static/prism-toolbar.css">
-<link rel="stylesheet" href="/static/prism-copy-to-clipboard.min.css">
+<link rel="stylesheet" href="/static/prism-okaidia.css" />
+<link rel="stylesheet" href="/static/prism-line-numbers.css" />
+<link rel="stylesheet" href="/static/prism-toolbar.css" />
 <!-- Katex -->
 <script src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css"
+/>
 <!-- Mermaid -->
-<script src="https://cdn.jsdelivr.net/npm/mermaid@8.0.0/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@8.4.3/dist/mermaid.min.js"></script>
 <!-- Emoji-js -->
 <script src="https://cdn.jsdelivr.net/npm/emoji-js@3.4.1/lib/emoji.min.js"></script>
 <!-- TinyMCE -->
 <script src="https://cdn.jsdelivr.net/npm/tinymce@5.0.5/tinymce.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tinymce@5.0.5/themes/silver/theme.min.js"></script>
 <script src="https://cdn.jsdelivr.net/combine/npm/tinymce@5.0.5/plugins/print/plugin.min.js,npm/tinymce@5.0.5/plugins/preview/plugin.min.js,npm/tinymce@5.0.5/plugins/fullpage/plugin.min.js,npm/tinymce@5.0.5/plugins/fullscreen/plugin.min.js,npm/tinymce@5.0.5/plugins/searchreplace/plugin.min.js,npm/tinymce@5.0.5/plugins/autolink/plugin.min.js,npm/tinymce@5.0.5/plugins/directionality/plugin.min.js,npm/tinymce@5.0.5/plugins/code/plugin.min.js,npm/tinymce@5.0.5/plugins/visualblocks/plugin.min.js,npm/tinymce@5.0.5/plugins/visualchars/plugin.min.js,npm/tinymce@5.0.5/plugins/image/plugin.min.js,npm/tinymce@5.0.5/plugins/link/plugin.min.js,npm/tinymce@5.0.5/plugins/media/plugin.min.js,npm/tinymce@5.0.5/plugins/template/plugin.min.js,npm/tinymce@5.0.5/plugins/codesample/plugin.min.js,npm/tinymce@5.0.5/plugins/table/plugin.min.js,npm/tinymce@5.0.5/plugins/charmap/plugin.min.js,npm/tinymce@5.0.5/plugins/hr/plugin.min.js,npm/tinymce@5.0.5/plugins/pagebreak/plugin.min.js,npm/tinymce@5.0.5/plugins/nonbreaking/plugin.min.js,npm/tinymce@5.0.5/plugins/anchor/plugin.min.js,npm/tinymce@5.0.5/plugins/toc/plugin.min.js,npm/tinymce@5.0.5/plugins/insertdatetime/plugin.min.js,npm/tinymce@5.0.5/plugins/advlist/plugin.min.js,npm/tinymce@5.0.5/plugins/lists/plugin.min.js,npm/tinymce@5.0.5/plugins/wordcount/plugin.min.js,npm/tinymce@5.0.5/plugins/imagetools/plugin.min.js,npm/tinymce@5.0.5/plugins/textpattern/plugin.min.js"></script>
+```
+
+```javascript
+module.exports = {
+  externals: {
+    "ace-builds": "ace",
+    marked: "marked",
+    turndown: "TurndownService",
+    "turndown-plugin-gfm": "turndownPluginGfm",
+    prismjs: "Prism",
+    "emoji-js": "EmojiConvertor",
+    "tinymce/tinymce": "tinyMCE",
+    mermaid: "mermaid",
+    katex: "katex",
+    "katex/dist/contrib/auto-render": "renderMathInElement"
+  }
+}
 ```
 
 ### 从 NPM 安装
@@ -114,58 +139,8 @@ export default {
 }
 ```
 
-### 从本项目上构建
-1. 首先clone本项目，或者前往[Releases](https://github.com/syfxlin/xkeditor/releases)下载本项目并解压
-```bash
-git clone https://github.com/syfxlin/xkeditor.git
-```
-2. 进入项目文件夹
-```bash
-cd xkeditor
-```
-3. 执行`yarn`或者`npm install`
-```bash
-yarn
-//or
-npm install
-```
-4. 测试运行
-```bash
-yarn start
-//or
-npm run dev
-```
-然后打开浏览器访问指定http://ip:8080，如果能正常访问则可以进行下一步
-5. build
-```bash
-yarn build
-//or
-npm run build
-```
-6. 将项目文件夹下的文件复制到网站目录即可
-
-### 组件方式使用
-1. 首先clone本项目，或者前往[Releases](https://github.com/syfxlin/xkeditor/releases)下载本项目并解压
-```bash
-git clone https://github.com/syfxlin/xkeditor.git
-```
-2. 进入项目文件夹
-```bash
-cd xkeditor
-```
-3. 将`static`文件夹下的所有文件复制到Vue项目下的`static`文件夹下
-4. 将`src/utils`和`src/components`下的所有问文件复制到Vue项目下的`src/utils`和`src/components`文件夹下
-5. 导入XK-Editor组件
-```javascript
-import XK_Editor from '@/components/XK_Editor'
-export default {
-    components: {
-        'xk-editor': XK_Editor
-    }
-}
-```
-
 ### 调用方法
+
 1. 导入XK-Editor组件
 ```javascript
 import XK_Editor from '@/components/XK_Editor'
@@ -182,13 +157,14 @@ export default {
 //contentApi: Markdown文件的地址，或者返回Markdown格式的API接口地址(GET)
 
 //or
-<xk-editor :setting="setting" :content="content" />
+<xk-editor :settingProps="setting" :contentProps="content" />
 //setting: 即setting object，解析setting.json得到的对象
 //content： Markdown内容文本
 ```
 
 ### 所需依赖
-```
+
+```text
 ace-builds
 @fortawesome/fontawesome-svg-core
 @fortawesome/free-solid-svg-icons
@@ -206,54 +182,70 @@ turndown-plugin-gfm
 ```
 
 ### setting.json
+
 ```json
 {
-    "tinymceSetting":{
-        "language_url":"/static/tinymce/langs/zh_CN.js",
-        "language":"zh_CN",
-        "skin_url":"/static/tinymce/skins/ui/oxide",
-        "body_class":"markdown-body",
-        "content_css":"/static/github-markdown.css",
-        "plugins":"print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern",
-        "toolbar":"formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor prismjs | link image media pageembed | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | tex-$ tex-math flow seq gantt mermaid | removeformat code toMarkdownEditor | undo redo",
-        "image_advtab":true,
-        "importcss_append":true,
-        "height":"100%",
-        "template_cdate_format":"[CDATE: %m/%d/%Y : %H:%M:%S]",
-        "template_mdate_format":"[MDATE: %m/%d/%Y : %H:%M:%S]",
-        "image_caption":true,
-        "spellchecker_dialog":true,
-        "spellchecker_whitelist":[
-            "Ephox",
-            "Moxiecode"
-        ]
-    },
-    "aceSetting":{
-        "minLines":10,
-        "fontSize":"17px",
-        "theme":"ace/theme/solarized_light",
-        "mode":"ace/mode/markdown",
-        "tabSize":4,
-        "wrap":true,
-        "enableSnippets":true,
-        "enableLiveAutocompletion":true,
-        "enableBasicAutocompletion":true,
-        "value":"# XK-Editor"
-    },
-    "xkSetting":{
-        "apiBaseUrl": "",
-        "previewCss": "/static/github-markdown.css",
-        "previewClass": "markdown-body",
-        "delayToHtml": 500,
-        "scrollBind": "both",
-        "imgUpload": "http://test.ixk.me/upload.php",
-        "graffUrl": "static/",
-        "graffUpload": "http://test.ixk.me/upload.php",
-        "scrollMode": "javascript",
-        "pasteFormat": true,
-        "pasteImageUpload": true,
-        "enableTinyMCE": true
+  "tinymceSetting": {
+    "language_url": "/static/tinymce/langs/zh_CN.js",
+    "language": "zh_CN",
+    "skin_url": "/static/tinymce/skins/ui/oxide",
+    "body_class": "markdown-body",
+    "content_css": "/static/github-markdown.css",
+    "plugins": "print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern",
+    "toolbar": "formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor prismjs | link image media pageembed | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | tex-$ tex-math flow seq gantt mermaid | removeformat code toMarkdownEditor | undo redo",
+    "image_advtab": true,
+    "importcss_append": true,
+    "height": "100%",
+    "template_cdate_format": "[CDATE: %m/%d/%Y : %H:%M:%S]",
+    "template_mdate_format": "[MDATE: %m/%d/%Y : %H:%M:%S]",
+    "image_caption": true,
+    "spellchecker_dialog": true,
+    "spellchecker_whitelist": ["Ephox", "Moxiecode"]
+  },
+  "aceSetting": {
+    "toolbar": "h1 h2 h3 h4 h5 h6 | bold italic underline strikethrough quote mark code | sup sub tex-$ tex-math | flow seq gantt mermaid | ul ol minus table time | link image video graff | toLine search toc typewriter switchPreview fullPreview fullScreen toHtmlEditor toTinyMCE format empty setting | undo redo | setLocalStorage getLocalStorage removeLocalStorage | help info | pasteFormat",
+    "minLines": 10,
+    "fontSize": "17px",
+    "theme": "ace/theme/solarized_light",
+    "mode": "ace/mode/markdown",
+    "tabSize": 4,
+    "wrap": true,
+    "enableSnippets": true,
+    "enableLiveAutocompletion": true,
+    "enableBasicAutocompletion": true,
+    "value": "# XK-Editor"
+  },
+  "xkSetting": {
+    "apiBaseUrl": "",
+    "previewCss": "/static/github-markdown.css",
+    "previewClass": "markdown-body",
+    "delayToHtml": 500,
+    "scrollBind": "both",
+    "imgUpload": "http://example.com/upload.php",
+    "graffUrl": "static/",
+    "graffUpload": "http://example.com/upload.php",
+    "scrollMode": "javascript",
+    "pasteFormat": true,
+    "pasteImageUpload": true,
+    "enableTinyMCE": true,
+    "judge0API": "https://example.com",
+    "runCodeLangList": {
+      "c": 1,
+      "cpp": 2,
+      "bash": 3,
+      "csharp": 4,
+      "go": 5,
+      "java": 6,
+      "node": 7,
+      "php": 8,
+      "python": 9,
+      "python2": 10,
+      "ruby": 11,
+      "rust": 12,
+      "scala": 13,
+      "typescript": 14
     }
+  }
 }
 ```
 
