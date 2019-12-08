@@ -22,37 +22,7 @@
 
 <script>
 import { mapState } from "../store";
-// import tinyMCE from 'tinymce/tinymce'
-// import 'tinymce/themes/silver'
-// import Editor from '@tinymce/tinymce-vue'
-// import 'tinymce/plugins/print'
-// import 'tinymce/plugins/preview'
-// import 'tinymce/plugins/fullpage'
-// import 'tinymce/plugins/searchreplace'
-// import 'tinymce/plugins/autolink'
-// import 'tinymce/plugins/directionality'
-// import 'tinymce/plugins/code'
-// import 'tinymce/plugins/visualblocks'
-// import 'tinymce/plugins/visualchars'
-// import 'tinymce/plugins/fullscreen'
-// import 'tinymce/plugins/image'
-// import 'tinymce/plugins/link'
-// import 'tinymce/plugins/media'
-// import 'tinymce/plugins/template'
-// import 'tinymce/plugins/codesample'
-// import 'tinymce/plugins/table'
-// import 'tinymce/plugins/charmap'
-// import 'tinymce/plugins/hr'
-// import 'tinymce/plugins/pagebreak'
-// import 'tinymce/plugins/nonbreaking'
-// import 'tinymce/plugins/anchor'
-// import 'tinymce/plugins/toc'
-// import 'tinymce/plugins/insertdatetime'
-// import 'tinymce/plugins/advlist'
-// import 'tinymce/plugins/lists'
-// import 'tinymce/plugins/wordcount'
-// import 'tinymce/plugins/imagetools'
-// import 'tinymce/plugins/textpattern'
+import tinyMCE from "tinymce/tinymce";
 export default {
   props: {
     value: String
@@ -136,14 +106,12 @@ export default {
       });
     };
     //初始化tinymce编辑器
-    window.tinyMCE.init(init);
+    tinyMCE.init(init);
     //赋初值
     this.htmlContent = this.value;
-    window.tinyMCE.editors["tinymce-textarea"].setContent(this.htmlContent);
-    window.tinyMCE.editors["tinymce-textarea"].on("KeyUp", e => {
-      this.htmlContent = window.tinyMCE.editors[
-        "tinymce-textarea"
-      ].getContent();
+    tinyMCE.editors["tinymce-textarea"].setContent(this.htmlContent);
+    tinyMCE.editors["tinymce-textarea"].on("KeyUp", e => {
+      this.htmlContent = tinyMCE.editors["tinymce-textarea"].getContent();
     });
   }
 };

@@ -11,7 +11,11 @@
         >
           <ace ref="ace"></ace>
         </div>
-        <div id="resizor" title="拖动我" v-show="editorModeShow && previewShow === 'show'"></div>
+        <div
+          id="resizor"
+          title="拖动我"
+          v-show="editorModeShow && previewShow === 'show'"
+        ></div>
         <div
           :class="
             'xkeditor-right ' +
@@ -26,14 +30,20 @@
             ref="htmlView"
           ></div>
         </div>
-        <div class="xk-col-24" v-show="!editorModeShow" v-if="setting.xkSetting.enableTinyMCE">
+        <div
+          class="xk-col-24"
+          v-show="!editorModeShow"
+          v-if="setting.xkSetting.enableTinyMCE"
+        >
           <tinymce ref="tinymce"></tinymce>
         </div>
         <button
           class="xk-button close-preview-full"
           @click="switchPreviewFull()"
           v-show="editorModeShow && previewShow === 'full'"
-        >关闭</button>
+        >
+          关闭
+        </button>
         <transition name="slide-fade">
           <div id="toc" v-show="showToc"></div>
         </transition>
@@ -43,7 +53,10 @@
       </div>
     </template>
     <graff-board></graff-board>
-    <div :class="'xkeditor-toast ' + (toast.status !== '' ? toast.status : '')" v-show="toast.show">
+    <div
+      :class="'xkeditor-toast ' + (toast.status !== '' ? toast.status : '')"
+      v-show="toast.show"
+    >
       <i v-show="toast.loading"></i>
       <p>{{ toast.message }}</p>
     </div>
@@ -60,11 +73,11 @@ import GraffBoard from "./GraffBoard";
 import axios from "axios";
 //HTML和Markdown互转
 import { toHtml, toMarkdown, getTocHtml } from "../utils/switchContent";
+import Prism from "prismjs";
 
-// import katex from "katex"
-// import "katex/dist/katex.min.css"
-// import renderMathInElement from "katex/dist/contrib/auto-render"
-// import mermaid from "mermaid"
+import katex from "katex";
+import renderMathInElement from "katex/dist/contrib/auto-render";
+import mermaid from "mermaid";
 
 //fa icon
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -163,7 +176,7 @@ export default {
       document.head.appendChild(css);
     },
     initEditor() {
-      window.mermaid.initialize({ startOnLoad: true });
+      mermaid.initialize({ startOnLoad: true });
       //初始化scroll操作
       this.initScroll();
       //初始化TOC
@@ -192,7 +205,7 @@ export default {
         //更新TOC icon
         this.updateTocTree();
         //转换Tex公式
-        window.renderMathInElement(document.getElementById("previewHtml"), {
+        renderMathInElement(document.getElementById("previewHtml"), {
           delimiters: [
             { left: "$$", right: "$$" },
             { left: "```math", right: "```" },
@@ -202,7 +215,7 @@ export default {
         });
         //转换Mermaid图
         try {
-          window.mermaid.init({ noteMargin: 10 }, ".xkeditor-mermaid");
+          mermaid.init({ noteMargin: 10 }, ".xkeditor-mermaid");
         } catch (error) {
           console.log("May have errors");
         }
@@ -233,7 +246,7 @@ export default {
       this.htmlViewContent = val;
       this.renderNextTick();
       this.$nextTick(() => {
-        window.Prism.highlightAll();
+        Prism.highlightAll();
       });
     }
   }

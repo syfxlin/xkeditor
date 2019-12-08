@@ -12,20 +12,10 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.17",
-    "@fortawesome/free-solid-svg-icons": "^5.8.1",
-    "@fortawesome/vue-fontawesome": "^0.1.6",
-    "@tinymce/tinymce-vue": "^2.0.0",
-    "ace-builds": "^1.4.3",
+    "@fortawesome/fontawesome-svg-core": "^1.2.25",
+    "@fortawesome/free-solid-svg-icons": "^5.11.2",
+    "@fortawesome/vue-fontawesome": "^0.1.8",
     "axios": "^0.18.0",
-    "emoji-js": "^3.4.1",
-    "katex": "^0.10.1",
-    "marked": "^0.6.1",
-    "mermaid": "^8.0.0",
-    "prismjs": "^1.16.0",
-    "tinymce": "^5.0.3",
-    "turndown": "^5.0.3",
-    "turndown-plugin-gfm": "^1.0.2",
     "vue": "^2.6.10"
   },
   "devDependencies": {

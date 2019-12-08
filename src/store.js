@@ -1,4 +1,6 @@
 import Vue from "vue";
+import ace from "ace-builds";
+import tinyMCE from "tinymce/tinymce";
 import { toHtml, toMarkdown } from "./utils/switchContent";
 import { initPaint } from "./utils/paint";
 import axios from "axios";
@@ -121,15 +123,15 @@ const actions = {
   },
   setTinyValue(val) {
     state.htmlContent = val;
-    window.tinyMCE.editors["tinymce-textarea"].setContent(state.htmlContent);
+    tinyMCE.editors["tinymce-textarea"].setContent(state.htmlContent);
   },
   initAceEditor(value, setting, ele) {
     setting.value = value ? value : "";
-    window.ace.config.set(
+    ace.config.set(
       "basePath",
       "https://cdn.jsdelivr.net/npm/ace-builds@1.4.4/src-noconflict/"
     );
-    state.aceEditor = window.ace.edit(ele, setting);
+    state.aceEditor = ace.edit(ele, setting);
     if (window.isMobile) {
       actions.execCommand("switchPreview");
     }
@@ -702,7 +704,7 @@ const actions = {
     let range = state.aceEditor.getSelectionRange();
     if (isStart) {
       for (let i = range.start.row; i <= range.end.row; i++) {
-        state.aceEditor.session.replace(new window.ace.Range(i, 0, i, 0), str);
+        state.aceEditor.session.replace(new ace.Range(i, 0, i, 0), str);
       }
     } else {
       state.aceEditor.session.replace(range, str);

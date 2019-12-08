@@ -1,17 +1,12 @@
 // "use strict";
 import marked from "marked";
 import turndown from "turndown";
-var turndownGfm = require("turndown-plugin-gfm");
+import turndownGfm from "turndown-plugin-gfm";
+import Prism from "prismjs";
+import EmojiConvertor from "emoji-js";
 import store from "../store";
 
-// import Prism from 'prismjs'
-// import 'prismjs/themes/prism-okaidia.css'
-// import 'prismjs/plugins/line-numbers/prism-line-numbers.css'
-// import 'prismjs/plugins/toolbar/prism-toolbar.css'
-// import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.min'
-// import EmojiConvertor from "emoji-js"
-
-var emoji = new window.EmojiConvertor();
+var emoji = new EmojiConvertor();
 emoji.replace_mode = "unified";
 
 var tocContent = [];
@@ -297,8 +292,8 @@ export function toHtml(val, isFull) {
         ).replace(/s(?=cript)/, "S");
       var lineNums = "<span></span>".repeat(code.split("\n").length);
       if (
-        window.Prism.languages[language] != null &&
-        window.Prism.languages[language] != undefined
+        Prism.languages[language] != null &&
+        Prism.languages[language] != undefined
       ) {
         return (
           '<div class="code-toolbar"><pre class="line-numbers language-' +
@@ -306,10 +301,10 @@ export function toHtml(val, isFull) {
           '"><code class="language-' +
           language +
           '">' +
-          window.Prism.highlight(
+          Prism.highlight(
             code,
-            window.Prism.languages[language],
-            window.Prism.languages[language]
+            Prism.languages[language],
+            Prism.languages[language]
           ) +
           '<span aria-hidden="true" class="line-numbers-rows">' +
           lineNums +
