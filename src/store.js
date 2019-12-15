@@ -955,6 +955,14 @@ const actions = {
         exec: () => {
           actions.execCommand("format");
         }
+      },
+      {
+        name: "switchPasteFormat",
+        win: "Ctrl-Q",
+        mac: "Command-Q",
+        exec: () => {
+          actions.execCommand("pasteFormat");
+        }
       }
     ];
     actions.execCommand("addKeys", keys);

@@ -105,6 +105,10 @@
         <td>插入链接</td>
       </tr>
       <tr>
+        <td>Ctrl + Q / Command + Q</td>
+        <td>切换粘贴转化</td>
+      </tr>
+      <tr>
         <td>Ctrl + U / Command + U</td>
         <td>插入无序列表</td>
       </tr>
