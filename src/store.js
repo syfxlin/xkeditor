@@ -1050,6 +1050,7 @@ const actions = {
         setting: state.setting,
         toMarkdown: toMarkdown,
         toHtml: toHtml,
+        execCommand: (command, data) => actions.execCommand(command, data),
         setSetting: setting => {
           Vue.set(state, "setting", setting);
           if (window.XKEditor) {
@@ -1129,6 +1130,9 @@ const actions = {
         },
         switchTypewriter: data => {
           actions.execCommand("typewriter", true);
+        },
+        formatContent() {
+          actions.execCommand("format");
         },
         setLocalStorage: filename => {
           window.localStorage.setItem(
