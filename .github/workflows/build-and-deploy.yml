@@ -1,0 +1,24 @@
+name: XK-Editor
+
+on: [push, pull_request, repository_dispatch]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - name: Build      
+        run: |
+          yarn install
+          yarn build
+      - name: Deploy
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          local: dist
+          remote: ${{ secrets.TARGET }}
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
