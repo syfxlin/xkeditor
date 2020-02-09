@@ -253,7 +253,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 .xkeditor {
   height: 100%;
   overflow-x: hidden;
@@ -284,29 +284,73 @@ export default {
   white-space: normal;
   overflow-y: auto;
   height: 100%;
-}
-.toc ul,
-#toc ul {
-  margin: 0px;
-  padding-left: 20px;
-}
-.toc li,
-#toc li {
-  list-style: none;
-  padding-left: 5px;
-}
-.toc li img,
-#toc li img {
-  display: inline-block;
-  width: 14px;
-  vertical-align: middle;
-  padding-right: 5px;
-}
-.toc a,
-#toc a {
-  color: #0366d6;
-  text-decoration: none;
-  font-size: 1.05em;
+
+  ul {
+    margin: 0px;
+    padding-left: 20px;
+  }
+
+  li {
+    list-style: none;
+    padding-left: 5px;
+
+    i {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      margin-right: 5px;
+      margin-top: 2px;
+
+      background-image: url("/static/svg/disc.svg");
+      background-size: cover;
+      background-position: center;
+
+      &.can-active {
+        background-image: url("/static/svg/minus-square.svg");
+
+        + a + ul {
+          display: block;
+        }
+      }
+
+      &.active {
+        background-image: url("/static/svg/plus-square.svg");
+
+        + a + ul {
+          display: none;
+        }
+      }
+
+      @at-root {
+        .toc,
+        #toc {
+          &.default-fold i {
+            &.can-active {
+              background-image: url("/static/svg/plus-square.svg");
+
+              + a + ul {
+                display: none;
+              }
+            }
+
+            &.active {
+              background-image: url("/static/svg/minus-square.svg");
+
+              + a + ul {
+                display: block;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  a {
+    color: #0366d6;
+    text-decoration: none;
+    font-size: 1.05em;
+  }
 }
 .row {
   margin: 0px;

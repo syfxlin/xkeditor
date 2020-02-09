@@ -10,11 +10,13 @@ var emoji = new EmojiConvertor();
 emoji.replace_mode = "unified";
 
 var tocContent = [];
+
 export function getTocHtml() {
   var html = getTocHtmlTree(0, "");
   window.$toc = html;
   return html;
 }
+
 function getTocHtmlTree(index, str) {
   if (index >= tocContent.length) return str;
   if (index == 0) {
@@ -47,12 +49,7 @@ function getTocHtmlTree(index, str) {
   } else {
     tocUrl = "javascript:sta('" + tocUrl + "');";
   }
-  str +=
-    '<li><img class="toc-img" src="/static/svg/disc.svg"><a href="' +
-    tocUrl +
-    '">' +
-    tocContent[index].title +
-    "</a>";
+  str += `<li><i class="toc-icon"></i><a href="${tocUrl}">${tocContent[index].title}</a>`;
   return getTocHtmlTree(index + 1, str);
 }
 
@@ -178,105 +175,103 @@ var Languages = {
   yml: "YAML"
 };
 
+// 公用解析器
+function commonParse(text) {
+  // :emoji:
+  text = text.replace(/(:.*:)/g, function($1, $2) {
+    return emoji.replace_colons($2);
+  });
+  // [Text]{style|label}
+  // [Text]{color,bg_color}
+  text = text.replace(
+    /(\[([^\[\]]*)]{([^{}|]*)(\|span|\|p|\|font|\||)})/g,
+    function($1, $2, $3, $4, $5) {
+      if ($3 === "graff") {
+        return `[graff]{${$4}}`;
+      }
+      if ($5 == "|" || $5 == "" || $5 == null) {
+        $5 = "span";
+      } else {
+        $5 = $5.substring(1);
+      }
+      if ($4.indexOf(":") === -1) {
+        let color = $4.split(",");
+        $4 = `color: ${color[0]}; background-color: ${color[1]}`;
+      }
+      return `<${$5} style="${$4}">${$3}</${$5}>`;
+    }
+  );
+  return text;
+}
+
 export function toHtml(val, isFull) {
   tocContent = [];
   var markedRenderer = new marked.Renderer();
   markedRenderer.paragraph = function(text) {
     var args = arguments;
-    if (/\[graff]{(.*)}/g.test(text)) {
-      args[0] = text.replace(/\[graff]{(.*)}/g, function($1, $2) {
-        return (
-          '<img class="graffiti" src="' +
-          store.state.setting.xkSetting.graffUrl +
-          "graff-" +
-          $2 +
-          ".png" +
-          '">'
-        );
-      });
-    } else if (/\[(.*)]{(.*)}/g.test(text)) {
-      args[0] = text.replace(
-        /(\[([^\[\]]*)]{([^{}|]*)(\|span|\|p|\|font|\||)})/g,
-        function($1, $2, $3, $4, $5) {
-          if ($5 == "|" || $5 == "" || $5 == null) {
-            $5 = "p";
-          } else {
-            $5 = $5.substring(1);
-          }
-          return "<" + $5 + ' style="' + $4 + '">' + $3 + "</" + $5 + ">";
-        }
+    text = commonParse(text);
+    // [graff]{hash}
+    text = text.replace(/\[graff]{(.*)}/g, function($1, $2) {
+      return (
+        '<img class="graffiti" src="' +
+        store.state.setting.xkSetting.graffUrl +
+        "graff-" +
+        $2 +
+        ".png" +
+        '">'
       );
-    }
-    if (/\[TOC\]/g.test(text)) {
-      args[0] = '<div class="toc"></div>';
-    }
-    if (/:(.*):/g.test(text)) {
-      args[0] = text.replace(/(:.*:)/g, function($1, $2) {
-        return emoji.replace_colons($2);
-      });
-    }
+    });
+    // [TOC]
+    // [TOC :fold]
+    text = text.replace(/\[TOC([^\]]*)\]/g, function($1, $2) {
+      return `<div class="toc ${$2 === " :fold" ? "default-fold" : ""}"></div>`;
+    });
+    args[0] = text;
     return marked.Renderer.prototype.paragraph.apply(this, args);
   };
   markedRenderer.heading = function(title, level) {
     var args = arguments;
     tocContent.push({ title: title, level: level });
-    if (/:(.*):/g.test(title)) {
-      args[0] = title.replace(/(:.*:)/g, function($1, $2) {
-        return emoji.replace_colons($2);
-      });
-    }
+    args[0] = commonParse(title);
     return marked.Renderer.prototype.heading.apply(this, args);
   };
   markedRenderer.blockquote = function(quote) {
     var args = arguments;
-    if (/:(.*):/g.test(quote)) {
-      args[0] = quote.replace(/(:.*:)/g, function($1, $2) {
-        return emoji.replace_colons($2);
-      });
-    }
+    args[0] = commonParse(quote);
     return marked.Renderer.prototype.blockquote.apply(this, args);
   };
   markedRenderer.code = function(code, language) {
     if (language === "math" || language === "tex") {
-      return (
-        '<pre class="xkeditor-tex">```' +
-        language +
-        "\n" +
-        code +
-        "\n```</pre>\n"
-      );
+      return `<pre class="xkeditor-tex">\`\`\`${language}\n${code}\n\`\`\`</pre>`;
     }
     if (/flow(TB|BT|RL|LR|TD)$/.test(language)) {
-      return (
-        '<pre class="xkeditor-mermaid">graph ' +
-        language.substring(language.length - 2) +
-        "\n" +
-        code +
-        "</pre>"
-      );
+      return `<pre class="xkeditor-mermaid">graph ${language.substring(
+        language.length - 2
+      )}\n${code}</pre>`;
     }
     if (language === "seq") {
-      return (
-        '<pre class="xkeditor-mermaid">sequenceDiagram\n' + code + "</pre>"
-      );
+      return `<pre class="xkeditor-mermaid">sequenceDiagram\n${code}</pre>`;
     }
     if (language === "gantt") {
-      return '<pre class="xkeditor-mermaid">gantt\n' + code + "</pre>";
+      return `<pre class="xkeditor-mermaid">gantt\n${code}</pre>`;
     }
     if (language === "mermaid") {
-      return '<pre class="xkeditor-mermaid">' + code + "</pre>";
+      return `<pre class="xkeditor-mermaid">${code}</pre>`;
     }
     var runExt = "";
     if (language.indexOf("run-") === 0) {
       language = language.substring(4);
-      runExt =
-        "<button language=" +
-        language +
-        ' class="run-code-btn">运行</button>' +
-        '<button class="reset-code-btn">重置</button>' +
-        '<button class="input-code-btn">输入</button>' +
-        '<div class="run-code-input"><textarea></textarea></div>' +
-        '<div class="run-code-output"><code></code></div>';
+      runExt = `
+        <button language="${language}" class="run-code-btn">运行</button>\
+        <button class="reset-code-btn">重置</button>
+        <button class="input-code-btn">输入</button>
+        <div class="run-code-input">
+          <textarea></textarea>
+        </div>
+        <div class="run-code-output">
+          <code></code>
+        </div>
+      `;
       if (language === "node") {
         language = "javascript";
       }
@@ -308,7 +303,7 @@ export function toHtml(val, isFull) {
           ) +
           '<span aria-hidden="true" class="line-numbers-rows">' +
           lineNums +
-          '</code></pre><div class="toolbar"><div class="toolbar-item"><a>Copy</a></div><div class="toolbar-item"><span>' +
+          '</code></pre><div class="toolbar"><div class="toolbar-item"><span>' +
           langTitle +
           "</span></div></div></div>" +
           runExt
@@ -447,7 +442,7 @@ export function toMarkdown(htmlVal, styleSwitch = true) {
               out += parseStyle[i] + ":" + node.style[parseStyle[i]] + ";";
             }
           }
-          if (node.localName === "p") {
+          if (node.localName === "span") {
             out += "}";
           } else {
             out += "|" + node.localName + "}";

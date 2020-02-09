@@ -11,14 +11,8 @@ window.isMobile = /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry
 );
 
 window.toggleToc = ele => {
-  var display = ele.nextElementSibling.nextElementSibling.style.display;
-  if (display === "" || display === "block") {
-    ele.nextElementSibling.nextElementSibling.style.display = "none";
-    ele.setAttribute("src", "/static/svg/plus-square.svg");
-  } else {
-    ele.nextElementSibling.nextElementSibling.style.display = "block";
-    ele.setAttribute("src", "/static/svg/minus-square.svg");
-  }
+  ele.classList.toggle("active");
+  ele.nextElementSibling.nextElementSibling.classList.toggle("active");
 };
 
 const state = Vue.observable({
@@ -1356,14 +1350,11 @@ const actions = {
   },
   updateTocTree() {
     var items = document.querySelectorAll(
-      "#toc .toc-img ~ ul,.toc .toc-img ~ ul"
+      "#toc .toc-icon ~ ul,.toc .toc-icon ~ ul"
     );
     for (let i = 0; i < items.length; i++) {
-      items[i].parentNode.children[0].setAttribute(
-        "src",
-        "/static/svg/minus-square.svg"
-      );
-      items[i].parentNode.children[0].setAttribute(
+      items[i].parentElement.children[0].classList.add("can-active");
+      items[i].parentElement.children[0].setAttribute(
         "onclick",
         "toggleToc(this)"
       );
