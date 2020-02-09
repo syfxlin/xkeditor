@@ -231,9 +231,9 @@ export default {
     markdownContent(val) {
       //最少延迟250ms转换为html以保证性能，否则会造成输入卡顿
       var delay =
-        this.setting.xkSetting.delayToHtml >= 250
+        this.setting.xkSetting.delayToHtml >= 500
           ? this.setting.xkSetting.delayToHtml
-          : 250;
+          : 500;
       if (this.delayToHtml) {
         clearTimeout(this.delayToHtml);
       }
@@ -566,6 +566,15 @@ export default {
   &:hover {
     background-color: #333;
     color: #fff;
+  }
+}
+
+.notebox {
+  margin: 15px 0;
+  padding: 1em;
+
+  p {
+    margin: 0px !important;
   }
 }
 

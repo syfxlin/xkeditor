@@ -175,6 +175,18 @@ var Languages = {
   yml: "YAML"
 };
 
+var Colors = {
+  gray: "rgba(206, 205, 202, 0.5)",
+  brown: "rgba(155, 154, 151, 0.4)",
+  orange: "rgba(245, 93, 0, 0.2)",
+  yellow: "rgba(233, 168, 0, 0.2)",
+  green: "rgba(0, 135, 107, 0.2)",
+  blue: "rgba(0, 120, 223, 0.2)",
+  purple: "rgba(103, 36, 222, 0.2)",
+  pink: "rgba(221, 0, 129, 0.2)",
+  red: "rgba(255, 0, 26, 0.2)"
+};
+
 // 公用解析器
 function commonParse(text) {
   // :emoji:
@@ -195,7 +207,10 @@ function commonParse(text) {
         $5 = $5.substring(1);
       }
       if ($4.indexOf(":") === -1) {
-        let color = $4.split(",");
+        let color =
+          $4.indexOf(",") === -1 && Colors[$4]
+            ? ["rgb(55, 53, 47)", Colors[$4]]
+            : $4.split(",");
         $4 = `color: ${color[0]}; background-color: ${color[1]}`;
       }
       return `<${$5} style="${$4}">${$3}</${$5}>`;
@@ -226,6 +241,17 @@ export function toHtml(val, isFull) {
     text = text.replace(/\[TOC([^\]]*)\]/g, function($1, $2) {
       return `<div class="toc ${$2 === " :fold" ? "default-fold" : ""}"></div>`;
     });
+    // details summary [det :text][/det]
+    text = text.replace(/\[(|\/)(det|details)([^\]]*)\]/g, function(
+      $1,
+      $2,
+      $3
+    ) {
+      if ($2 !== "/" && $3.substring(0, 2) === " :") {
+        $3 = `<summary>${$3.substring(2)}</summary>\n`;
+      }
+      return `<${$2}details>${$3}`;
+    });
     args[0] = text;
     return marked.Renderer.prototype.paragraph.apply(this, args);
   };
@@ -237,8 +263,92 @@ export function toHtml(val, isFull) {
   };
   markedRenderer.blockquote = function(quote) {
     var args = arguments;
-    args[0] = commonParse(quote);
+    quote = commonParse(quote);
+    // > :color,bg_color text
+    if (/^(|<p>):([^ ]*)/g.test(quote)) {
+      return quote.replace(/^(|<p>):([^ ]*) (.*)/g, function($1, $2, $3, $4) {
+        let [color, bg_color] = $3.split(",");
+        return `<div class="notebox" style="color: ${color};background-color: ${bg_color}">${$2 + $4}</div>`;
+      });
+    }
+    args[0] = quote;
     return marked.Renderer.prototype.blockquote.apply(this, args);
+  };
+  markedRenderer.image = function(href, title, text) {
+    // var args = arguments;
+    let options = "controls ";
+    if (title && title.charAt(0) === ":") {
+      let optTemp = "";
+      [optTemp, title] = title.substring(1).split("|");
+      for (const opt of optTemp.split(";")) {
+        if (opt.indexOf("=") === -1) {
+          options += opt + " ";
+        } else {
+          options += opt.replace("=", '="') + '"';
+        }
+      }
+    }
+    // ![vid alt](src ":option|title")
+    if (/^(vid|video)/g.test(text)) {
+      text = text.replace(/^(vid|video)(| )/g, "");
+      return `<video src="${href}" ${
+        title ? 'title="' + title + '"' : ""
+      } ${options}>${text}</video>`;
+    }
+    // ![aud alt](src ":option|title")
+    if (/^(aud|audio)/g.test(text)) {
+      text = text.replace(/^(aud|audio)(| )/g, "");
+      return `<audio src="${href}" ${
+        title ? 'title="' + title + '"' : ""
+      } ${options}>${text}</audio>`;
+    }
+    // return marked.Renderer.prototype.image.apply(this, args);
+    // ![alt](src ":option|title")
+    return `<img src="${href}" ${
+      title ? 'title="' + title + '"' : ""
+    } ${options} alt="${text}" />`;
+  };
+  markedRenderer.link = function(href, title, text) {
+    var args = arguments;
+    // [inc=type](href ":option|title")
+    if (/^(inc|include)=/g.test(text)) {
+      let type = text.replace(/^(inc|include)=/g, "");
+      let options = "";
+      if (title && title.charAt(0) === ":") {
+        let optTemp = "";
+        [optTemp, title] = title.substring(1).split("|");
+        for (const opt of optTemp.split(";")) {
+          if (opt.indexOf("=") === -1) {
+            options += opt + " ";
+          } else {
+            options += opt.replace("=", '="') + '"';
+          }
+        }
+      }
+      if (type === "iframe") {
+        return `<iframe src="${href}" ${
+          title ? 'title="' + title + '"' : ""
+        } ${options}></iframe>`;
+      }
+    }
+    return marked.Renderer.prototype.link.apply(this, args);
+  };
+  markedRenderer.codespan = function(code) {
+    var args = arguments;
+    if (/(.*) {([^}]*)}$/g.test(code)) {
+      return code.replace(/(.*) {([^}]*)}$/g, function($1, $2, $3) {
+        if ($3.indexOf(":") === -1) {
+          let color =
+            $3.indexOf(",") === -1 && Colors[$3]
+              ? ["rgb(55, 53, 47)", Colors[$3]]
+              : $3.split(",");
+          $3 = `color: ${color[0]}; background-color: ${color[1]}`;
+        }
+        return `<code style="${$3}">${$2}</code>`;
+      });
+    }
+    args[0] = code;
+    return marked.Renderer.prototype.codespan.apply(this, args);
   };
   markedRenderer.code = function(code, language) {
     if (language === "math" || language === "tex") {
