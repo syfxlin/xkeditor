@@ -106,61 +106,93 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss">
 th {
   text-align: left;
 }
+
 .help {
   overflow-y: auto;
   height: 50vh;
 }
+
 .info {
   overflow-y: auto;
+
+  p {
+    font-size: 0.9em;
+  }
+  * {
+    margin: 5px;
+  }
 }
-.info p {
-  font-size: 0.9em;
-}
-.info * {
-  margin: 5px;
-}
+
 .show {
   display: block;
 }
+
 .hide {
   display: none;
 }
+
 .ace-container {
   position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
+
+  .bookmarklet {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 20px;
+    height: 20px;
+    z-index: 2;
+    cursor: pointer;
+    border-width: 9px;
+    border-style: solid;
+    border-color: lightblue gray gray rgb(206, 173, 230);
+    border-image: initial;
+  }
 }
-.ace-container .bookmarklet {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 20px;
-  height: 20px;
-  z-index: 2;
-  cursor: pointer;
-  border-width: 9px;
-  border-style: solid;
-  border-color: lightblue gray gray rgb(206, 173, 230);
-  border-image: initial;
-}
+
 .ace-toolbar {
   background: #fff;
+
+  span {
+    padding: 0px;
+  }
+
+  .xk-button {
+    background: none;
+    color: #6190e8;
+    color: #3f536e;
+    border: none;
+    font-size: 1em;
+    padding: 0.2em 0.4em;
+    margin: 0.2em;
+
+    &:hover {
+      color: #fff;
+      background: #6190e8a0;
+    }
+
+    &.active {
+      color: #fff;
+      background: #6190e8;
+    }
+  }
 }
-.ace-toolbar span {
-  padding: 0px;
-}
+
 .ace-toolbar-modal .xk-input {
   margin-top: 5px;
   margin-bottom: 10px;
 }
+
 .ace-editor {
   flex: 1;
 }
+
 .xk-button {
   display: inline-block;
   padding: 6px 16px;
@@ -182,25 +214,6 @@ th {
 }
 
 .xk-button-primary {
-  color: #fff;
-  background: #6190e8;
-}
-.ace-toolbar .xk-button {
-  background: none;
-  color: #6190e8;
-  color: #3f536e;
-  border: none;
-  font-size: 1em;
-  padding: 0.2em 0.4em;
-  margin: 0.2em;
-}
-
-.ace-toolbar .xk-button:hover {
-  color: #fff;
-  background: #6190e8a0;
-}
-
-.ace-toolbar .xk-button.active {
   color: #fff;
   background: #6190e8;
 }

@@ -22,8 +22,11 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
+html,
 body {
+  width: 100%;
+  height: 100%;
   background-color: #fff;
   color: #3f536e;
   line-height: 1.5;
@@ -32,19 +35,13 @@ body {
     Arial, sans-serif;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
-}
-
-html,
-body {
-  width: 100%;
-  height: 100%;
-}
-body {
   margin: 0;
 }
+
 p {
   margin: 0;
 }
+
 /* 滚动槽 */
 ::-webkit-scrollbar {
   width: 6px;
@@ -61,6 +58,7 @@ p {
   background: rgba(0, 0, 0, 0.12);
   -webkit-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
 }
+
 #app {
   width: 100%;
   height: 100%;

@@ -258,14 +258,17 @@ export default {
   height: 100%;
   overflow-x: hidden;
   overflow-y: hidden;
+
+  .row {
+    height: 100%;
+    transform: translate(0, 0);
+
+    .xk-col-12 {
+      height: 100%;
+    }
+  }
 }
-.xkeditor .row {
-  height: 100%;
-  transform: translate(0, 0);
-}
-.xkeditor .row .xk-col-12 {
-  height: 100%;
-}
+
 #previewHtml {
   overflow: auto;
   max-height: 100%;
@@ -274,10 +277,12 @@ export default {
   white-space: normal;
   box-sizing: border-box;
 }
+
 .xk-col-24 #previewHtml {
   float: left;
   width: 80%;
 }
+
 .toc,
 #toc {
   word-break: break-word;
@@ -354,28 +359,33 @@ export default {
 }
 .row {
   margin: 0px;
+
+  .xk-col-12 {
+    float: left;
+    border-left: 1px solid #ddd;
+    box-sizing: border-box;
+  }
 }
-.row .xk-col-12 {
-  float: left;
-  border-left: 1px solid #ddd;
-  box-sizing: border-box;
-}
+
 .xk-col-24 {
   padding: 0px;
   width: 100%;
   height: 100%;
 }
+
 .xk-col-12 {
   padding: 0px;
   width: 50%;
   height: 100%;
 }
+
 .close-preview-full {
   position: fixed;
   right: 20px;
   top: 20px;
   z-index: 1000;
 }
+
 #toc {
   position: fixed;
   top: 0px;
@@ -387,6 +397,7 @@ export default {
   padding: 20px;
   box-sizing: border-box;
 }
+
 #toc-button {
   position: fixed;
   right: 20px;
@@ -397,6 +408,7 @@ export default {
   z-index: 1000;
   box-sizing: content-box;
 }
+
 .xk-button {
   display: inline-block;
   padding: 6px 16px;
@@ -440,44 +452,44 @@ export default {
   background-color: #03b8cf;
   color: #fff;
   border-radius: 20px;
-}
 
-.xkeditor-toast.error {
-  background-color: #ea644a;
-}
+  &.error {
+    background-color: #ea644a;
+  }
 
-.xkeditor-toast.success {
-  background-color: #38b03f;
-}
+  &.success {
+    background-color: #38b03f;
+  }
 
-.xkeditor-toast p {
-  padding: 10px 15px;
-  display: inline-block;
-}
+  p {
+    padding: 10px 15px;
+    display: inline-block;
+  }
 
-.xkeditor-toast i {
-  width: 0.8rem;
-  height: 0.8rem;
-  display: inline-block;
-  padding: 0 0 0 15px;
-}
+  i {
+    width: 0.8rem;
+    height: 0.8rem;
+    display: inline-block;
+    padding: 0 0 0 15px;
 
-.xkeditor-toast i:after {
-  animation: loading 0.5s infinite linear;
-  border: 0.1rem solid #fff;
-  border-radius: 50%;
-  border-right-color: transparent;
-  border-top-color: transparent;
-  content: "";
-  display: block;
-  height: 0.8rem;
-  left: 50%;
-  margin-left: -0.4rem;
-  margin-top: -0.4rem;
-  position: relative;
-  top: 50%;
-  width: 0.8rem;
-  z-index: 1;
+    &:after {
+      animation: loading 0.5s infinite linear;
+      border: 0.1rem solid #fff;
+      border-radius: 50%;
+      border-right-color: transparent;
+      border-top-color: transparent;
+      content: "";
+      display: block;
+      height: 0.8rem;
+      left: 50%;
+      margin-left: -0.4rem;
+      margin-top: -0.4rem;
+      position: relative;
+      top: 50%;
+      width: 0.8rem;
+      z-index: 1;
+    }
+  }
 }
 
 .run-code-output,
@@ -487,48 +499,52 @@ export default {
   position: relative;
   width: 100%;
   font-family: courier;
-}
 
-.run-code-output code,
-.run-code-input textarea {
-  width: 100%;
-  height: 100px;
-  margin: 0 0.8rem;
-  white-space: pre;
-  vertical-align: middle;
-  word-break: break-word;
-  overflow-y: auto;
-  background-color: #fff !important;
-  margin: 0;
-  border: 0.05rem solid #bcc3ce;
-  box-shadow: 2px 2px 5px -2px rgba(0, 0, 0, 0.1);
-  padding: 0.5rem 0.7rem !important;
-}
+  code,
+  textarea {
+    width: 100%;
+    height: 100px;
+    margin: 0 0.8rem;
+    white-space: pre;
+    vertical-align: middle;
+    word-break: break-word;
+    overflow-y: auto;
+    background-color: #fff !important;
+    margin: 0;
+    border: 0.05rem solid #bcc3ce;
+    box-shadow: 2px 2px 5px -2px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem 0.7rem !important;
+  }
 
-.run-code-input textarea {
-  height: 3rem;
-  display: none;
-}
+  textarea {
+    height: 3rem;
+    display: none;
+  }
 
-.run-code-output code:empty {
-  display: none;
-  margin: 0;
-}
+  code {
+    &:empty {
+      display: none;
+      margin: 0;
+    }
 
-.run-code-output code span.process {
-  color: #3280fc;
-}
+    span {
+      &.process {
+        color: #3280fc;
+      }
 
-.run-code-output code span.success {
-  color: #32b643;
-}
+      &.success {
+        color: #32b643;
+      }
 
-.run-code-output code span.error {
-  color: #ea644a;
-}
+      &.error {
+        color: #ea644a;
+      }
 
-.run-code-output code span.o1 {
-  color: #f1a325;
+      &.o1 {
+        color: #f1a325;
+      }
+    }
+  }
 }
 
 .run-code-btn,
@@ -546,13 +562,11 @@ export default {
   margin-right: 0.5rem;
   margin-bottom: 0.5rem;
   transition: all 0.5s;
-}
 
-.run-code-btn:hover,
-.reset-code-btn:hover,
-.input-code-btn:hover {
-  background-color: #333;
-  color: #fff;
+  &:hover {
+    background-color: #333;
+    color: #fff;
+  }
 }
 
 @media (max-width: 991px) {
