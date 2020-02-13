@@ -10,8 +10,8 @@ module.exports = {
   rules: {
     "no-console": "off",
     "no-debugger": "off",
-    "no-undef": "waring",
-    "no-unused-vars": "waring"
+    "no-undef": "warn",
+    "no-unused-vars": "warn"
   },
   overrides: [
     {
