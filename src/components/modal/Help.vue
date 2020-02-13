@@ -6,9 +6,9 @@
         <a href="http://www.markdown.cn/">Markdown 语法说明</a>
       </li>
       <li>
-        <a
-          href="https://help.github.com/articles/github-flavored-markdown/"
-        >GitHub Flavored Markdown</a>
+        <a href="https://help.github.com/articles/github-flavored-markdown/"
+          >GitHub Flavored Markdown</a
+        >
       </li>
     </ul>
     <h3>XK-Editor独有的语法</h3>
@@ -20,7 +20,9 @@
       </tr>
       <tr>
         <td>[text]{style|label}</td>
-        <td>text:内容，style:样式(css)，label:包裹的标签(span,p,font)默认为p</td>
+        <td>
+          text:内容，style:样式(css)，label:包裹的标签(span,p,font)默认为p
+        </td>
         <td>[这是蓝色的字]{color:blue} [灰色背景]{background:#ddd|span}</td>
       </tr>
       <tr>
@@ -29,6 +31,7 @@
         <td>在[TOC]位置填充目录</td>
       </tr>
     </table>
+
     <h3>键盘快捷键</h3>
     <blockquote>当编辑器取得焦点的时候才能使用快捷键</blockquote>
     <table>
@@ -161,12 +164,17 @@
         <td>格式化Markdown(美化)</td>
       </tr>
     </table>
+
     <h3>Emoji表情</h3>
-    <a href="https://www.webfx.com/tools/emoji-cheat-sheet/">EMOJI CHEAT SHEET</a>
+    <a href="https://www.webfx.com/tools/emoji-cheat-sheet/"
+      >EMOJI CHEAT SHEET</a
+    >
     <h3>流程图/时序图/甘特图</h3>
     <a href="https://mermaidjs.github.io/">mermaid - GitBook</a>
     <h3>Tex数学公式</h3>
-    <a href="https://juejin.im/post/5af93ec6518825428b38e7f4">markdown 数学公式Latex语法 - 掘金</a>
+    <a href="https://juejin.im/post/5af93ec6518825428b38e7f4"
+      >markdown 数学公式Latex语法 - 掘金</a
+    >
   </div>
 </template>
 

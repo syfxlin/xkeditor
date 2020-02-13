@@ -196,6 +196,7 @@ function commonParse(text) {
   // [Text]{style|label}
   // [Text]{color,bg_color}
   text = text.replace(
+    // eslint-disable-next-line no-useless-escape
     /(\[([^\[\]]*)]{([^{}|]*)(\|span|\|p|\|font|\||)})/g,
     function($1, $2, $3, $4, $5) {
       if ($3 === "graff") {
