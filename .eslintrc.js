@@ -1,23 +1,27 @@
 module.exports = {
+  root: true,
   env: {
-    browser: true,
-    es6: true,
-    commonjs: true,
-    node: true,
-    worker: true
+    node: true
   },
-  extends: ["eslint:recommended", "plugin:vue/essential"],
-  globals: {
-    Atomics: "readonly",
-    SharedArrayBuffer: "readonly"
-  },
+  extends: ["plugin:vue/essential", "eslint:recommended", "@vue/prettier"],
   parserOptions: {
-    ecmaVersion: 2018,
-    sourceType: "module"
+    parser: "babel-eslint"
   },
-  plugins: ["vue"],
   rules: {
-    "no-useless-escape": [0],
-    "no-unused-vars": [1]
-  }
+    "no-console": "off",
+    "no-debugger": "off",
+    "no-undef": "waring",
+    "no-unused-vars": "waring"
+  },
+  overrides: [
+    {
+      files: [
+        "**/__tests__/*.{j,t}s?(x)",
+        "**/tests/unit/**/*.spec.{j,t}s?(x)"
+      ],
+      env: {
+        jest: true
+      }
+    }
+  ]
 };
