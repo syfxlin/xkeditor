@@ -133,7 +133,8 @@ export default {
       "initTocTree",
       "initResizor",
       "updateRunCode",
-      "setValue"
+      "setValue",
+      "mergeTinyMCEOptions"
     ]),
     loadCss(url) {
       let css = document.createElement("link");
@@ -201,8 +202,16 @@ export default {
         this.setValue(val);
       }
     },
-    config(val) {
-      this.setting = mergeDeep(this.setting, val);
+    config: {
+      handler(val) {
+        this.setting = val;
+        if (window.XKEditor) {
+          window.XKEditor.tinymce.remove();
+          window.XKEditor.tinymce.init(this.mergeTinyMCEOptions());
+          window.XKEditor.ace.setOptions(val.aceSetting);
+        }
+      },
+      deep: true
     },
     markdownContent(val) {
       this.$emit("input", val);

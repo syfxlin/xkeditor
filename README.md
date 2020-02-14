@@ -14,9 +14,8 @@
   - [安装 Install](#%e5%ae%89%e8%a3%85-install)
     - [注意事项](#%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a1%b9)
     - [从 NPM 安装](#%e4%bb%8e-npm-%e5%ae%89%e8%a3%85)
-    - [调用方法](#%e8%b0%83%e7%94%a8%e6%96%b9%e6%b3%95)
     - [所需依赖](#%e6%89%80%e9%9c%80%e4%be%9d%e8%b5%96)
-    - [setting.json](#settingjson)
+    - [config](#config)
   - [运行代码块](#%e8%bf%90%e8%a1%8c%e4%bb%a3%e7%a0%81%e5%9d%97)
   - [文档 Doc](#%e6%96%87%e6%a1%a3-doc)
   - [维护者 Maintainer](#%e7%bb%b4%e6%8a%a4%e8%80%85-maintainer)
@@ -127,7 +126,7 @@ npm i --save xkeditor
 ```
 2. 将XK-Editor static文件复制到项目根目录
 ```bash
-cp -r ./node_modules/xkeditor/static ./
+cp -r ./node_modules/xkeditor/public/static ./
 ```
 3. 导入XK-Editor组件
 ```javascript
@@ -138,28 +137,11 @@ export default {
     }
 }
 ```
-
-### 调用方法
-
-1. 导入XK-Editor组件
-```javascript
-import XK_Editor from '@/components/XK_Editor'
-export default {
-    components: {
-        'xk-editor': XK_Editor
-    }
-}
-```
-2. 在合适的位置调用组件
-```javascript
-<xk-editor :settingApi="setting" :contentApi="content" />
-//settingApi: setting.json的地址，或者返回setting的API接口地址(GET)
-//contentApi: Markdown文件的地址，或者返回Markdown格式的API接口地址(GET)
-
-//or
-<xk-editor :settingProps="setting" :contentProps="content" />
-//setting: 即setting object，解析setting.json得到的对象
-//content： Markdown内容文本
+4. 使用XK-Editor组件
+```html
+<xk-editor :config="config" v-model="content" />
+<!-- config 是下方config内容，该参数是单向的，Editor内部的设置变动不会同步到父组件 -->
+<!-- v-model 对应Markdown内容，该参数是双向的，由于ACE和TinyMCE编辑器的限制，当该参数被外部修改的时候，即与内部Markdown内容不一致时，会触发ACE编辑器和TinyMCE的setValue，此时光标将会重置。 -->
 ```
 
 ### 所需依赖
@@ -181,72 +163,92 @@ turndown
 turndown-plugin-gfm
 ```
 
-### setting.json
+### config
 
-```json
-{
-  "tinymceSetting": {
-    "language_url": "/static/tinymce/langs/zh_CN.js",
-    "language": "zh_CN",
-    "skin_url": "/static/tinymce/skins/ui/oxide",
-    "body_class": "markdown-body",
-    "content_css": "/static/github-markdown.css",
-    "plugins": "print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern",
-    "toolbar": "formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor prismjs | link image media pageembed | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | tex-$ tex-math flow seq gantt mermaid | removeformat code toMarkdownEditor | undo redo",
-    "image_advtab": true,
-    "importcss_append": true,
-    "height": "100%",
-    "template_cdate_format": "[CDATE: %m/%d/%Y : %H:%M:%S]",
-    "template_mdate_format": "[MDATE: %m/%d/%Y : %H:%M:%S]",
-    "image_caption": true,
-    "spellchecker_dialog": true,
-    "spellchecker_whitelist": ["Ephox", "Moxiecode"]
+```javascript
+var config = {
+  // 该设置为TinyMCE的设置，详情见TinyMCE编辑器的文档
+  tinymceSetting: {
+    language_url: "/static/tinymce/langs/zh_CN.js",
+    language: "zh_CN",
+    skin_url: "/static/tinymce/skins/ui/oxide",
+    body_class: "markdown-body",
+    content_css: "/static/github-markdown.css",
+    plugins:
+      "print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern",
+    toolbar:
+      "formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor prismjs | link image media pageembed | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | tex-$ tex-math flow seq gantt mermaid | removeformat code toMarkdownEditor | undo redo",
+    image_advtab: true,
+    importcss_append: true,
+    height: "100%",
+    template_cdate_format: "[CDATE: %m/%d/%Y : %H:%M:%S]",
+    template_mdate_format: "[MDATE: %m/%d/%Y : %H:%M:%S]",
+    image_caption: true,
+    spellchecker_dialog: true,
+    spellchecker_whitelist: ["Ephox", "Moxiecode"]
   },
-  "aceSetting": {
-    "toolbar": "h1 h2 h3 h4 h5 h6 | bold italic underline strikethrough quote mark code | sup sub tex-$ tex-math | flow seq gantt mermaid | ul ol minus table time | link image video graff | toLine search toc typewriter switchPreview fullPreview fullScreen toHtmlEditor toTinyMCE format empty setting | undo redo | setLocalStorage getLocalStorage removeLocalStorage | help info | pasteFormat",
-    "minLines": 10,
-    "fontSize": "17px",
-    "theme": "ace/theme/solarized_light",
-    "mode": "ace/mode/markdown",
-    "tabSize": 4,
-    "wrap": true,
-    "enableSnippets": true,
-    "enableLiveAutocompletion": true,
-    "enableBasicAutocompletion": true,
-    "value": "# XK-Editor"
+  // 该设置为ACE编辑器的设置，详情见ACE编辑器文档
+  aceSetting: {
+    // toolbar 为XK-Editor扩展的字段，语法和tinymce的toolbar字段一致
+    toolbar:
+      "h1 h2 h3 h4 h5 h6 | bold italic underline strikethrough quote mark code | sup sub tex-$ tex-math | flow seq gantt mermaid | ul ol minus table time | link image video graff | toLine search toc typewriter switchPreview fullPreview fullScreen toHtmlEditor toTinyMCE format empty setting | undo redo | setLocalStorage getLocalStorage removeLocalStorage | help info | pasteFormat",
+    minLines: 10,
+    fontSize: "17px",
+    theme: "ace/theme/solarized_light",
+    mode: "ace/mode/markdown",
+    tabSize: 4,
+    wrap: true,
+    enableSnippets: true,
+    enableLiveAutocompletion: true,
+    enableBasicAutocompletion: true,
+    value: "# XK-Editor"
   },
-  "xkSetting": {
-    "apiBaseUrl": "",
-    "previewCss": "/static/github-markdown.css",
-    "previewClass": "markdown-body",
-    "delayToHtml": 500,
-    "scrollBind": "both",
-    "imgUpload": "http://example.com/upload.php",
-    "graffUrl": "static/",
-    "graffUpload": "http://example.com/upload.php",
-    "scrollMode": "javascript",
-    "pasteFormat": true,
-    "pasteImageUpload": true,
-    "enableTinyMCE": true,
-    "judge0API": "https://example.com",
-    "runCodeLangList": {
-      "c": 1,
-      "cpp": 2,
-      "bash": 3,
-      "csharp": 4,
-      "go": 5,
-      "java": 6,
-      "node": 7,
-      "php": 8,
-      "python": 9,
-      "python2": 10,
-      "ruby": 11,
-      "rust": 12,
-      "scala": 13,
-      "typescript": 14
+  // XK-Editor相关设置
+  xkSetting: {
+    // 暂时无用
+    apiBaseUrl: "",
+    // 预览的CSS文件，类似于主题
+    previewCss: "/static/github-markdown.css",
+    // 预览的class
+    previewClass: "markdown-body",
+    // 延迟渲染时间(ms)，由于性能因素XK-Editor限制该选项不能低于500ms
+    delayToHtml: 500,
+    // 滚动绑定，(left,right,both)
+    scrollBind: "both",
+    // 图片上传的地址
+    imgUpload: "http://example.com/upload.php",
+    // 暂时不要使用该功能
+    graffUrl: "static/",
+    graffUpload: "http://example.com/upload.php",
+    // 滚动模式，默认使用JavaScript的方式来滚动，防止与Hash Router冲突
+    scrollMode: "javascript",
+    // 粘贴格式化
+    pasteFormat: true,
+    // 粘贴自动上传(仅对复制图像时有效，混合内容无效，需要设置图片上传地址)
+    pasteImageUpload: true,
+    // 是否开启TinyMCE编辑器
+    enableTinyMCE: true,
+    // run-code的地址
+    judge0API: "https://example.com",
+    // run-code语言列表
+    runCodeLangList: {
+      c: 1,
+      cpp: 2,
+      bash: 3,
+      csharp: 4,
+      go: 5,
+      java: 6,
+      node: 7,
+      php: 8,
+      python: 9,
+      python2: 10,
+      ruby: 11,
+      rust: 12,
+      scala: 13,
+      typescript: 14
     }
   }
-}
+};
 ```
 
 ## 运行代码块
