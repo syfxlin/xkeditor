@@ -220,6 +220,17 @@ function commonParse(text) {
   return text;
 }
 
+function htmlRestore(str) {
+  return str
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/(<br \/>|<br>)/g, "\n");
+}
+
 export function toHtml(val, isFull) {
   tocContent = [];
   var markedRenderer = new marked.Renderer();
@@ -456,11 +467,7 @@ export function toMarkdown(htmlVal, styleSwitch = true) {
       );
     },
     replacement: function(content, node) {
-      return (
-        "\n\n```mermaid\n" +
-        node.innerHTML.replace(/(<br \/>|<br>)/g, "\n") +
-        "\n```\n"
-      );
+      return "\n\n```mermaid\n" + htmlRestore(node.innerHTML) + "\n```\n";
     }
   });
   turndownService.addRule("math", {
@@ -468,7 +475,7 @@ export function toMarkdown(htmlVal, styleSwitch = true) {
       return node.nodeName === "PRE" && node.classList.contains("xkeditor-tex");
     },
     replacement: function(content, node) {
-      return node.innerHTML.replace(/(<br \/>|<br>)/g, "\n");
+      return htmlRestore(node.innerHTML);
     }
   });
   turndownService.addRule("prismjs", {
@@ -482,13 +489,7 @@ export function toMarkdown(htmlVal, styleSwitch = true) {
     },
     replacement: function(content, node) {
       var lang = node.children[0].classList[1].substring(9);
-      return (
-        "\n```" +
-        lang +
-        "\n" +
-        content.replace(/(<br \/>|<br>)/g, "\n") +
-        "\n```\n\n"
-      );
+      return "\n```" + lang + "\n" + htmlRestore(content) + "\n```\n\n";
     }
   });
   turndownService.addRule("sup", {
