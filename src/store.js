@@ -111,9 +111,15 @@ const state = Vue.observable({
 });
 
 const actions = {
+  setValue(val) {
+    if (state.editorMode === "ace") {
+      actions.setAceValue(val);
+    } else {
+      actions.setTinyValue(toHtml(val), false);
+    }
+  },
   setAceValue(val) {
-    state.aceEditor.setValue(val);
-    state.aceEditor.gotoLine(1);
+    state.aceEditor.setValue(val, 1);
   },
   setTinyValue(val) {
     state.htmlContent = val;
@@ -962,231 +968,228 @@ const actions = {
     actions.execCommand("addKeys", keys);
   },
   setInterface() {
-    return new Promise((resolve, reject) => {
-      var downloadFun = (filename, data, type) => {
-        var aLink = document.createElement("a");
-        var evt = document.createEvent("MouseEvents");
-        evt.initMouseEvent(
-          "click",
-          true,
-          false,
-          window,
-          0,
-          0,
-          0,
-          0,
-          0,
-          false,
-          false,
-          false,
-          false,
-          0,
-          null
-        );
-        aLink.download = filename + "." + type;
-        aLink.href = URL.createObjectURL(
-          new Blob([data], { type: "text/" + type })
-        );
-        aLink.dispatchEvent(evt);
-      };
-      window.XKEditorAPI = {
-        //response: {"error":false,"path":"img url"}
-        imgUpload: (file, success, failure) => {
-          if (state.setting.xkSetting.imgUpload) {
-            let param = new FormData();
+    var downloadFun = (filename, data, type) => {
+      var aLink = document.createElement("a");
+      var evt = document.createEvent("MouseEvents");
+      evt.initMouseEvent(
+        "click",
+        true,
+        false,
+        window,
+        0,
+        0,
+        0,
+        0,
+        0,
+        false,
+        false,
+        false,
+        false,
+        0,
+        null
+      );
+      aLink.download = filename + "." + type;
+      aLink.href = URL.createObjectURL(
+        new Blob([data], { type: "text/" + type })
+      );
+      aLink.dispatchEvent(evt);
+    };
+    window.XKEditorAPI = {
+      //response: {"error":false,"path":"img url"}
+      imgUpload: (file, success, failure) => {
+        if (state.setting.xkSetting.imgUpload) {
+          let param = new FormData();
+          param.append("file", file);
+          let config = {
+            headers: { "Content-Type": "multipart/form-data" }
+          };
+          // success({"error":false,"path":"https://img.url"})
+          actions.showToast("上传中...", "", true);
+          axios
+            .post(state.setting.xkSetting.imgUpload, param, config)
+            .then(response => {
+              actions.timeToast("上传成功！", "success");
+              success(response);
+            })
+            .catch(error => {
+              actions.timeToast("上传失败！", "error");
+              failure(error);
+            });
+        }
+      },
+      graffUpload: (file, success, failure, filename = null) => {
+        if (state.setting.xkSetting.graffUpload) {
+          let param = new FormData();
+          if (filename) {
+            param.append("file", file, filename);
+          } else {
             param.append("file", file);
-            let config = {
-              headers: { "Content-Type": "multipart/form-data" }
-            };
-            // success({"error":false,"path":"https://img.url"})
-            actions.showToast("上传中...", "", true);
-            axios
-              .post(state.setting.xkSetting.imgUpload, param, config)
-              .then(response => {
-                actions.timeToast("上传成功！", "success");
-                success(response);
-              })
-              .catch(error => {
-                actions.timeToast("上传失败！", "error");
-                failure(error);
-              });
           }
-        },
-        graffUpload: (file, success, failure, filename = null) => {
-          if (state.setting.xkSetting.graffUpload) {
-            let param = new FormData();
-            if (filename) {
-              param.append("file", file, filename);
-            } else {
-              param.append("file", file);
-            }
-            let config = {
-              headers: { "Content-Type": "multipart/form-data" }
-            };
-            // success({"error":false,"path":"https://img.url"})
-            actions.showToast("上传中...", "", true);
-            axios
-              .post(state.setting.xkSetting.graffUpload, param, config)
-              .then(response => {
-                actions.timeToast("上传成功！", "success");
-                success(response);
-              })
-              .catch(error => {
-                actions.timeToast("上传失败！", "error");
-                failure(error);
-              });
+          let config = {
+            headers: { "Content-Type": "multipart/form-data" }
+          };
+          // success({"error":false,"path":"https://img.url"})
+          actions.showToast("上传中...", "", true);
+          axios
+            .post(state.setting.xkSetting.graffUpload, param, config)
+            .then(response => {
+              actions.timeToast("上传成功！", "success");
+              success(response);
+            })
+            .catch(error => {
+              actions.timeToast("上传失败！", "error");
+              failure(error);
+            });
+        }
+      }
+    };
+    window.XKEditor = {
+      ace: state.aceEditor,
+      tinymce: window.tinymce,
+      setting: state.setting,
+      toMarkdown: toMarkdown,
+      toHtml: toHtml,
+      execCommand: (command, data) => actions.execCommand(command, data),
+      setSetting: setting => {
+        Vue.set(state, "setting", setting);
+        if (window.XKEditor) {
+          window.XKEditor.tinymce.remove();
+          window.XKEditor.tinymce.init(setting.tinymceSetting);
+          window.XKEditor.ace.setOptions(setting.aceSetting);
+        }
+      },
+      getMarkdown: () => {
+        return state.markdownContent;
+      },
+      getHTML: () => {
+        return state.htmlViewContent;
+      },
+      setMarkdown: (val, valueType = "markdown") => {
+        //默认设置时在ACE编辑界面
+        if (state.editorMode !== "ace") {
+          actions.timeToast("当前不在Markdown编辑器！", "error");
+          return;
+        }
+        if (valueType !== "markdown") {
+          val = toMarkdown(val, true);
+        }
+        state.markdownContent = val;
+        actions.setAceValue(val);
+      },
+      setHTML: (val, valueType = "html") => {
+        //默认设置时在TinyMCE编辑界面
+        if (state.editorMode !== "tinymce") {
+          actions.timeToast("当前不在富文本编辑器！", "error");
+          return;
+        }
+        if (valueType !== "html") {
+          val = toHtml(val, false);
+        }
+        state.htmlContent = val;
+        actions.setTinyValue(val);
+      },
+      switchEditor: () => {
+        actions.switchEditor();
+      },
+      switchPreview: () => {
+        actions.execCommand("switchPreview");
+      },
+      switchFullPreview: () => {
+        actions.execCommand("fullPreview");
+      },
+      switchFullScreen: () => {
+        actions.execCommand("fullScreen");
+      },
+      toLine: () => {
+        actions.execCommand("toLine");
+      },
+      toc: () => {
+        actions.execCommand("toc");
+      },
+      toolbar: () => {
+        actions.execCommand("toolbar");
+      },
+      resize: () => {
+        actions.execCommand("resize");
+      },
+      addKeys: keys => {
+        // keys = [{name,win,mac,exec},{name,win,mac,exec}]
+        actions.execCommand("addKeys", keys);
+      },
+      removeKeys: keys => {
+        // keys = [name, name]
+        actions.execCommand("removeKeys", keys);
+      },
+      getEditor: name => {
+        if (name === "ace") {
+          return actions.aceEditor;
+        } else if (name === "tinymce") {
+          return window.tinymce;
+        }
+      },
+      switchTypewriter: data => {
+        actions.execCommand("typewriter", true);
+      },
+      formatContent() {
+        actions.execCommand("format");
+      },
+      setLocalStorage: filename => {
+        window.localStorage.setItem(
+          "xkeditor_" + filename,
+          window.XKEditor.getMarkdown()
+        );
+      },
+      getLocalStorage: filename => {
+        return window.localStorage.getItem("xkeditor_" + filename);
+      },
+      listLocalStorage: () => {
+        var list = {};
+        for (const key in window.localStorage) {
+          if (key.indexOf("xkeditor_") != -1) {
+            list[key.substring(9)] = window.localStorage.getItem(key);
           }
         }
-      };
-      window.XKEditor = {
-        ace: state.aceEditor,
-        tinymce: window.tinymce,
-        setting: state.setting,
-        toMarkdown: toMarkdown,
-        toHtml: toHtml,
-        execCommand: (command, data) => actions.execCommand(command, data),
-        setSetting: setting => {
-          Vue.set(state, "setting", setting);
-          if (window.XKEditor) {
-            window.XKEditor.tinymce.remove();
-            window.XKEditor.tinymce.init(setting.tinymceSetting);
-            window.XKEditor.ace.setOptions(setting.aceSetting);
-          }
-        },
-        getMarkdown: () => {
-          return state.markdownContent;
-        },
-        getHTML: () => {
-          return state.htmlViewContent;
-        },
-        setMarkdown: (val, valueType = "markdown") => {
-          //默认设置时在ACE编辑界面
-          if (state.editorMode !== "ace") {
-            actions.timeToast("当前不在Markdown编辑器！", "error");
-            return;
-          }
-          if (valueType !== "markdown") {
-            val = toMarkdown(val, true);
-          }
-          state.markdownContent = val;
-          actions.setAceValue(val);
-        },
-        setHTML: (val, valueType = "html") => {
-          //默认设置时在TinyMCE编辑界面
-          if (state.editorMode !== "tinymce") {
-            actions.timeToast("当前不在富文本编辑器！", "error");
-            return;
-          }
-          if (valueType !== "html") {
-            val = toHtml(val, false);
-          }
-          state.htmlContent = val;
-          actions.setTinyValue(val);
-        },
-        switchEditor: () => {
-          actions.switchEditor();
-        },
-        switchPreview: () => {
-          actions.execCommand("switchPreview");
-        },
-        switchFullPreview: () => {
-          actions.execCommand("fullPreview");
-        },
-        switchFullScreen: () => {
-          actions.execCommand("fullScreen");
-        },
-        toLine: () => {
-          actions.execCommand("toLine");
-        },
-        toc: () => {
-          actions.execCommand("toc");
-        },
-        toolbar: () => {
-          actions.execCommand("toolbar");
-        },
-        resize: () => {
-          actions.execCommand("resize");
-        },
-        addKeys: keys => {
-          // keys = [{name,win,mac,exec},{name,win,mac,exec}]
-          actions.execCommand("addKeys", keys);
-        },
-        removeKeys: keys => {
-          // keys = [name, name]
-          actions.execCommand("removeKeys", keys);
-        },
-        getEditor: name => {
-          if (name === "ace") {
-            return actions.aceEditor;
-          } else if (name === "tinymce") {
-            return window.tinymce;
-          }
-        },
-        switchTypewriter: data => {
-          actions.execCommand("typewriter", true);
-        },
-        formatContent() {
-          actions.execCommand("format");
-        },
-        setLocalStorage: filename => {
-          window.localStorage.setItem(
-            "xkeditor_" + filename,
-            window.XKEditor.getMarkdown()
-          );
-        },
-        getLocalStorage: filename => {
-          return window.localStorage.getItem("xkeditor_" + filename);
-        },
-        listLocalStorage: () => {
-          var list = {};
-          for (const key in window.localStorage) {
-            if (key.indexOf("xkeditor_") != -1) {
-              list[key.substring(9)] = window.localStorage.getItem(key);
-            }
-          }
-          return list;
-        },
-        removeLocalStorage: filename => {
-          window.localStorage.removeItem("xkeditor_" + filename);
-        },
-        download: async (filename, type = "markdown") => {
-          var data = "";
-          if (type === "markdown") {
-            data = state.markdownContent;
-            type = "md";
-          } else if (type === "html") {
-            data = state.htmlViewContent;
-          } else if (type === "fullhtml") {
-            var d_t1 =
-              '<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><title>';
-            var d_t2 = "</title>";
-            var d_t3 = "</head><body>";
-            var d_t4 = "</body></html>";
-            var style = await axios.get(state.setting.xkSetting.previewCss);
-            style += await axios.get("/static/prism-okaidia.css");
-            style += await axios.get("/static/prism-line-numbers.css");
-            style += await axios.get("/static/prism-toolbar.css");
-            data =
-              d_t1 +
-              filename +
-              d_t2 +
-              "<style>" +
-              style +
-              "</style>" +
-              d_t3 +
-              '<div class="markdown-body editormd-html-preview">' +
-              state.htmlViewContent +
-              "</div>" +
-              d_t4;
-            type = "html";
-            downloadFun(filename, data, type);
-            return;
-          }
+        return list;
+      },
+      removeLocalStorage: filename => {
+        window.localStorage.removeItem("xkeditor_" + filename);
+      },
+      download: async (filename, type = "markdown") => {
+        var data = "";
+        if (type === "markdown") {
+          data = state.markdownContent;
+          type = "md";
+        } else if (type === "html") {
+          data = state.htmlViewContent;
+        } else if (type === "fullhtml") {
+          var d_t1 =
+            '<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><title>';
+          var d_t2 = "</title>";
+          var d_t3 = "</head><body>";
+          var d_t4 = "</body></html>";
+          var style = await axios.get(state.setting.xkSetting.previewCss);
+          style += await axios.get("/static/prism-okaidia.css");
+          style += await axios.get("/static/prism-line-numbers.css");
+          style += await axios.get("/static/prism-toolbar.css");
+          data =
+            d_t1 +
+            filename +
+            d_t2 +
+            "<style>" +
+            style +
+            "</style>" +
+            d_t3 +
+            '<div class="markdown-body editormd-html-preview">' +
+            state.htmlViewContent +
+            "</div>" +
+            d_t4;
+          type = "html";
           downloadFun(filename, data, type);
+          return;
         }
-      };
-      resolve();
-    });
+        downloadFun(filename, data, type);
+      }
+    };
   },
   initScroll() {
     window.scrollBind = (operate = null, bindType = "both") => {

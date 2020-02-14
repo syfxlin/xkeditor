@@ -1,62 +1,47 @@
 <template>
   <div class="xkeditor">
-    <template v-if="isRenderEditor">
-      <div class="row">
-        <div
-          :class="
+    <div class="row">
+      <div
+        :class="
             'xkeditor-left ' +
               (previewShow === 'show' ? 'xk-col-12' : 'xk-col-24')
           "
-          v-show="editorModeShow && previewShow !== 'full'"
-        >
-          <ace ref="ace"></ace>
-        </div>
-        <div
-          id="resizor"
-          title="拖动我"
-          v-show="editorModeShow && previewShow === 'show'"
-        ></div>
-        <div
-          :class="
+        v-show="isAceMode && previewShow !== 'full'"
+      >
+        <ace ref="ace"></ace>
+      </div>
+      <div id="resizor" title="拖动我" v-show="isAceMode && previewShow === 'show'"></div>
+      <div
+        :class="
             'xkeditor-right ' +
               (previewShow === 'show' ? 'xk-col-12' : 'xk-col-24')
           "
-          v-show="editorModeShow && previewShow !== 'hide'"
-        >
-          <div
-            :class="setting.xkSetting.previewClass"
-            v-html="htmlViewContent"
-            id="previewHtml"
-            ref="htmlView"
-          ></div>
-        </div>
+        v-show="isAceMode && previewShow !== 'hide'"
+      >
         <div
-          class="xk-col-24"
-          v-show="!editorModeShow"
-          v-if="setting.xkSetting.enableTinyMCE"
-        >
-          <tinymce ref="tinymce"></tinymce>
-        </div>
-        <button
-          class="xk-button close-preview-full"
-          @click="switchPreviewFull()"
-          v-show="editorModeShow && previewShow === 'full'"
-        >
-          关闭
-        </button>
-        <transition name="slide-fade">
-          <div id="toc" v-show="showToc"></div>
-        </transition>
-        <div id="toc-button" class="xk-button">
-          <fa-icon icon="bars" />
-        </div>
+          :class="setting.xkSetting.previewClass"
+          v-html="htmlViewContent"
+          id="previewHtml"
+          ref="htmlView"
+        ></div>
       </div>
-    </template>
+      <div class="xk-col-24" v-show="!isAceMode" v-if="setting.xkSetting.enableTinyMCE">
+        <tinymce ref="tinymce"></tinymce>
+      </div>
+      <button
+        class="xk-button close-preview-full"
+        @click="switchPreviewFull()"
+        v-show="isAceMode && previewShow === 'full'"
+      >关闭</button>
+      <transition name="slide-fade">
+        <div id="toc" v-show="showToc"></div>
+      </transition>
+      <div id="toc-button" class="xk-button">
+        <fa-icon icon="bars" />
+      </div>
+    </div>
     <graff-board></graff-board>
-    <div
-      :class="'xkeditor-toast ' + (toast.status !== '' ? toast.status : '')"
-      v-show="toast.show"
-    >
+    <div :class="'xkeditor-toast ' + (toast.status !== '' ? toast.status : '')" v-show="toast.show">
       <i v-show="toast.loading"></i>
       <p>{{ toast.message }}</p>
     </div>
@@ -66,11 +51,11 @@
 <script>
 //导入基础组件
 import "../utils/dialogDrag";
+import mergeDeep from "../utils/mergeDeep";
 import Ace from "./ACE_Editor";
 import TinyMCE from "./TinyMCE_Editor";
 import GraffBoard from "./GraffBoard";
 
-import axios from "axios";
 //HTML和Markdown互转
 import { toHtml, toMarkdown, getTocHtml } from "../utils/switchContent";
 import Prism from "prismjs";
@@ -85,7 +70,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 library.add(fas);
 
-import { mapState, mapActions } from "../store";
+import store, { mapState, mapActions } from "../store";
 
 export default {
   name: "XK_Editor",
@@ -96,19 +81,16 @@ export default {
     "graff-board": GraffBoard
   },
   props: {
-    settingApi: String,
-    contentApi: String,
-    settingProps: Object,
-    contentProps: String
+    config: Object,
+    value: String
   },
   data() {
     return {
-      isRenderEditor: false,
       delayToHtml: null
     };
   },
   computed: {
-    editorModeShow() {
+    isAceMode() {
       if (this.editorMode === "ace") {
         return true;
       } else if (this.editorMode === "tinymce") {
@@ -127,16 +109,18 @@ export default {
       "toast"
     ])
   },
-  async mounted() {
-    await this.load();
+  created() {
+    this.markdownContent = this.value || "";
+    this.setting = mergeDeep(this.setting, this.config);
     this.htmlViewContent = toHtml(this.markdownContent, true);
+    this.loadCss(this.setting.xkSetting.previewCss);
+  },
+  mounted() {
     this.$nextTick(function() {
       this.initEditor();
     });
-    this.setInterface().then(() => {
-      this.$emit("loadHook", "interfaceLoad");
-    });
-    this.$emit("loadHook", "componentLoad");
+    this.setInterface();
+    this.$emit("loaded", true);
   },
   methods: {
     ...mapActions([
@@ -148,26 +132,9 @@ export default {
       "updateTocTree",
       "initTocTree",
       "initResizor",
-      "updateRunCode"
+      "updateRunCode",
+      "setValue"
     ]),
-    async load() {
-      let md = null;
-      let setting = null;
-      if (!this.contentProps) {
-        md = (await axios.get(this.contentApi)).data;
-      } else {
-        md = this.contentProps;
-      }
-      if (!this.settingProps) {
-        setting = (await axios.get(this.settingApi)).data;
-      } else {
-        setting = this.settingProps;
-      }
-      this.markdownContent = md;
-      this.setting = setting;
-      this.loadCss(setting.xkSetting.previewCss);
-      this.isRenderEditor = true;
-    },
     loadCss(url) {
       let css = document.createElement("link");
       css.href = url;
@@ -176,7 +143,6 @@ export default {
       document.head.appendChild(css);
     },
     initEditor() {
-      mermaid.initialize({ startOnLoad: true });
       //初始化scroll操作
       this.initScroll();
       //初始化TOC
@@ -186,6 +152,7 @@ export default {
         this.initPaste();
         // 注册涂鸦板
         this.initGraff();
+        // 注册调整按钮
         this.initResizor();
       });
     },
@@ -228,7 +195,17 @@ export default {
     }
   },
   watch: {
+    value(val) {
+      if (val !== this.markdownContent) {
+        this.markdownContent = val;
+        this.setValue(val);
+      }
+    },
+    config(val) {
+      this.setting = mergeDeep(this.setting, val);
+    },
     markdownContent(val) {
+      this.$emit("input", val);
       //最少延迟250ms转换为html以保证性能，否则会造成输入卡顿
       var delay =
         this.setting.xkSetting.delayToHtml >= 500
@@ -243,11 +220,7 @@ export default {
       }, delay);
     },
     htmlContent(val) {
-      this.htmlViewContent = val;
-      this.renderNextTick();
-      this.$nextTick(() => {
-        Prism.highlightAll();
-      });
+      this.$emit("input", toMarkdown(val));
     }
   }
 };

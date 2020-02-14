@@ -1,19 +1,3 @@
-<!--
-  /**
-  * Ace编辑器
-  * @module /components
-  * @desc 将Ace编辑器封装为Markdown编辑器，数据实时同步至父组件，父组件通过调用函数将数据传入该组件，初始化数据通过props传输，之后通过setValue方法传输
-  * @author Otstar Lin
-  * @date 2019年4月
-  * @param {String} [value]  - 初始数据
-  * @example 调用示例
-  *  <ace v-model="md_content" ref="ace"></ace>
-  *  <button @click="switchEditor('ace')">switchToAce</button>
-  * @import 导入
-  *  import ACE from './components/ACE_Editor.vue'
-  *  Vue.component('ace', ACE)
-  */
--->
 <template>
   <div class="ace-container">
     <div class="ace-toolbar" v-show="aceToolbarShow">
@@ -34,16 +18,8 @@
         </template>
       </template>
     </div>
-    <div
-      class="ace-toolbar-html ace-toolbar"
-      v-show="!aceToolbarShow && aceToolbarHtmlShow"
-    >
-      <button
-        class="xk-button"
-        type="text"
-        title="转换为Markdown模式"
-        @click="switchToHtml()"
-      >
+    <div class="ace-toolbar-html ace-toolbar" v-show="!aceToolbarShow && aceToolbarHtmlShow">
+      <button class="xk-button" type="text" title="转换为Markdown模式" @click="switchToHtml()">
         <fa-icon icon="file-code" />转换为Markdown模式
       </button>
     </div>

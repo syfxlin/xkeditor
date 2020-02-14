@@ -1,11 +1,12 @@
 <template>
   <div id="app">
-    <xk-editor :settingApi="setting" :contentApi="content" />
+    <xk-editor :config="config" v-model="content" />
   </div>
 </template>
 
 <script>
 import XK_Editor from "./index.js";
+import axios from "axios";
 export default {
   name: "App",
   components: {
@@ -13,12 +14,24 @@ export default {
   },
   data() {
     return {
-      setting: "/static/setting.json",
-      content: "/static/md_content.md"
+      config: {},
+      content: ""
     };
   },
   methods: {},
-  mounted() {}
+  async mounted() {
+    await axios
+      .all([
+        axios.get("/static/setting.json"),
+        axios.get("/static/md_content.md")
+      ])
+      .then(
+        axios.spread((res1, res2) => {
+          this.config = res1.data;
+          this.content = res2.data;
+        })
+      );
+  }
 };
 </script>
 
