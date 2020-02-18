@@ -25,7 +25,7 @@ export default {
   name: "image-item",
   computed: {
     ...mapState({
-      data: state => state.aceToolbarModal.data,
+      data: state => state.toolbarModal.data,
       openImgUpload: state => (state.setting.xkSetting.imgUpload ? true : false)
     })
   },

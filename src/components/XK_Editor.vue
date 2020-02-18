@@ -1,6 +1,31 @@
 <template>
   <div class="xkeditor">
     <div class="row">
+      <div class="toolbar-container">
+        <div class="toolbar" v-show="toolbarShow">
+          <template v-for="item in toolbarButtons">
+            <span v-if="item.icon === '|'" :key="item.id">|</span>
+            <template v-else>
+              <button
+                class="xk-button"
+                :key="item.id"
+                type="text"
+                :title="item.title"
+                @click="toolbarClick(item.operate)"
+                :id="'toolbar-' + item.operate"
+              >
+                <b v-if="typeof item.icon === 'number'">H{{ item.icon }}</b>
+                <fa-icon v-else :icon="item.icon" />
+              </button>
+            </template>
+          </template>
+        </div>
+        <div class="toolbar-html toolbar" v-show="!toolbarShow && toolbarHtmlShow">
+          <button class="xk-button" type="text" title="转换为Markdown模式" @click="switchToHtml()">
+            <fa-icon icon="file-code" />转换为Markdown模式
+          </button>
+        </div>
+      </div>
       <div
         :class="
             'xkeditor-left ' +
@@ -40,6 +65,7 @@
         <fa-icon icon="bars" />
       </div>
     </div>
+    <toolbar-modal></toolbar-modal>
     <graff-board></graff-board>
     <div :class="'xkeditor-toast ' + (toast.status !== '' ? toast.status : '')" v-show="toast.show">
       <i v-show="toast.loading"></i>
@@ -52,9 +78,11 @@
 //导入基础组件
 import "../utils/dialogDrag";
 import mergeDeep from "../utils/mergeDeep";
+import allButtons from "../utils/allButtons";
 import Ace from "./ACE_Editor";
 import TinyMCE from "./TinyMCE_Editor";
 import GraffBoard from "./GraffBoard";
+import ToolBarModal from "./ToolbarModal";
 
 //HTML和Markdown互转
 import { toHtml, toMarkdown, getTocHtml } from "../utils/switchContent";
@@ -78,7 +106,8 @@ export default {
     ace: Ace,
     tinymce: TinyMCE,
     "fa-icon": FontAwesomeIcon,
-    "graff-board": GraffBoard
+    "graff-board": GraffBoard,
+    "toolbar-modal": ToolBarModal
   },
   props: {
     config: Object,
@@ -90,14 +119,6 @@ export default {
     };
   },
   computed: {
-    isAceMode() {
-      if (this.editorMode === "ace") {
-        return true;
-      } else if (this.editorMode === "tinymce") {
-        return false;
-      }
-      return null;
-    },
     ...mapState([
       "showToc",
       "previewShow",
@@ -106,8 +127,26 @@ export default {
       "htmlContent",
       "htmlViewContent",
       "setting",
-      "toast"
-    ])
+      "toast",
+      "toolbarShow",
+      "toolbarHtmlShow"
+    ]),
+    isAceMode() {
+      if (this.editorMode === "ace") {
+        return true;
+      } else if (this.editorMode === "tinymce") {
+        return false;
+      }
+      return null;
+    },
+    toolbarButtons() {
+      const buttons = [];
+      const selectButtons = this.setting.aceSetting.toolbar.split(" ");
+      for (const operate of selectButtons) {
+        buttons.push(allButtons.find(item => item.operate === operate));
+      }
+      return buttons;
+    }
   },
   created() {
     this.markdownContent = this.value || "";
@@ -134,7 +173,9 @@ export default {
       "initResizor",
       "updateRunCode",
       "setValue",
-      "mergeTinyMCEOptions"
+      "mergeTinyMCEOptions",
+      "toolbarClick",
+      "switchEditorMode"
     ]),
     loadCss(url) {
       let css = document.createElement("link");
@@ -193,6 +234,10 @@ export default {
         }
         this.updateRunCode();
       });
+    },
+    switchToHtml() {
+      this.toolbarShow = true;
+      this.switchEditorMode();
     }
   },
   watch: {
@@ -411,6 +456,68 @@ export default {
   cursor: pointer;
 }
 
+.xk-button-primary {
+  color: #fff;
+  background: #6190e8;
+}
+
+.toolbar {
+  background: #fff;
+
+  span {
+    padding: 0px;
+  }
+
+  .xk-button {
+    background: none;
+    color: #6190e8;
+    color: #3f536e;
+    border: none;
+    font-size: 1em;
+    padding: 0.2em 0.4em;
+    margin: 0.2em;
+
+    &:hover {
+      color: #fff;
+      background: #6190e8a0;
+    }
+
+    &.active {
+      color: #fff;
+      background: #6190e8;
+    }
+  }
+}
+
+.toolbar-modal .xk-input {
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.help {
+  overflow-y: auto;
+  height: 50vh;
+}
+
+.info {
+  overflow-y: auto;
+
+  p {
+    font-size: 0.9em;
+  }
+  * {
+    margin: 5px;
+  }
+}
+
+.show {
+  display: block;
+}
+
+.hide {
+  display: none;
+}
+
 #resizor {
   position: absolute;
   bottom: 50%;
@@ -472,6 +579,11 @@ export default {
       z-index: 1;
     }
   }
+}
+
+.toolbar-container {
+  width: 100%;
+  border-bottom: 1px solid #ddd;
 }
 
 .run-code-output,

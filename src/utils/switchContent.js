@@ -342,6 +342,17 @@ export function toHtml(val, isFull) {
           title ? 'title="' + title + '"' : ""
         } ${options}></iframe>`;
       }
+      if (type === "md" || type === "markdown") {
+        // TODO: async load
+        return toHtml("# this is embed", isFull);
+      }
+      if (type === "code") {
+        // TODO: async load
+        return markedRenderer.code(
+          'console.log("This is embed")',
+          "javascript"
+        );
+      }
     }
     return marked.Renderer.prototype.link.apply(this, args);
   };

@@ -83,8 +83,8 @@ const state = Vue.observable({
     }
   },
   aceEditor: null,
-  aceToolbarShow: true,
-  aceToolbarHtmlShow: true,
+  toolbarShow: true,
+  toolbarHtmlShow: true,
   previewShow: "show",
   typewriterMode: false,
   isMarkdownMode: true,
@@ -92,7 +92,7 @@ const state = Vue.observable({
   markdownContent: "",
   htmlContent: "",
   htmlViewContent: "",
-  aceToolbarModal: {
+  toolbarModal: {
     show: false,
     data: {},
     content: ""
@@ -137,14 +137,14 @@ const actions = {
     }
     actions.initKey();
   },
-  showAceToolbarModal(operate, title = "") {
-    state.aceToolbarModal.show = true;
-    state.aceToolbarModal.content = operate;
-    state.aceToolbarModal.data.modalTitle = title;
+  showtoolbarModal(operate, title = "") {
+    state.toolbarModal.show = true;
+    state.toolbarModal.content = operate;
+    state.toolbarModal.data.modalTitle = title;
   },
-  hideAceToolbarModal() {
-    state.aceToolbarModal.content = "";
-    state.aceToolbarModal.show = false;
+  hidetoolbarModal() {
+    state.toolbarModal.content = "";
+    state.toolbarModal.show = false;
   },
   showToast(message, status = "", loading = false) {
     state.toast.message = message;
@@ -163,9 +163,9 @@ const actions = {
       actions.hideToast();
     }, delay);
   },
-  aceToolbarSubmit() {
+  toolbarSubmit() {
     let str = "";
-    let data = state.aceToolbarModal.data;
+    let data = state.toolbarModal.data;
     if (data.operate === "table") {
       if (data.row > 1) {
         data.row = parseInt(data.row) + 1;
@@ -211,35 +211,33 @@ const actions = {
     } else if (data.operate === "toLine") {
       state.aceEditor.gotoLine(data.line);
       state.aceEditor.focus();
-      actions.hideAceToolbarModal();
-      actions.aceToolbarCancer();
+      actions.hidetoolbarModal();
+      actions.toolbarCancer();
       return;
     } else if (data.operate === "setLocalStorage") {
-      window.XKEditor.setLocalStorage(
-        state.aceToolbarModal.data.locationStorage
-      );
-      actions.aceToolbarCancer();
+      window.XKEditor.setLocalStorage(state.toolbarModal.data.locationStorage);
+      actions.toolbarCancer();
       return;
     } else if (data.operate === "getLocalStorage") {
       str = window.XKEditor.getLocalStorage(
-        state.aceToolbarModal.data.locationStorage
+        state.toolbarModal.data.locationStorage
       );
       actions.setAceValue(str);
-      actions.aceToolbarCancer();
+      actions.toolbarCancer();
       return;
     } else if (data.operate === "removeLocalStorage") {
       window.XKEditor.removeLocalStorage(
-        state.aceToolbarModal.data.locationStorage
+        state.toolbarModal.data.locationStorage
       );
-      actions.aceToolbarCancer();
+      actions.toolbarCancer();
       return;
     }
-    actions.hideAceToolbarModal();
+    actions.hidetoolbarModal();
     actions.operateAceContent(false, 0, str);
-    actions.aceToolbarCancer();
+    actions.toolbarCancer();
   },
-  aceToolbarCancer() {
-    actions.hideAceToolbarModal();
+  toolbarCancer() {
+    actions.hidetoolbarModal();
   },
   imgUpload() {
     if (document.getElementById("img-upload").files.length > 0) {
@@ -247,7 +245,7 @@ const actions = {
       window.XKEditorAPI.imgUpload(
         file,
         response => {
-          Vue.set(state.aceToolbarModal.data, "src", response.data.path);
+          Vue.set(state.toolbarModal.data, "src", response.data.path);
         },
         error => {
           console.log(error);
@@ -296,7 +294,7 @@ const actions = {
       window.XKEditorAPI.graffUpload(
         file,
         response => {
-          Vue.set(state.aceToolbarModal.data, "hash", hash);
+          Vue.set(state.toolbarModal.data, "hash", hash);
         },
         error => {
           console.log(error);
@@ -313,7 +311,7 @@ const actions = {
         window.XKEditorAPI.graffUpload(
           file,
           response => {
-            Vue.set(state.aceToolbarModal.data, "hash", hash);
+            Vue.set(state.toolbarModal.data, "hash", hash);
           },
           error => {
             console.log(error);
@@ -454,8 +452,8 @@ const actions = {
   },
   execCommand(command, data = null) {
     if (command === "toLine") {
-      state.aceToolbarModal.data.allLine = state.aceEditor.session.getLength();
-      actions.showAceToolbarModal(command, "跳转到指定行");
+      state.toolbarModal.data.allLine = state.aceEditor.session.getLength();
+      actions.showtoolbarModal(command, "跳转到指定行");
       return;
     } else if (command === "search") {
       state.aceEditor.commands.commands.find.exec(state.aceEditor);
@@ -481,7 +479,7 @@ const actions = {
       return;
     } else if (command === "toHtmlEditor") {
       actions.switchEditorMode();
-      state.aceToolbarShow = false;
+      state.toolbarShow = false;
       return;
     } else if (command === "toTinyMCE") {
       actions.switchEditor();
@@ -499,8 +497,8 @@ const actions = {
       state.aceEditor.redo();
       return;
     } else if (command === "toolbar") {
-      state.aceToolbarShow = !state.aceToolbarShow;
-      state.aceToolbarHtmlShow = !state.aceToolbarHtmlShow;
+      state.toolbarShow = !state.toolbarShow;
+      state.toolbarHtmlShow = !state.toolbarHtmlShow;
       return;
     } else if (command === "resize") {
       Vue.nextTick(() => {
@@ -595,7 +593,7 @@ const actions = {
     }
   },
   toolbarClick(operate) {
-    state.aceToolbarModal.data.operate = operate;
+    state.toolbarModal.data.operate = operate;
     let str = "";
     let isStart = false;
     let toLeft = 0;
@@ -659,36 +657,36 @@ const actions = {
       str = "\n---\n\n";
       isStart = true;
     } else if (operate === "table") {
-      actions.showAceToolbarModal(operate, "添加表格");
+      actions.showtoolbarModal(operate, "添加表格");
       return;
     } else if (operate === "time") {
       str = new Date().toLocaleString();
     } else if (operate === "link") {
-      actions.showAceToolbarModal(operate, "添加链接");
+      actions.showtoolbarModal(operate, "添加链接");
       return;
     } else if (operate === "image") {
-      actions.showAceToolbarModal(operate, "添加图片");
+      actions.showtoolbarModal(operate, "添加图片");
       return;
     } else if (operate === "video") {
-      actions.showAceToolbarModal(operate, "添加视频");
+      actions.showtoolbarModal(operate, "添加视频");
       return;
     } else if (operate === "graff") {
-      actions.showAceToolbarModal(operate, "上传涂鸦图");
+      actions.showtoolbarModal(operate, "上传涂鸦图");
       return;
     } else if (operate === "setLocalStorage") {
-      actions.showAceToolbarModal("localStorage", "保存到本地");
+      actions.showtoolbarModal("localStorage", "保存到本地");
       return;
     } else if (operate === "getLocalStorage") {
-      actions.showAceToolbarModal("localStorage", "从本地读取");
+      actions.showtoolbarModal("localStorage", "从本地读取");
       return;
     } else if (operate === "removeLocalStorage") {
-      actions.showAceToolbarModal("localStorage", "删除本地存储");
+      actions.showtoolbarModal("localStorage", "删除本地存储");
       return;
     } else if (operate === "help") {
-      actions.showAceToolbarModal(operate, "帮助");
+      actions.showtoolbarModal(operate, "帮助");
       return;
     } else if (operate === "info") {
-      actions.showAceToolbarModal(operate, "关于");
+      actions.showtoolbarModal(operate, "关于");
       return;
     } else if (
       /(toLine|search|toc|switchPreview|fullPreview|fullScreen|toHtmlEditor|toTinyMCE|empty|setting|undo|redo|typewriter|format|pasteFormat)/g.test(

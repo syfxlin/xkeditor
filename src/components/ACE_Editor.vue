@@ -1,65 +1,15 @@
 <template>
   <div class="ace-container">
-    <div class="ace-toolbar" v-show="aceToolbarShow">
-      <template v-for="item in aceToolbarButtons">
-        <span v-if="item.icon === '|'" :key="item.id">|</span>
-        <template v-else>
-          <button
-            class="xk-button"
-            :key="item.id"
-            type="text"
-            :title="item.title"
-            @click="toolbarClick(item.operate)"
-            :id="'toolbar-' + item.operate"
-          >
-            <b v-if="typeof item.icon === 'number'">H{{ item.icon }}</b>
-            <fa-icon v-else :icon="item.icon" />
-          </button>
-        </template>
-      </template>
-    </div>
-    <div class="ace-toolbar-html ace-toolbar" v-show="!aceToolbarShow && aceToolbarHtmlShow">
-      <button class="xk-button" type="text" title="转换为Markdown模式" @click="switchToHtml()">
-        <fa-icon icon="file-code" />转换为Markdown模式
-      </button>
-    </div>
     <div class="ace-editor" ref="ace"></div>
-    <toolbar-modal></toolbar-modal>
   </div>
 </template>
 
 <script>
-//fa icon
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { fas } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-library.add(fas);
-import ToolBarModal from "./ToolbarModal";
-
-import aceAllButtons from "../utils/aceAllButtons";
 import { mapState, mapActions } from "../store";
 
 export default {
-  components: {
-    "fa-icon": FontAwesomeIcon,
-    "toolbar-modal": ToolBarModal
-  },
   computed: {
-    ...mapState([
-      "aceEditor",
-      "aceToolbarShow",
-      "aceToolbarHtmlShow",
-      "markdownContent",
-      "setting"
-    ]),
-    aceToolbarButtons() {
-      const buttons = [];
-      const selectButtons = this.setting.aceSetting.toolbar.split(" ");
-      for (const operate of selectButtons) {
-        buttons.push(aceAllButtons.find(item => item.operate === operate));
-      }
-      return buttons;
-    }
+    ...mapState(["aceEditor", "markdownContent", "setting"])
   },
   mounted() {
     //初始化Value
@@ -73,11 +23,7 @@ export default {
     });
   },
   methods: {
-    ...mapActions(["initAceEditor", "switchEditorMode", "toolbarClick"]),
-    switchToHtml() {
-      this.aceToolbarShow = true;
-      this.switchEditorMode();
-    }
+    ...mapActions(["initAceEditor"])
   }
 };
 </script>
@@ -85,30 +31,6 @@ export default {
 <style lang="scss">
 th {
   text-align: left;
-}
-
-.help {
-  overflow-y: auto;
-  height: 50vh;
-}
-
-.info {
-  overflow-y: auto;
-
-  p {
-    font-size: 0.9em;
-  }
-  * {
-    margin: 5px;
-  }
-}
-
-.show {
-  display: block;
-}
-
-.hide {
-  display: none;
 }
 
 .ace-container {
@@ -132,65 +54,7 @@ th {
   }
 }
 
-.ace-toolbar {
-  background: #fff;
-
-  span {
-    padding: 0px;
-  }
-
-  .xk-button {
-    background: none;
-    color: #6190e8;
-    color: #3f536e;
-    border: none;
-    font-size: 1em;
-    padding: 0.2em 0.4em;
-    margin: 0.2em;
-
-    &:hover {
-      color: #fff;
-      background: #6190e8a0;
-    }
-
-    &.active {
-      color: #fff;
-      background: #6190e8;
-    }
-  }
-}
-
-.ace-toolbar-modal .xk-input {
-  margin-top: 5px;
-  margin-bottom: 10px;
-}
-
 .ace-editor {
   flex: 1;
-}
-
-.xk-button {
-  display: inline-block;
-  padding: 6px 16px;
-  outline: 0;
-  font-size: 0.85em;
-  line-height: 1.5;
-  text-align: center;
-  white-space: nowrap;
-  border: 1px solid #c5d9e8;
-  border-radius: 4px;
-  background-color: #fff;
-  -webkit-transition: background 0.2s;
-  transition: background 0.2s;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  cursor: pointer;
-}
-
-.xk-button-primary {
-  color: #fff;
-  background: #6190e8;
 }
 </style>
