@@ -1,31 +1,31 @@
 <template>
   <div class="xkeditor">
-    <div class="row">
-      <div class="toolbar-container">
-        <div class="toolbar" v-show="toolbarShow">
-          <template v-for="item in toolbarButtons">
-            <span v-if="item.icon === '|'" :key="item.id">|</span>
-            <template v-else>
-              <button
-                class="xk-button"
-                :key="item.id"
-                type="text"
-                :title="item.title"
-                @click="toolbarClick(item.operate)"
-                :id="'toolbar-' + item.operate"
-              >
-                <b v-if="typeof item.icon === 'number'">H{{ item.icon }}</b>
-                <fa-icon v-else :icon="item.icon" />
-              </button>
-            </template>
+    <div class="toolbar-container" v-show="isAceMode && previewShow !== 'full'">
+      <div class="toolbar" v-show="toolbarShow">
+        <template v-for="item in toolbarButtons">
+          <span v-if="item.icon === '|'" :key="item.id">|</span>
+          <template v-else>
+            <button
+              class="xk-button"
+              :key="item.id"
+              type="text"
+              :title="item.title"
+              @click="toolbarClick(item.operate)"
+              :id="'toolbar-' + item.operate"
+            >
+              <b v-if="typeof item.icon === 'number'">H{{ item.icon }}</b>
+              <fa-icon v-else :icon="item.icon" />
+            </button>
           </template>
-        </div>
-        <div class="toolbar-html toolbar" v-show="!toolbarShow && toolbarHtmlShow">
-          <button class="xk-button" type="text" title="转换为Markdown模式" @click="switchToHtml()">
-            <fa-icon icon="file-code" />转换为Markdown模式
-          </button>
-        </div>
+        </template>
       </div>
+      <div class="toolbar-html toolbar" v-show="!toolbarShow && toolbarHtmlShow">
+        <button class="xk-button" type="text" title="转换为Markdown模式" @click="switchToHtml()">
+          <fa-icon icon="file-code" />转换为Markdown模式
+        </button>
+      </div>
+    </div>
+    <div class="editor-container">
       <div
         :class="
             'xkeditor-left ' +
@@ -53,6 +53,8 @@
       <div class="xk-col-24" v-show="!isAceMode" v-if="setting.xkSetting.enableTinyMCE">
         <tinymce ref="tinymce"></tinymce>
       </div>
+    </div>
+    <div class="tools-container">
       <button
         class="xk-button close-preview-full"
         @click="switchPreviewFull()"
@@ -64,12 +66,15 @@
       <div id="toc-button" class="xk-button">
         <fa-icon icon="bars" />
       </div>
-    </div>
-    <toolbar-modal></toolbar-modal>
-    <graff-board></graff-board>
-    <div :class="'xkeditor-toast ' + (toast.status !== '' ? toast.status : '')" v-show="toast.show">
-      <i v-show="toast.loading"></i>
-      <p>{{ toast.message }}</p>
+      <toolbar-modal></toolbar-modal>
+      <graff-board></graff-board>
+      <div
+        :class="'xkeditor-toast ' + (toast.status !== '' ? toast.status : '')"
+        v-show="toast.show"
+      >
+        <i v-show="toast.loading"></i>
+        <p>{{ toast.message }}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -283,10 +288,12 @@ export default {
 <style lang="scss">
 .xkeditor {
   height: 100%;
-  overflow-x: hidden;
-  overflow-y: hidden;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
   .row {
+    margin: 0;
     height: 100%;
     transform: translate(0, 0);
 
@@ -294,6 +301,11 @@ export default {
       height: 100%;
     }
   }
+}
+
+.editor-container {
+  overflow: auto;
+  flex: 1;
 }
 
 #previewHtml {
@@ -384,15 +396,6 @@ export default {
     font-size: 1.05em;
   }
 }
-.row {
-  margin: 0px;
-
-  .xk-col-12 {
-    float: left;
-    border-left: 1px solid #ddd;
-    box-sizing: border-box;
-  }
-}
 
 .xk-col-24 {
   padding: 0px;
@@ -404,6 +407,9 @@ export default {
   padding: 0px;
   width: 50%;
   height: 100%;
+  float: left;
+  border-left: 1px solid #ddd;
+  box-sizing: border-box;
 }
 
 .close-preview-full {
