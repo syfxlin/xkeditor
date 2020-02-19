@@ -536,7 +536,7 @@ export default {
   height: 30px;
   background-size: cover;
   background-position: center;
-  z-index: 99999;
+  z-index: 999;
 }
 
 .xkeditor-toast {
