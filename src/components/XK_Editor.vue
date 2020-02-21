@@ -306,6 +306,7 @@ export default {
 .editor-container {
   overflow: auto;
   flex: 1;
+  display: flex;
 }
 
 #previewHtml {
