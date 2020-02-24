@@ -239,14 +239,20 @@ export function toHtml(val, isFull) {
     text = commonParse(text);
     // [graff]{hash}
     text = text.replace(/\[graff]{(.*)}/g, function($1, $2) {
-      return (
-        '<img class="graffiti" src="' +
-        store.state.setting.xkSetting.graffUrl +
-        "graff-" +
-        $2 +
-        ".png" +
-        '">'
-      );
+      if (!isFull) {
+        return text;
+      } else {
+        let index = store.state.graffContent[$2].indexOf("|");
+        let size = store.state.graffContent[$2]
+          .substring(0, index)
+          .split(" ")
+          .map(item => parseFloat(item));
+        return `<svg class="graffiti" viewBox="${size[0]} ${size[1]} ${
+          size[2]
+        } ${size[3]}" data-hash="${$2}">${store.state.graffContent[
+          $2
+        ].substring(index + 1)}</svg>`;
+      }
     });
     // [TOC]
     // [TOC :fold]
@@ -517,21 +523,6 @@ export function toMarkdown(htmlVal, styleSwitch = true) {
     },
     replacement: function(content, node) {
       return "<sub>" + content + "</sub>";
-    }
-  });
-  turndownService.addRule("graff", {
-    filter: function(node) {
-      return node.nodeName === "IMG" && node.className === "graffiti";
-    },
-    replacement: function(content, node) {
-      return (
-        "[graff]{" +
-        node
-          .getAttribute("src")
-          .replace(store.state.setting.xkSetting.graffUrl + "graff-", "")
-          .substr(0, 6) +
-        "}"
-      );
     }
   });
   if (styleSwitch) {

@@ -2,7 +2,6 @@ import Vue from "vue";
 import ace from "ace-builds";
 import tinyMCE from "tinymce/tinymce";
 import { toHtml, toMarkdown } from "./utils/switchContent";
-import { initPaint } from "./utils/paint";
 import axios from "axios";
 import runCode from "./utils/runCode";
 
@@ -17,6 +16,7 @@ window.toggleToc = ele => {
 
 const state = Vue.observable({
   showToc: false,
+  showGraff: false,
   setting: {
     tinymceSetting: {
       language_url: "/static/tinymce/langs/zh_CN.js",
@@ -58,7 +58,6 @@ const state = Vue.observable({
       scrollBind: "both",
       imgUpload: false,
       graffUrl: "static/",
-      graffUpload: false,
       scrollMode: "anchor",
       pasteFormat: true,
       pasteImageUpload: true,
@@ -92,6 +91,8 @@ const state = Vue.observable({
   markdownContent: "",
   htmlContent: "",
   htmlViewContent: "",
+  graffContent: {},
+  graffHash: "123456",
   toolbarModal: {
     show: false,
     data: {},
@@ -256,69 +257,12 @@ const actions = {
     }
   },
   initGraff() {
-    if (state.setting.xkSetting.graffUpload) {
-      initPaint("canvas", true, false, { x: 1, y: 1 });
-      document.getElementById("previewHtml").addEventListener("click", e => {
-        let ele = e.target;
-        if (
-          ele.nodeName === "IMG" &&
-          ele.className.indexOf("graffiti") !== -1
-        ) {
-          let canvas = document.getElementById("canvas");
-          document.getElementsByClassName("canvas-main")[0].style.display =
-            "block";
-          let canvasContext = canvas.getContext("2d");
-          canvasContext.drawImage(
-            ele,
-            0,
-            0,
-            canvasContext.canvas.width,
-            canvasContext.canvas.height
-          );
-          let filename = ele.getAttribute("src");
-          if (filename.indexOf("/") > 0) {
-            filename = filename.substring(filename.lastIndexOf("/") + 1);
-          }
-          canvas.setAttribute("data-filename", filename);
-          window.setCanvasScale();
-        }
-      });
-    }
-  },
-  graffUpload() {
-    let hash = Math.random()
-      .toString(36)
-      .substring(2, 8);
-    if (document.getElementById("graff-upload").files.length > 0) {
-      let file = document.getElementById("graff-upload").files[0];
-      window.XKEditorAPI.graffUpload(
-        file,
-        response => {
-          Vue.set(state.toolbarModal.data, "hash", hash);
-        },
-        error => {
-          console.log(error);
-        },
-        "graff-" + hash + ".png"
-      );
-    } else {
-      let canvas = document.getElementById("canvas");
-      canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-      canvas.toBlob(blob => {
-        let file = new window.File([blob], "graff-" + hash + ".png", {
-          type: blob.type
-        });
-        window.XKEditorAPI.graffUpload(
-          file,
-          response => {
-            Vue.set(state.toolbarModal.data, "hash", hash);
-          },
-          error => {
-            console.log(error);
-          }
-        );
-      });
-    }
+    document.getElementById("previewHtml").addEventListener("click", e => {
+      if (e.target.classList.contains("graffiti") !== -1) {
+        state.graffHash = e.target.getAttribute("data-hash");
+        state.showGraff = true;
+      }
+    });
   },
   switchToc() {
     state.showToc = !state.showToc;
@@ -1005,31 +949,6 @@ const actions = {
           actions.showToast("上传中...", "", true);
           axios
             .post(state.setting.xkSetting.imgUpload, param, config)
-            .then(response => {
-              actions.timeToast("上传成功！", "success");
-              success(response);
-            })
-            .catch(error => {
-              actions.timeToast("上传失败！", "error");
-              failure(error);
-            });
-        }
-      },
-      graffUpload: (file, success, failure, filename = null) => {
-        if (state.setting.xkSetting.graffUpload) {
-          let param = new FormData();
-          if (filename) {
-            param.append("file", file, filename);
-          } else {
-            param.append("file", file);
-          }
-          let config = {
-            headers: { "Content-Type": "multipart/form-data" }
-          };
-          // success({"error":false,"path":"https://img.url"})
-          actions.showToast("上传中...", "", true);
-          axios
-            .post(state.setting.xkSetting.graffUpload, param, config)
             .then(response => {
               actions.timeToast("上传成功！", "success");
               success(response);

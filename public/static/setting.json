@@ -35,8 +35,6 @@
     "delayToHtml": 500,
     "scrollBind": "both",
     "imgUpload": "http://test.ixk.me/upload.php",
-    "graffUrl": "static/",
-    "graffUpload": "http://test.ixk.me/upload.php",
     "scrollMode": "javascript",
     "pasteFormat": true,
     "pasteImageUpload": true,

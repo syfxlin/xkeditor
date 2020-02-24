@@ -5,7 +5,7 @@
       <input id="graff-upload" type="file" accept="image/png" />
     </div>
     <div class="xk-input xk-col-12 graff-upload-sub">
-      <button class="xk-button" @click="graffUpload()">上传</button>
+      <button class="xk-button">上传</button>
     </div>
   </div>
 </template>
@@ -15,7 +15,7 @@ import { mapActions } from "../../store";
 export default {
   name: "graff-item",
   methods: {
-    ...mapActions(["graffUpload"])
+    // TODO: 新建Graff
   }
 };
 </script>

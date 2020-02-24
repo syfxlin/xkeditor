@@ -1,7 +1,7 @@
 <template>
   <div class="xkeditor">
     <div class="toolbar-container" v-show="isAceMode && previewShow !== 'full'">
-      <div class="toolbar" v-show="toolbarShow">
+      <div class="xk-toolbar" v-show="toolbarShow">
         <template v-for="item in toolbarButtons">
           <span v-if="item.icon === '|'" :key="item.id">|</span>
           <template v-else>
@@ -19,7 +19,7 @@
           </template>
         </template>
       </div>
-      <div class="toolbar-html toolbar" v-show="!toolbarShow && toolbarHtmlShow">
+      <div class="toolbar-html xk-toolbar" v-show="!toolbarShow && toolbarHtmlShow">
         <button class="xk-button" type="text" title="转换为Markdown模式" @click="switchToHtml()">
           <fa-icon icon="file-code" />转换为Markdown模式
         </button>
@@ -67,7 +67,7 @@
         <fa-icon icon="bars" />
       </div>
       <toolbar-modal></toolbar-modal>
-      <graff-board></graff-board>
+      <graff-board v-if="showGraff"></graff-board>
       <div
         :class="'xkeditor-toast ' + (toast.status !== '' ? toast.status : '')"
         v-show="toast.show"
@@ -116,7 +116,8 @@ export default {
   },
   props: {
     config: Object,
-    value: String
+    value: String,
+    graff: Object
   },
   data() {
     return {
@@ -134,7 +135,9 @@ export default {
       "setting",
       "toast",
       "toolbarShow",
-      "toolbarHtmlShow"
+      "toolbarHtmlShow",
+      "graffContent",
+      "showGraff"
     ]),
     isAceMode() {
       if (this.editorMode === "ace") {
@@ -157,6 +160,7 @@ export default {
     this.markdownContent = this.value || "";
     this.setting = mergeDeep(this.setting, this.config);
     this.htmlViewContent = toHtml(this.markdownContent, true);
+    this.graffContent = this.graff || {};
     this.loadCss(this.setting.xkSetting.previewCss);
   },
   mounted() {
@@ -280,6 +284,18 @@ export default {
     },
     htmlContent(val) {
       this.$emit("input", toMarkdown(val));
+    },
+    graff: {
+      handler(val) {
+        this.graffContent = val;
+      },
+      deep: true
+    },
+    graffContent: {
+      handler(val) {
+        this.$emit("update:graff", val);
+      },
+      deep: true
     }
   }
 };
@@ -468,7 +484,7 @@ export default {
   background: #6190e8;
 }
 
-.toolbar {
+.xk-toolbar {
   background: #fff;
 
   span {

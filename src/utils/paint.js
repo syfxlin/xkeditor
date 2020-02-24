@@ -1,563 +1,1158 @@
+import intersect from "./path-intersect";
+
 window.paints = [];
 
-export function initPaint(
-  canvasId,
-  initBtn = false,
-  autoScale = true,
-  scale = { x: 1, y: 1 }
-) {
-  if (paints[canvasId]) {
+function rect2path(x, y, width, height, rx, ry) {
+  x = parseFloat(x);
+  y = parseFloat(y);
+  width = parseFloat(width);
+  height = parseFloat(height);
+  rx = parseFloat(rx);
+  ry = parseFloat(ry);
+  rx = rx || ry || 0;
+  ry = ry || rx || 0;
+  if (isNaN(x - y + width - height + rx - ry)) return;
+  rx = rx > width / 2 ? width / 2 : rx;
+  ry = ry > height / 2 ? height / 2 : ry;
+  var path = "";
+  if (0 == rx || 0 == ry) {
+    path = `M ${x} ${y} h ${width} v ${height} h ${-width} Z`;
+  } else {
+    path =
+      `M ${x} ${y + ry} ` +
+      `a ${rx} ${ry} 0 0 1 ${rx} ${-ry} ` +
+      `h ${width - 2 * rx} ` +
+      `a ${rx} ${ry} 0 0 1 ${rx} ${ry} ` +
+      `v ${height - 2 * ry} ` +
+      `a ${rx} ${ry} 0 0 1 ${-rx} ${ry} ` +
+      `h ${2 * rx - width} ` +
+      `a ${rx} ${ry} 0 0 1 ${-rx} ${-ry} ` +
+      `Z`;
+  }
+  return path;
+}
+
+function ellipse2path(cx, cy, rx, ry) {
+  cx = parseFloat(cx);
+  cy = parseFloat(cy);
+  rx = parseFloat(rx);
+  ry = parseFloat(ry);
+  if (isNaN(cx - cy + rx - ry)) return;
+  return (
+    `M ${cx - rx} ${cy} ` +
+    `a ${rx} ${ry} 0 1 0 ${2 * rx} 0` +
+    `a ${rx} ${ry} 0 1 0 ${-2 * rx} 0 ` +
+    `Z`
+  );
+}
+
+function polygon2path(points) {
+  let pointsList = points.split(/(,|, )/g);
+  return `M ${pointsList[0]} L ${pointsList.splice(1).join(" ")} Z`;
+}
+
+export default function initPaint(svgId, conf = null) {
+  if (window.paints[svgId]) {
     return;
   } else {
-    paints.push(canvasId);
+    window.paints.push(svgId);
   }
-  var canvasEle = document.getElementById(canvasId);
-  var canvasContext = canvasEle.getContext("2d");
-  var canvasMoveOpen = false;
-  var auxEle = document.getElementById("auxiliary-ele");
-  var point = {
-    s: [],
-    e: []
-  };
-  var firstPoint = null;
-  var lastPoint = null;
+  var svgns = "http://www.w3.org/2000/svg";
+  var svg = document.getElementById(svgId);
 
-  var prevCanvas = [];
-  var nextCanvas = [];
-  var inputStatus = "mid";
-  // 存入初始状态，即空白状态，或者有图像的状态
-  prevCanvas.push(
-    canvasContext.getImageData(
-      0,
-      0,
-      canvasContext.canvas.width,
-      canvasContext.canvas.height
-    )
-  );
-
-  var type = "pen";
   var config = {
-    lineColor: "#5ab639",
-    lineWidth: 0.5,
-    shadowBlur: 0.7,
-    eraserSize: 15,
+    color: "#6190e8",
+    fillColor: "none",
+    lineWidth: 2,
+    eraserSize: 10,
+    fontFamily: "inherit",
     fontSize: 14,
-    fontFamily: "Arial"
+    type: "pen",
+    ...conf
   };
-  //初始化绘制比例
-  if (autoScale) {
-    scale.x = canvasEle.width / canvasEle.clientWidth;
-    scale.y = canvasEle.height / canvasEle.clientHeight;
-  }
-  /**
-   * 形状：
-   * 线 ok
-   * 矩形 ok
-   * 圆 ok
-   * 圆角矩形 ok
-   * 菱形 ok
-   * 直线 ok
-   * 不规则边形（可折线段） ok
-   *
-   * 功能：
-   * 画笔颜色 ok
-   * 画笔大小 ok
-   * 撤销前进 ok
-   * 清空 ok
-   * 保存 ok
-   * 橡皮擦 ok
-   * 背景 ok
-   * 插入文字 ok
-   */
 
-  function drawEraser(loc) {
-    canvasContext.save();
-    canvasContext.beginPath();
-    canvasContext.arc(
-      loc.x * scale.x,
-      loc.y * scale.y,
-      config.eraserSize * scale.x,
-      0,
-      Math.PI * 2,
-      false
-    );
-    canvasContext.clip();
-    canvasContext.clearRect(
-      0,
-      0,
-      canvasContext.canvas.width,
-      canvasContext.canvas.height
-    );
-    canvasContext.restore();
+  document.querySelector(`[data-type="${config.type}"`).classList.add("active");
+  document.querySelector("#select-color").value = "custom";
+  document.querySelector("#custom-color").value = config.color;
+  document.querySelector("#select-size").value = "custom";
+  document.querySelector("#custom-size").value = config.lineWidth;
+  document.querySelector("#select-fill-color").value =
+    config.fillColor === "none" ? "none" : "custom";
+  document.querySelector("#custom-fill-color").value =
+    config.fillColor === "none" ? "black" : config.fillColor;
+  document.querySelector("#text-size").value = config.fontSize;
+
+  var drawMoveOpen = false;
+  var selectHasMove = false;
+  var resizeOpen = false;
+  var svgCurrEle = null;
+  var eraserPath = "";
+  var tempPoint = null;
+  var drawLimited = false;
+  var resizeBtn = false;
+  var resizeIndex = null;
+  var resizeEle = null;
+  let resizeType = null;
+  var resizePoints = {};
+
+  var undoList = [];
+  var redoList = [];
+  var boxSizeList = [];
+  var redoBoxSizeList = [];
+
+  // Init
+  for (const item of svg.children) {
+    undoList.push(item);
+    boxSizeList.push(item.getBBox());
   }
 
-  // 停止绘制不规则边形
-  document.addEventListener("keydown", function(e) {
-    if (e.key === "Escape") {
-      if (type === "polyline") {
-        firstPoint = null;
-        lastPoint = null;
-      }
-    }
-  });
-
-  document.addEventListener("keydown", function(e) {
-    if (e.key === "Enter" && document.getElementById("canvas-text")) {
-      operateCanvasText();
-    }
-  });
-
-  function operateCanvasText() {
-    let text = document.getElementById("canvas-text").value;
-    auxEle.innerHTML = "";
-    auxEle.style.display = "none";
-    auxEle.style.pointerEvents = "none";
-    canvasContext.font = config.fontSize + "px " + config.fontFamily;
-    canvasContext.fillText(
-      text,
-      point.s.x * scale.x + 3,
-      point.s.y * scale.y + config.fontSize
-    );
-    let prevData = canvasContext.getImageData(
-      0,
-      0,
-      canvasContext.canvas.width,
-      canvasContext.canvas.height
-    );
-    prevCanvas.push(prevData);
-    inputStatus = "mid";
-  }
-
-  function canvasDown(e) {
-    if (e.buttons === 32) {
-      type = "eraser";
-    }
-    if (e.pointerType === "pen" && type === "eraser" && e.buttons === 1) {
-      type = "pen";
-    }
-    let clientX = 0;
-    let clientY = 0;
-    clientX = e.clientX;
-    clientY = e.clientY;
-    let offsetCanvas = canvasEle.getBoundingClientRect();
-    clientX -= offsetCanvas.left;
-    clientY -= offsetCanvas.top;
-    // 记录开始的坐标
-    point.s.x = clientX;
-    point.s.y = clientY;
-    // 若不是 pen 状态就显示辅助线
-    if (type !== "pen") {
-      auxEle.style.left = clientX + "px";
-      auxEle.style.top = clientY + "px";
-      auxEle.style.width = "0px";
-      auxEle.style.height = "0px";
-      auxEle.style.display = "block";
-    }
-    // 橡皮擦
-    if (type === "eraser") {
-      drawEraser(point.s);
-      auxEle.style.width = config.eraserSize * 2 + "px";
-      auxEle.style.height = config.eraserSize * 2 + "px";
-      auxEle.style.borderRadius = "50%";
-      auxEle.style.transform =
-        "translate(-" + config.eraserSize + "px, -" + config.eraserSize + "px)";
-    }
-    if (type === "text") {
-      auxEle.innerHTML = '<input type="text" id="canvas-text" autofocus>';
-      auxEle.style.pointerEvents = "auto";
-    }
-    // 为不同的输入状态调整辅助线
-    if (type === "round-rect") {
-      auxEle.style.borderRadius = "10px";
-    }
-    if (type === "ellipse") {
-      auxEle.style.borderRadius = "50%";
-    }
-    // 激活移动事件
-    if (type !== "text") {
-      canvasMoveOpen = true;
-    }
-    // 初始化
-    canvasContext.beginPath();
-    // 设置样式
-    canvasContext.strokeStyle = config.lineColor;
-    if (type === "pen") {
-      canvasContext.lineWidth = config.lineWidth;
+  var getPoint = (x, y) => {
+    var svgOffset = svg.getBoundingClientRect();
+    if (drawLimited) {
+      return {
+        x: Math.round((x - svgOffset.x) / 20) * 20,
+        y: Math.round((y - svgOffset.y) / 20) * 20
+      };
     } else {
-      canvasContext.lineWidth = config.lineWidth + config.shadowBlur * 2;
+      return {
+        x: Math.round((x - svgOffset.x) * 100) / 100,
+        y: Math.round((y - svgOffset.y) * 100) / 100
+      };
     }
-    canvasContext.shadowBlur = config.shadowBlur;
-    canvasContext.shadowColor = config.lineColor;
-  }
+  };
 
-  function canvasMove(e) {
-    // 若未激活就直接return
-    if (e.buttons === 0) return;
-    if (!canvasMoveOpen) return;
-    // 获取当前坐标
-    let t = e.target;
-    let clientX = 0;
-    let clientY = 0;
-    clientX = e.clientX;
-    clientY = e.clientY;
-    let offsetCanvas = canvasEle.getBoundingClientRect();
-    clientX -= offsetCanvas.left;
-    clientY -= offsetCanvas.top;
-    let canvasX = clientX;
-    let canvasY = clientY;
-    let width = canvasX - point.s.x;
-    let height = canvasY - point.s.y;
-    // 由于用户有可能从右下向左上绘制，需要将其转化为正数，否则辅助线会显示错误
-    if (canvasX - point.s.x < 0 || canvasY - point.s.y < 0) {
-      width = -width;
-      height = -height;
-      auxEle.style.left = clientX + "px";
-      auxEle.style.top = clientY + "px";
-    }
-    // 各种状态的绘制
-    if (type === "pen") {
-      // 通过压力重置线宽
-      canvasContext.lineWidth = config.lineWidth * e.pressure * 2;
-      canvasContext.lineTo(canvasX * scale.x, canvasY * scale.y);
-      canvasContext.stroke();
-    }
-    // 橡皮擦
-    if (type === "eraser") {
-      drawEraser({ x: canvasX, y: canvasY });
-      auxEle.style.left = clientX + "px";
-      auxEle.style.top = clientY + "px";
-    }
-    if (type === "line") {
-      let length = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
-      let angle = (Math.atan(height / width) / Math.PI) * 180;
-      // 修复向右上角滑动显示不正确的情况
-      if (canvasX - point.s.x >= 0 && canvasY - point.s.y <= 0) {
-        angle = (Math.acos(width / length) / Math.PI) * 180;
+  var drawDown = e => {
+    drawMoveOpen = true;
+    let { x, y } = getPoint(e.clientX, e.clientY);
+    if (e.target.getAttributeNS(null, "data-resize")) {
+      resizeOpen = true;
+      resizeBtn = e.target;
+      tempPoint = { x, y };
+      resizeIndex = parseInt(
+        resizeBtn.parentElement.getAttributeNS(null, "data-index")
+      );
+      resizeEle = undoList[resizeIndex];
+      resizeType = resizeEle.nodeName;
+      if (resizeType === "path") {
+        resizePoints = {
+          x: boxSizeList[resizeIndex].x,
+          y: boxSizeList[resizeIndex].y,
+          width: boxSizeList[resizeIndex].width,
+          height: boxSizeList[resizeIndex].height,
+          points: resizeEle
+            .getAttributeNS(null, "d")
+            .split(/M |L /g)
+            .map(item => {
+              return {
+                x: parseFloat(item.split(",")[0]),
+                y: parseFloat(item.split(",")[1])
+              };
+            })
+        };
       }
-      auxEle.style.width = length + "px";
-      auxEle.style.height = "0px";
-      auxEle.style.transform = "rotate(" + angle + "deg)";
-      auxEle.style.transformOrigin = "top left";
+      if (resizeType === "line") {
+        resizePoints = {
+          x1: parseFloat(resizeEle.getAttributeNS(null, "x1")),
+          y1: parseFloat(resizeEle.getAttributeNS(null, "y1")),
+          x2: parseFloat(resizeEle.getAttributeNS(null, "x2")),
+          y2: parseFloat(resizeEle.getAttributeNS(null, "y2"))
+        };
+      }
+      if (resizeType === "rect") {
+        resizePoints = {
+          x: parseFloat(resizeEle.getAttributeNS(null, "x")),
+          y: parseFloat(resizeEle.getAttributeNS(null, "y")),
+          width: parseFloat(resizeEle.getAttributeNS(null, "width")),
+          height: parseFloat(resizeEle.getAttributeNS(null, "height"))
+        };
+      }
+      if (resizeType === "circle" || resizeType === "ellipse") {
+        resizePoints = {
+          cx: parseFloat(resizeEle.getAttributeNS(null, "cx")),
+          cy: parseFloat(resizeEle.getAttributeNS(null, "cy")),
+          rx: parseFloat(
+            resizeEle.getAttributeNS(null, resizeType === "circle" ? "r" : "rx")
+          ),
+          ry: parseFloat(
+            resizeEle.getAttributeNS(null, resizeType === "circle" ? "r" : "ry")
+          )
+        };
+      }
+      if (resizeType === "polygon") {
+        resizePoints = {
+          x: boxSizeList[resizeIndex].x,
+          y: boxSizeList[resizeIndex].y,
+          width: boxSizeList[resizeIndex].width,
+          height: boxSizeList[resizeIndex].height,
+          points: resizeEle
+            .getAttributeNS(null, "points")
+            .split(", ")
+            .map(item => {
+              return {
+                x: parseFloat(item.split(" ")[0]),
+                y: parseFloat(item.split(" ")[1])
+              };
+            })
+        };
+      }
+      return;
+    } else if (svg.querySelector("#selects")) {
+      svg.querySelector("#selects").remove();
     }
-    if (type !== "pen" && type !== "line" && type !== "eraser") {
-      auxEle.style.width = width + "px";
-      auxEle.style.height = height + "px";
-    }
-  }
 
-  function canvasUp(e) {
-    let clientX = 0;
-    let clientY = 0;
-    // 关闭移动事件
-    canvasMoveOpen = false;
-    clientX = e.clientX;
-    clientY = e.clientY;
-    let offsetCanvas = canvasEle.getBoundingClientRect();
-    clientX -= offsetCanvas.left;
-    clientY -= offsetCanvas.top;
-    // 获取结束的坐标
-    point.e.x = clientX;
-    point.e.y = clientY;
-    // 由于用户有可能从右下向左上绘制，需要将其转化为正数，否则辅助线会显示错误
-    if (point.e.x - point.s.x < 0 || point.e.y - point.s.y < 0) {
-      let temp = point.s;
-      point.s = point.e;
-      point.e = temp;
+    redoList = [];
+    if (config.type === "pen") {
+      svgCurrEle = document.createElementNS(svgns, "path");
+      svgCurrEle.setAttributeNS(null, "d", `M ${x},${y}`);
     }
-    // 各种状态的绘制
-    if (type === "line") {
-      canvasContext.moveTo(point.s.x * scale.x, point.s.y * scale.y);
-      canvasContext.lineTo(point.e.x * scale.x, point.e.y * scale.y);
-      auxEle.style.transform = "none";
+    if (config.type === "line") {
+      svgCurrEle = document.createElementNS(svgns, "line");
+      svgCurrEle.setAttributeNS(null, "x1", x);
+      svgCurrEle.setAttributeNS(null, "y1", y);
+      svgCurrEle.setAttributeNS(null, "x2", x);
+      svgCurrEle.setAttributeNS(null, "y2", y);
+      tempPoint = { x, y };
     }
-    if (type === "polyline") {
-      if (lastPoint === null) {
-        canvasContext.moveTo(point.s.x * scale.x, point.s.y * scale.y);
-        canvasContext.lineTo(point.e.x * scale.x, point.e.y * scale.y);
-        firstPoint = [point.s.x, point.s.y];
-        lastPoint = [point.e.x, point.e.y];
+    if (config.type === "rect" || config.type === "round-rect") {
+      svgCurrEle = document.createElementNS(svgns, "rect");
+      svgCurrEle.setAttributeNS(null, "x", x);
+      svgCurrEle.setAttributeNS(null, "y", y);
+      tempPoint = { x, y };
+    }
+    if (config.type === "circle") {
+      svgCurrEle = document.createElementNS(svgns, "circle");
+      svgCurrEle.setAttributeNS(null, "cx", x);
+      svgCurrEle.setAttributeNS(null, "cy", y);
+      tempPoint = { x, y };
+    }
+    if (config.type === "ellipse") {
+      svgCurrEle = document.createElementNS(svgns, "ellipse");
+      svgCurrEle.setAttributeNS(null, "cx", x);
+      svgCurrEle.setAttributeNS(null, "cy", y);
+      tempPoint = { x, y };
+    }
+    if (config.type === "polygon") {
+      if (tempPoint === null) {
+        svgCurrEle = document.createElementNS(svgns, "polygon");
+        svgCurrEle.setAttributeNS(null, "points", `${x} ${y}`);
+        tempPoint = `${x} ${y}, `;
       } else {
-        canvasContext.moveTo(lastPoint[0] * scale.x, lastPoint[1] * scale.y);
-        canvasContext.lineTo(point.e.x * scale.x, point.e.y * scale.y);
-        lastPoint = [point.e.x, point.e.y];
-        if (
-          Math.abs(lastPoint[0] - firstPoint[0]) < 5 &&
-          Math.abs(lastPoint[1] - firstPoint[1]) < 5
-        ) {
-          canvasContext.lineTo(
-            firstPoint[0] * scale.x,
-            firstPoint[1] * scale.y
-          );
-          firstPoint = null;
-          lastPoint = null;
-        }
+        tempPoint += `${x} ${y}, `;
       }
     }
-    if (type === "rect") {
-      canvasContext.rect(
-        point.s.x * scale.x,
-        point.s.y * scale.y,
-        (point.e.x - point.s.x) * scale.x,
-        (point.e.y - point.s.y) * scale.y
-      );
+    if (config.type === "diamond") {
+      svgCurrEle = document.createElementNS(svgns, "polygon");
+      svgCurrEle.setAttributeNS(null, "points", `${x} ${y}`);
+      tempPoint = { x, y };
     }
-    if (type === "round-rect") {
-      // 上
-      canvasContext.moveTo(point.s.x * scale.x + 10, point.s.y * scale.y);
-      canvasContext.lineTo(point.e.x * scale.x - 10, point.s.y * scale.y);
-      canvasContext.arc(
-        point.e.x * scale.x - 10,
-        point.s.y * scale.y + 10,
-        10,
-        (Math.PI / 2) * 3,
-        Math.PI * 2
-      );
-      // 下
-      canvasContext.moveTo(point.e.x * scale.x - 10, point.e.y * scale.y);
-      canvasContext.lineTo(point.s.x * scale.x + 10, point.e.y * scale.y);
-      canvasContext.arc(
-        point.s.x * scale.x + 10,
-        point.e.y * scale.y - 10,
-        10,
-        Math.PI / 2,
-        Math.PI
-      );
-      // 左
-      canvasContext.moveTo(point.s.x * scale.x, point.e.y * scale.y - 10);
-      canvasContext.lineTo(point.s.x * scale.x, point.s.y * scale.y + 10);
-      canvasContext.arc(
-        point.s.x * scale.x + 10,
-        point.s.y * scale.y + 10,
-        10,
-        Math.PI,
-        (Math.PI / 2) * 3
-      );
-      // 右
-      canvasContext.moveTo(point.e.x * scale.x, point.s.y * scale.y + 10);
-      canvasContext.lineTo(point.e.x * scale.x, point.e.y * scale.y - 10);
-      canvasContext.arc(
-        point.e.x * scale.x - 10,
-        point.e.y * scale.y - 10,
-        10,
-        0,
-        Math.PI / 2
-      );
-    }
-    if (type === "ellipse") {
-      let radiusX = (point.e.x - point.s.x) / 2;
-      let radiusY = (point.e.y - point.s.y) / 2;
-      canvasContext.ellipse(
-        (point.s.x + radiusX) * scale.x,
-        (point.s.y + radiusY) * scale.y,
-        radiusX * scale.x,
-        radiusY * scale.y,
-        0,
-        0,
-        2 * Math.PI
-      );
-      auxEle.style.borderRadius = "0";
-    }
-    if (type === "diamond") {
-      canvasContext.moveTo(
-        ((point.s.x + point.e.x) / 2) * scale.x,
-        point.s.y * scale.y
-      );
-      canvasContext.lineTo(
-        point.e.x * scale.x,
-        ((point.s.y + point.e.y) / 2) * scale.y
-      );
-      canvasContext.lineTo(
-        ((point.s.x + point.e.x) / 2) * scale.x,
-        point.e.y * scale.y
-      );
-      canvasContext.lineTo(
-        point.s.x * scale.x,
-        ((point.s.y + point.e.y) / 2) * scale.y
-      );
-      canvasContext.lineTo(
-        ((point.s.x + point.e.x) / 2) * scale.x,
-        point.s.y * scale.y
-      );
-    }
-    // 隐藏辅助线并开始绘制
-    if (type !== "text") {
-      auxEle.style.display = "none";
-    }
-    if (type !== "eraser") {
-      canvasContext.stroke();
-    }
-    // 保存状态
-    let prevData = canvasContext.getImageData(
-      0,
-      0,
-      canvasContext.canvas.width,
-      canvasContext.canvas.height
-    );
-    prevCanvas.push(prevData);
-    inputStatus = "mid";
-  }
-
-  function switchType(typeStr) {
-    type = typeStr;
-  }
-
-  function setBackground(img) {
-    canvasContext.drawImage(img, 0, 0);
-  }
-
-  window.setCanvasScale = function(auto = true, s = { x: 1, y: 1 }) {
-    if (auto) {
-      scale.x = canvasEle.width / canvasEle.clientWidth;
-      scale.y = canvasEle.height / canvasEle.clientHeight;
+    if (config.type === "eraser") {
+      eraserPath = `M ${x} ${y}`;
+    } else if (config.type === "text") {
+      drawMoveOpen = false;
+      svgCurrEle = document.createElementNS(svgns, "text");
+      svgCurrEle.setAttributeNS(null, "font-family", config.fontFamily);
+      svgCurrEle.setAttributeNS(null, "font-size", config.fontSize);
+      svgCurrEle.setAttributeNS(null, "fill", config.color);
+      svgCurrEle.setAttributeNS(null, "x", x);
+      svgCurrEle.setAttributeNS(null, "y", y);
+      let input = document.createElement("input");
+      input.style.fontFamily = config.fontFamily;
+      input.style.fontSize = config.fontSize + "px";
+      input.style.color = config.color;
+      input.type = "text";
+      input.style.position = "fixed";
+      input.style.top = e.clientY - config.fontSize + "px";
+      input.style.left = e.clientX + "px";
+      document.body.append(input);
+      setTimeout(() => input.focus(), 0);
+      input.addEventListener("blur", e => {
+        input.remove();
+      });
+      input.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+          svgCurrEle.textContent = input.value;
+          svg.append(svgCurrEle);
+          input.remove();
+        }
+      });
+    } else if (config.type === "select") {
+      svgCurrEle = document.createElementNS(svgns, "rect");
+      svgCurrEle.setAttributeNS(null, "x", x);
+      svgCurrEle.setAttributeNS(null, "y", y);
+      svgCurrEle.setAttributeNS(null, "fill", "rgba(240, 240,240, 0.4)");
+      svgCurrEle.setAttributeNS(null, "stroke", "#BBB");
+      svgCurrEle.setAttributeNS(null, "stroke-width", 1);
+      svg.append(svgCurrEle);
+      tempPoint = { x, y };
+      selectHasMove = false;
     } else {
-      scale = s;
+      if (config.type !== "pen" && config.type !== "line") {
+        svgCurrEle.setAttributeNS(null, "fill", config.fillColor);
+      } else {
+        svgCurrEle.setAttributeNS(null, "fill", "none");
+      }
+      svgCurrEle.setAttributeNS(null, "stroke", config.color);
+      svgCurrEle.setAttributeNS(null, "stroke-width", config.lineWidth);
+      svg.append(svgCurrEle);
     }
   };
 
-  function toPrevCanvas() {
-    if (prevCanvas.length == 0) {
-      document.getElementsByClassName("fa-reply")[0].classList.remove("active");
-      document.getElementsByClassName("fa-share")[0].classList.add("active");
+  var drawMove = e => {
+    if (!drawMoveOpen) {
       return;
     }
-    if (inputStatus !== "prev") {
-      nextCanvas.push(prevCanvas.pop());
-    }
-    let data = prevCanvas.pop();
-    canvasContext.putImageData(data, 0, 0);
-    nextCanvas.push(data);
-    inputStatus = "prev";
-  }
-
-  function toNextCanvas() {
-    if (nextCanvas.length == 0) {
-      document.getElementsByClassName("fa-reply")[0].classList.add("active");
-      document.getElementsByClassName("fa-share")[0].classList.remove("active");
+    let { x, y } = getPoint(e.clientX, e.clientY);
+    if (resizeOpen) {
+      let selectBox = resizeBtn.parentElement;
+      switch (resizeBtn.getAttributeNS(null, "data-resize")) {
+        case "mv":
+          if (resizeType === "line") {
+            resizeEle.setAttributeNS(
+              null,
+              "x1",
+              resizePoints.x1 + x - tempPoint.x
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "x2",
+              resizePoints.x2 + x - tempPoint.x
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "y1",
+              resizePoints.y1 + y - tempPoint.y
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "y2",
+              resizePoints.y2 + y - tempPoint.y
+            );
+          }
+          if (resizeType === "rect") {
+            resizeEle.setAttributeNS(
+              null,
+              "x",
+              resizePoints.x + x - tempPoint.x
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "y",
+              resizePoints.y + y - tempPoint.y
+            );
+          }
+          if (resizeType === "circle" || resizeType === "ellipse") {
+            resizeEle.setAttributeNS(
+              null,
+              "cx",
+              resizePoints.cx + x - tempPoint.x
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "cy",
+              resizePoints.cy + y - tempPoint.y
+            );
+          }
+          if (resizeType === "polygon") {
+            let points = resizePoints.points
+              .map(
+                item =>
+                  `${item.x + x - tempPoint.x} ${item.y + y - tempPoint.y}`
+              )
+              .join(", ");
+            resizeEle.setAttributeNS(null, "points", points);
+          }
+          if (resizeType === "path") {
+            let points = resizePoints.points
+              .map(item => {
+                if (isNaN(item.x) || isNaN(item.y)) {
+                  return "";
+                } else {
+                  return `${item.x + x - tempPoint.x},${item.y +
+                    y -
+                    tempPoint.y}`;
+                }
+              })
+              .join(" L ");
+            resizeEle.setAttributeNS(null, "d", `M${points.substring(2)}`);
+          }
+          break;
+        case "tl":
+          if (resizeType === "line") {
+            resizeEle.setAttributeNS(
+              null,
+              "x1",
+              resizePoints.x1 + x - tempPoint.x
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "y1",
+              resizePoints.y1 + y - tempPoint.y
+            );
+          }
+          if (resizeType === "rect") {
+            resizeEle.setAttributeNS(
+              null,
+              "x",
+              resizePoints.x + x - tempPoint.x
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "y",
+              resizePoints.y + y - tempPoint.y
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "width",
+              resizePoints.width - x + tempPoint.x
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "height",
+              resizePoints.height - y + tempPoint.y
+            );
+          }
+          if (resizeType === "circle") {
+            let len = Math.min((x - tempPoint.x) / 2, (y - tempPoint.y) / 2);
+            resizeEle.setAttributeNS(null, "cx", resizePoints.cx + len);
+            resizeEle.setAttributeNS(null, "cy", resizePoints.cy + len);
+            resizeEle.setAttributeNS(null, "r", resizePoints.rx - len);
+          }
+          if (resizeType === "ellipse") {
+            resizeEle.setAttributeNS(
+              null,
+              "cx",
+              resizePoints.cx + (x - tempPoint.x) / 2
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "cy",
+              resizePoints.cy + (y - tempPoint.y) / 2
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "rx",
+              resizePoints.rx - (x - tempPoint.x) / 2
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "ry",
+              resizePoints.ry - (y - tempPoint.y) / 2
+            );
+          }
+          if (resizeType === "polygon") {
+            let s = {
+              x: 1 - (x - tempPoint.x) / resizePoints.width,
+              y: 1 - (y - tempPoint.y) / resizePoints.height
+            };
+            let points = resizePoints.points
+              .map(
+                item =>
+                  `${(item.x - resizePoints.x) * s.x +
+                    resizePoints.x +
+                    x -
+                    tempPoint.x} ${(item.y - resizePoints.y) * s.y +
+                    resizePoints.y +
+                    y -
+                    tempPoint.y}`
+              )
+              .join(", ");
+            resizeEle.setAttributeNS(null, "points", points);
+          }
+          if (resizeType === "path") {
+            let s = {
+              x: 1 - (x - tempPoint.x) / resizePoints.width,
+              y: 1 - (y - tempPoint.y) / resizePoints.height
+            };
+            let points = resizePoints.points
+              .map(item => {
+                if (isNaN(item.x) || isNaN(item.y)) {
+                  return "";
+                } else {
+                  return `${(item.x - resizePoints.x) * s.x +
+                    resizePoints.x +
+                    x -
+                    tempPoint.x},${(item.y - resizePoints.y) * s.y +
+                    resizePoints.y +
+                    y -
+                    tempPoint.y}`;
+                }
+              })
+              .join(" L ");
+            resizeEle.setAttributeNS(null, "d", `M${points.substring(2)}`);
+          }
+          break;
+        case "bl":
+          if (resizeType === "line") {
+            resizeEle.setAttributeNS(
+              null,
+              "x1",
+              resizePoints.x1 + x - tempPoint.x
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "y2",
+              resizePoints.y2 + y - tempPoint.y
+            );
+          }
+          if (resizeType === "rect") {
+            resizeEle.setAttributeNS(
+              null,
+              "x",
+              resizePoints.x + x - tempPoint.x
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "width",
+              resizePoints.width - x + tempPoint.x
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "height",
+              resizePoints.height + y - tempPoint.y
+            );
+          }
+          if (resizeType === "circle") {
+            let len = Math.min((x - tempPoint.x) / 2, -(y - tempPoint.y) / 2);
+            resizeEle.setAttributeNS(null, "cx", resizePoints.cx + len);
+            resizeEle.setAttributeNS(null, "cy", resizePoints.cy - len);
+            resizeEle.setAttributeNS(null, "r", resizePoints.rx - len);
+          }
+          if (resizeType === "ellipse") {
+            resizeEle.setAttributeNS(
+              null,
+              "cx",
+              resizePoints.cx + (x - tempPoint.x) / 2
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "cy",
+              resizePoints.cy + (y - tempPoint.y) / 2
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "rx",
+              resizePoints.rx - (x - tempPoint.x) / 2
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "ry",
+              resizePoints.ry + (y - tempPoint.y) / 2
+            );
+          }
+          if (resizeType === "polygon") {
+            let s = {
+              x: 1 - (x - tempPoint.x) / resizePoints.width,
+              y: 1 + (y - tempPoint.y) / resizePoints.height
+            };
+            let points = resizePoints.points
+              .map(
+                item =>
+                  `${(item.x - resizePoints.x) * s.x +
+                    resizePoints.x +
+                    x -
+                    tempPoint.x} ${(item.y - resizePoints.y) * s.y +
+                    resizePoints.y}`
+              )
+              .join(", ");
+            resizeEle.setAttributeNS(null, "points", points);
+          }
+          if (resizeType === "path") {
+            let s = {
+              x: 1 - (x - tempPoint.x) / resizePoints.width,
+              y: 1 + (y - tempPoint.y) / resizePoints.height
+            };
+            let points = resizePoints.points
+              .map(item => {
+                if (isNaN(item.x) || isNaN(item.y)) {
+                  return "";
+                } else {
+                  return `${(item.x - resizePoints.x) * s.x +
+                    resizePoints.x +
+                    x -
+                    tempPoint.x},${(item.y - resizePoints.y) * s.y +
+                    resizePoints.y}`;
+                }
+              })
+              .join(" L ");
+            resizeEle.setAttributeNS(null, "d", `M${points.substring(2)}`);
+          }
+          break;
+        case "tr":
+          if (resizeType === "line") {
+            resizeEle.setAttributeNS(
+              null,
+              "x2",
+              resizePoints.x2 + x - tempPoint.x
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "y1",
+              resizePoints.y1 + y - tempPoint.y
+            );
+          }
+          if (resizeType === "rect") {
+            resizeEle.setAttributeNS(
+              null,
+              "y",
+              resizePoints.y + y - tempPoint.y
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "width",
+              resizePoints.width + x - tempPoint.x
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "height",
+              resizePoints.height - y + tempPoint.y
+            );
+          }
+          if (resizeType === "circle") {
+            let len = Math.min((x - tempPoint.x) / 2, -(y - tempPoint.y) / 2);
+            resizeEle.setAttributeNS(null, "cx", resizePoints.cx + len);
+            resizeEle.setAttributeNS(null, "cy", resizePoints.cy - len);
+            resizeEle.setAttributeNS(null, "r", resizePoints.rx + len);
+          }
+          if (resizeType === "ellipse") {
+            resizeEle.setAttributeNS(
+              null,
+              "cx",
+              resizePoints.cx + (x - tempPoint.x) / 2
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "cy",
+              resizePoints.cy + (y - tempPoint.y) / 2
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "rx",
+              resizePoints.rx + (x - tempPoint.x) / 2
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "ry",
+              resizePoints.ry - (y - tempPoint.y) / 2
+            );
+          }
+          if (resizeType === "polygon") {
+            let s = {
+              x: 1 + (x - tempPoint.x) / resizePoints.width,
+              y: 1 - (y - tempPoint.y) / resizePoints.height
+            };
+            let points = resizePoints.points
+              .map(
+                item =>
+                  `${(item.x - resizePoints.x) * s.x +
+                    resizePoints.x} ${(item.y - resizePoints.y) * s.y +
+                    resizePoints.y +
+                    y -
+                    tempPoint.y}`
+              )
+              .join(", ");
+            resizeEle.setAttributeNS(null, "points", points);
+          }
+          if (resizeType === "path") {
+            let s = {
+              x: 1 + (x - tempPoint.x) / resizePoints.width,
+              y: 1 - (y - tempPoint.y) / resizePoints.height
+            };
+            let points = resizePoints.points
+              .map(item => {
+                if (isNaN(item.x) || isNaN(item.y)) {
+                  return "";
+                } else {
+                  return `${(item.x - resizePoints.x) * s.x +
+                    resizePoints.x},${(item.y - resizePoints.y) * s.y +
+                    resizePoints.y +
+                    y -
+                    tempPoint.y}`;
+                }
+              })
+              .join(" L ");
+            resizeEle.setAttributeNS(null, "d", `M${points.substring(2)}`);
+          }
+          break;
+        case "br":
+          if (resizeType === "line") {
+            resizeEle.setAttributeNS(
+              null,
+              "x2",
+              resizePoints.x2 + x - tempPoint.x
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "y2",
+              resizePoints.y2 + y - tempPoint.y
+            );
+          }
+          if (resizeType === "rect") {
+            resizeEle.setAttributeNS(
+              null,
+              "width",
+              resizePoints.width + x - tempPoint.x
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "height",
+              resizePoints.height + y - tempPoint.y
+            );
+          }
+          if (resizeType === "circle") {
+            let len = Math.min((x - tempPoint.x) / 2, (y - tempPoint.y) / 2);
+            resizeEle.setAttributeNS(null, "cx", resizePoints.cx + len);
+            resizeEle.setAttributeNS(null, "cy", resizePoints.cy + len);
+            resizeEle.setAttributeNS(null, "r", resizePoints.rx + len);
+          }
+          if (resizeType === "ellipse") {
+            resizeEle.setAttributeNS(
+              null,
+              "cx",
+              resizePoints.cx + (x - tempPoint.x) / 2
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "cy",
+              resizePoints.cy + (y - tempPoint.y) / 2
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "rx",
+              resizePoints.rx + (x - tempPoint.x) / 2
+            );
+            resizeEle.setAttributeNS(
+              null,
+              "ry",
+              resizePoints.ry + (y - tempPoint.y) / 2
+            );
+          }
+          if (resizeType === "polygon") {
+            let s = {
+              x: 1 + (x - tempPoint.x) / resizePoints.width,
+              y: 1 + (y - tempPoint.y) / resizePoints.height
+            };
+            let points = resizePoints.points
+              .map(
+                item =>
+                  `${(item.x - resizePoints.x) * s.x +
+                    resizePoints.x} ${(item.y - resizePoints.y) * s.y +
+                    resizePoints.y}`
+              )
+              .join(", ");
+            resizeEle.setAttributeNS(null, "points", points);
+          }
+          if (resizeType === "path") {
+            let s = {
+              x: 1 + (x - tempPoint.x) / resizePoints.width,
+              y: 1 + (y - tempPoint.y) / resizePoints.height
+            };
+            let points = resizePoints.points
+              .map(item => {
+                if (isNaN(item.x) || isNaN(item.y)) {
+                  return "";
+                } else {
+                  return `${(item.x - resizePoints.x) * s.x +
+                    resizePoints.x},${(item.y - resizePoints.y) * s.y +
+                    resizePoints.y}`;
+                }
+              })
+              .join(" L ");
+            resizeEle.setAttributeNS(null, "d", `M${points.substring(2)}`);
+          }
+          break;
+      }
+      let boxSize = resizeEle.getBBox();
+      boxSizeList[resizeIndex] = boxSize;
+      selectBox.children[0].setAttributeNS(null, "x", boxSize.x - 5);
+      selectBox.children[0].setAttributeNS(null, "y", boxSize.y - 5);
+      selectBox.children[0].setAttributeNS(null, "width", boxSize.width + 10);
+      selectBox.children[0].setAttributeNS(null, "height", boxSize.height + 10);
+      selectBox.children[1].setAttributeNS(null, "x", boxSize.x - 8);
+      selectBox.children[1].setAttributeNS(null, "y", boxSize.y - 8);
+      selectBox.children[2].setAttributeNS(
+        null,
+        "x",
+        boxSize.x + boxSize.width
+      );
+      selectBox.children[2].setAttributeNS(null, "y", boxSize.y - 8);
+      selectBox.children[3].setAttributeNS(
+        null,
+        "x",
+        boxSize.x + boxSize.width
+      );
+      selectBox.children[3].setAttributeNS(
+        null,
+        "y",
+        boxSize.y + boxSize.height
+      );
+      selectBox.children[4].setAttributeNS(null, "x", boxSize.x - 8);
+      selectBox.children[4].setAttributeNS(
+        null,
+        "y",
+        boxSize.y + boxSize.height
+      );
       return;
     }
-    if (inputStatus !== "next") {
-      prevCanvas.push(nextCanvas.pop());
+    if (config.type === "pen") {
+      svgCurrEle.setAttributeNS(
+        null,
+        "d",
+        `${svgCurrEle.getAttributeNS(null, "d")} L ${x},${y}`
+      );
     }
-    let data = nextCanvas.pop();
-    canvasContext.putImageData(data, 0, 0);
-    prevCanvas.push(data);
-    inputStatus = "next";
-  }
+    if (config.type === "eraser") {
+      eraserPath += `L ${x} ${y}`;
+      let index = undoList.findIndex(
+        item => intersect(eraserPath, item.getAttributeNS(null, "d")).length > 0
+      );
+      if (index !== -1) {
+        undoList[index].remove();
+        undoList.splice(index, 1);
+        boxSizeList.splice(index, 1);
+      }
+    }
+    if (config.type === "line") {
+      svgCurrEle.setAttributeNS(null, "x2", x);
+      svgCurrEle.setAttributeNS(null, "y2", y);
+    }
+    if (config.type === "rect" || config.type === "round-rect") {
+      if (x - tempPoint.x < 0) {
+        svgCurrEle.setAttributeNS(null, "x", x);
+        svgCurrEle.setAttributeNS(null, "y", y);
+      }
+      svgCurrEle.setAttributeNS(null, "width", Math.abs(x - tempPoint.x));
+      svgCurrEle.setAttributeNS(null, "height", Math.abs(y - tempPoint.y));
+      if (config.type === "round-rect") {
+        svgCurrEle.setAttributeNS(null, "rx", 10);
+        svgCurrEle.setAttributeNS(null, "ry", 10);
+      }
+    }
+    if (config.type === "circle") {
+      svgCurrEle.setAttributeNS(
+        null,
+        "r",
+        Math.sqrt(Math.pow(x - tempPoint.x, 2) + Math.pow(y - tempPoint.y, 2))
+      );
+    }
+    if (config.type === "ellipse") {
+      svgCurrEle.setAttributeNS(null, "rx", Math.abs(x - tempPoint.x));
+      svgCurrEle.setAttributeNS(null, "ry", Math.abs(y - tempPoint.y));
+    }
+    if (config.type === "polygon") {
+      svgCurrEle.setAttributeNS(null, "points", tempPoint + `${x} ${y}`);
+    }
+    if (config.type === "diamond") {
+      let x2 = (x + tempPoint.x) / 2;
+      let y2 = (y + tempPoint.y) / 2;
+      svgCurrEle.setAttributeNS(
+        null,
+        "points",
+        `${x} ${y2}, ${x2} ${y}, ${tempPoint.x} ${y2}, ${x2} ${tempPoint.y}`
+      );
+    }
+    if (config.type === "select") {
+      if (x - tempPoint.x < 0) {
+        svgCurrEle.setAttributeNS(null, "x", x);
+        svgCurrEle.setAttributeNS(null, "y", y);
+      }
+      svgCurrEle.setAttributeNS(null, "width", Math.abs(x - tempPoint.x));
+      svgCurrEle.setAttributeNS(null, "height", Math.abs(y - tempPoint.y));
+      selectHasMove = true;
+    }
+  };
 
-  function cleanCanvas() {
-    inputStatus = "mid";
-    nextCanvas = [];
-    prevCanvas = [];
-    canvasContext.clearRect(
-      0,
-      0,
-      canvasContext.canvas.width,
-      canvasContext.canvas.height
+  var drawUp = e => {
+    let { x, y } = getPoint(e.clientX, e.clientY);
+    drawMoveOpen = false;
+    if (config.type === "eraser") {
+      return;
+    }
+    if (resizeOpen) {
+      resizeOpen = false;
+      return;
+    }
+    if (config.type === "line") {
+      svgCurrEle.setAttributeNS(
+        null,
+        "d",
+        `M ${svgCurrEle.getAttributeNS(null, "x1")} ${svgCurrEle.getAttributeNS(
+          null,
+          "y1"
+        )} L ${svgCurrEle.getAttributeNS(
+          null,
+          "x2"
+        )} ${svgCurrEle.getAttributeNS(null, "y2")}`
+      );
+    }
+    if (config.type === "rect" || config.type === "round-rect") {
+      svgCurrEle.setAttributeNS(
+        null,
+        "d",
+        rect2path(
+          svgCurrEle.getAttributeNS(null, "x"),
+          svgCurrEle.getAttributeNS(null, "y"),
+          svgCurrEle.getAttributeNS(null, "width"),
+          svgCurrEle.getAttributeNS(null, "height"),
+          svgCurrEle.getAttributeNS(null, "rx"),
+          svgCurrEle.getAttributeNS(null, "ry")
+        )
+      );
+    }
+    if (config.type === "circle") {
+      svgCurrEle.setAttributeNS(
+        null,
+        "d",
+        ellipse2path(
+          svgCurrEle.getAttributeNS(null, "cx"),
+          svgCurrEle.getAttributeNS(null, "cy"),
+          svgCurrEle.getAttributeNS(null, "r"),
+          svgCurrEle.getAttributeNS(null, "r")
+        )
+      );
+    }
+    if (config.type === "ellipse") {
+      svgCurrEle.setAttributeNS(
+        null,
+        "d",
+        ellipse2path(
+          svgCurrEle.getAttributeNS(null, "cx"),
+          svgCurrEle.getAttributeNS(null, "cy"),
+          svgCurrEle.getAttributeNS(null, "rx"),
+          svgCurrEle.getAttributeNS(null, "ry")
+        )
+      );
+    }
+    if (config.type === "polygon") {
+      drawMoveOpen = true;
+      return;
+    }
+    if (config.type === "diamond") {
+      svgCurrEle.setAttributeNS(
+        null,
+        "d",
+        polygon2path(svgCurrEle.getAttributeNS(null, "points"))
+      );
+    }
+    if (config.type === "select") {
+      if (!selectHasMove) {
+        svg.querySelector("#selects").remove();
+        return;
+      }
+      svgCurrEle.remove();
+      let selects = document.createElementNS(svgns, "g");
+      selects.id = "selects";
+      svg.append(selects);
+      for (let i = 0; i < boxSizeList.length; i++) {
+        if (
+          boxSizeList[i].x >= tempPoint.x &&
+          boxSizeList[i].y >= tempPoint.y &&
+          boxSizeList[i].x + boxSizeList[i].width <= x &&
+          boxSizeList[i].y + boxSizeList[i].height <= y
+        ) {
+          let selectBoxC = document.createElementNS(svgns, "g");
+          selectBoxC.setAttributeNS(null, "data-index", i);
+          selects.append(selectBoxC);
+          let selectBox = document.createElementNS(svgns, "rect");
+          selectBox.setAttributeNS(null, "x", boxSizeList[i].x - 5);
+          selectBox.setAttributeNS(null, "y", boxSizeList[i].y - 5);
+          selectBox.setAttributeNS(null, "width", boxSizeList[i].width + 10);
+          selectBox.setAttributeNS(null, "height", boxSizeList[i].height + 10);
+          selectBox.setAttributeNS(null, "fill", "transparent");
+          selectBox.setAttributeNS(null, "stroke", "#888");
+          selectBox.setAttributeNS(null, "stroke-width", 1);
+          selectBox.setAttributeNS(null, "stroke-dasharray", "3 3");
+          selectBox.setAttributeNS(null, "data-resize", "mv");
+          selectBox.style.cursor = "move";
+          selectBoxC.append(selectBox);
+          let addSelectBoxBtn = (x, y, type) => {
+            let selectBoxBtn = document.createElementNS(
+              svgns,
+              type === "ro" ? "circle" : "rect"
+            );
+            if (type === "ro") {
+              selectBoxBtn.setAttributeNS(null, "cx", x);
+              selectBoxBtn.setAttributeNS(null, "cy", y);
+              selectBoxBtn.setAttributeNS(null, "r", 4);
+            } else {
+              selectBoxBtn.setAttributeNS(null, "x", x);
+              selectBoxBtn.setAttributeNS(null, "y", y);
+              selectBoxBtn.setAttributeNS(null, "width", 8);
+              selectBoxBtn.setAttributeNS(null, "height", 8);
+            }
+            selectBoxBtn.setAttributeNS(null, "fill", "#FFF");
+            selectBoxBtn.setAttributeNS(null, "stroke", "#888");
+            selectBoxBtn.setAttributeNS(null, "stroke-width", 1);
+            selectBoxBtn.setAttributeNS(null, "data-resize", type);
+            selectBoxBtn.style.cursor =
+              type === "ro"
+                ? "alias"
+                : type === "tl" || type === "br"
+                ? "nwse-resize"
+                : "nesw-resize";
+            selectBoxC.append(selectBoxBtn);
+          };
+          addSelectBoxBtn(boxSizeList[i].x - 8, boxSizeList[i].y - 8, "tl");
+          addSelectBoxBtn(
+            boxSizeList[i].x + boxSizeList[i].width,
+            boxSizeList[i].y - 8,
+            "tr"
+          );
+          addSelectBoxBtn(
+            boxSizeList[i].x + boxSizeList[i].width,
+            boxSizeList[i].y + boxSizeList[i].height,
+            "br"
+          );
+          addSelectBoxBtn(
+            boxSizeList[i].x - 8,
+            boxSizeList[i].y + boxSizeList[i].height,
+            "bl"
+          );
+        }
+      }
+    } else {
+      undoList.push(svgCurrEle);
+      boxSizeList.push(svgCurrEle.getBBox());
+    }
+  };
+
+  svg.addEventListener("pointerdown", drawDown);
+  svg.addEventListener("pointermove", drawMove);
+  svg.addEventListener("pointerup", drawUp);
+
+  var stopPolygon = () => {
+    tempPoint = null;
+    drawMoveOpen = false;
+    svgCurrEle.setAttributeNS(
+      null,
+      "d",
+      polygon2path(svgCurrEle.getAttributeNS(null, "points"))
     );
-    prevCanvas = [
-      canvasContext.getImageData(
-        0,
-        0,
-        canvasContext.canvas.width,
-        canvasContext.canvas.height
-      )
-    ];
-  }
+    undoList.push(svgCurrEle);
+    boxSizeList.push(svgCurrEle.getBBox());
+  };
 
-  function getCanvasBlob() {
-    let canvasBlob = null;
-    canvasEle.toBlob(function(blob) {
-      canvasBlob = blob;
-    });
-    return canvasBlob;
-  }
-
-  function getCanvasUrl() {
-    return canvasEle.toDataURL();
-  }
-
-  canvasEle.addEventListener("pointerdown", canvasDown);
-  canvasEle.addEventListener("pointermove", canvasMove);
-  canvasEle.addEventListener("pointerup", canvasUp);
-
-  // canvasEle.addEventListener('touchstart', canvasDown);
-  // canvasEle.addEventListener('touchmove', canvasMove);
-  // canvasEle.addEventListener('touchend', canvasUp);
-
-  if (initBtn) {
-    var canBtns = document.getElementsByClassName("can-btn");
-    for (let i = 0; i < canBtns.length; i++) {
-      const ele = canBtns[i];
-      ele.addEventListener("click", function(e) {
-        let target = null;
-        let type = null;
-        if (e.target.tagName === "SPAN") {
-          target = e.target.parentElement;
-        } else {
-          target = e.target;
-        }
-        type = target.getAttribute("data-type");
-        if (type === "color") {
-          if (document.querySelector(".can-color .active")) {
-            document
-              .querySelector(".can-color .active")
-              .classList.remove("active");
-          }
-          config.lineColor = window.getComputedStyle(target).backgroundColor;
-          target.classList.add("active");
-          return;
-        }
-        if (type === "size") {
-          if (document.querySelector(".can-size .active")) {
-            document
-              .querySelector(".can-size .active")
-              .classList.remove("active");
-          }
-          let size = target.classList[target.classList.length - 1];
-          if (size === "big") {
-            config.lineWidth = 3.5;
-            config.shadowBlur = 5;
-          } else if (size === "middle") {
-            config.lineWidth = 2;
-            config.shadowBlur = 3;
-          } else {
-            config.lineWidth = 0.5;
-            config.shadowBlur = 0.7;
-          }
-          target.classList.add("active");
-          return;
-        }
-        if (type === "to-prev-canvas") {
-          toPrevCanvas();
-          return;
-        }
-        if (type === "to-next-canvas") {
-          toNextCanvas();
-          return;
-        }
-        if (type === "clean-canvas") {
-          cleanCanvas();
-          return;
-        }
-        if (type === "save-canvas" || type === "cancel-canvas") {
-          return;
-        }
-        if (document.querySelector(".can-pen .active")) {
-          document.querySelector(".can-pen .active").classList.remove("active");
-        }
-        if (document.querySelector(".can-shape .active")) {
-          document
-            .querySelector(".can-shape .active")
-            .classList.remove("active");
-        }
-        if (document.querySelector(".can-operate .active")) {
-          document
-            .querySelector(".can-operate .active")
-            .classList.remove("active");
-        }
-        switchType(type);
-        target.classList.add("active");
-      });
+  window.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      stopPolygon();
     }
-  }
+    if (e.key === "Control") {
+      drawLimited = true;
+    }
+    if (e.key === "Delete" && svg.querySelector("#selects")) {
+      redoList = [];
+      for (const item of svg.querySelector("#selects").children) {
+        let index = item.getAttributeNS(null, "data-index");
+        undoList[index].remove();
+        redoList.push(undoList[index]);
+        undoList.slice(index, 1);
+        boxSizeList.splice(index, 1);
+      }
+      svg.querySelector("#selects").remove();
+    }
+  });
+
+  window.addEventListener("keyup", e => {
+    if (e.key === "Control") {
+      drawLimited = false;
+    }
+  });
+
+  document.querySelectorAll(".svg-pen .svg-btn").forEach(item => {
+    item.addEventListener("click", e => {
+      if (document.querySelector(".active")) {
+        document.querySelector(".active").classList.remove("active");
+      }
+      item.classList.add("active");
+      config.type = item.getAttribute("data-type");
+    });
+  });
+
+  document.querySelector("#select-color").addEventListener("change", e => {
+    config.color =
+      e.target.value === "custom"
+        ? document.querySelector("#custom-color").value
+        : e.target.value;
+  });
+
+  document.querySelector("#custom-color").addEventListener("change", e => {
+    if (document.querySelector("#select-color").value === "custom") {
+      config.color = e.target.value;
+    }
+  });
+
+  document.querySelector("#select-size").addEventListener("change", e => {
+    switch (e.target.value) {
+      case "custom":
+        config.lineWidth = document.querySelector("#custom-size").value;
+        break;
+      case "small":
+        config.lineWidth = 2;
+        break;
+      case "middle":
+        config.lineWidth = 4;
+        break;
+      case "big":
+        config.lineWidth = 6;
+        break;
+    }
+  });
+
+  document.querySelector("#custom-size").addEventListener("change", e => {
+    if (document.querySelector("#select-size").value === "custom") {
+      config.lineWidth = e.target.value;
+    }
+  });
+
+  document.querySelector("#select-fill-color").addEventListener("change", e => {
+    config.fillColor =
+      e.target.value === "custom"
+        ? document.querySelector("#custom-fill-color").value
+        : e.target.value;
+  });
+
+  document.querySelector("#custom-fill-color").addEventListener("change", e => {
+    if (document.querySelector("#select-fill-color").value === "custom") {
+      config.fillColor = e.target.value;
+    }
+  });
+
+  document.querySelector("#text-size").addEventListener("change", e => {
+    config.fontSize = e.target.value;
+  });
+
+  document.querySelectorAll(".svg-shape .svg-btn").forEach(item => {
+    item.addEventListener("click", e => {
+      if (document.querySelector(".active")) {
+        document.querySelector(".active").classList.remove("active");
+      }
+      item.classList.add("active");
+      config.type = item.getAttribute("data-type");
+    });
+  });
+
+  document.querySelector("#svg-undo").addEventListener("click", e => {
+    if (undoList.length < 1) {
+      return;
+    }
+    let undoEle = undoList.pop();
+    undoEle.remove();
+    redoList.push(undoEle);
+    redoBoxSizeList.push(boxSizeList.pop());
+  });
+
+  document.querySelector("#svg-redo").addEventListener("click", e => {
+    if (redoList.length < 1) {
+      return;
+    }
+    let redoEle = redoList.pop();
+    svg.append(redoEle);
+    undoList.push(redoEle);
+    boxSizeList.push(redoBoxSizeList.pop());
+  });
+
+  document.querySelector("#svg-clean").addEventListener("click", e => {
+    undoList = [];
+    redoList = [];
+    svg.innerHTML = "";
+  });
 }

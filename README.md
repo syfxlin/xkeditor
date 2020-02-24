@@ -217,9 +217,6 @@ var config = {
     scrollBind: "both",
     // 图片上传的地址
     imgUpload: "http://example.com/upload.php",
-    // 暂时不要使用该功能
-    graffUrl: "static/",
-    graffUpload: "http://example.com/upload.php",
     // 滚动模式，默认使用JavaScript的方式来滚动，防止与Hash Router冲突
     scrollMode: "javascript",
     // 粘贴格式化

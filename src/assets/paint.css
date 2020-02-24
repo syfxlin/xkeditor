@@ -1,8 +1,29 @@
-.title {
+.graff-main {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.graff-container {
+  width: 80%;
+  background-color: #fff;
+  padding: 1.5rem;
+  border: 1px solid #6190e8;
+}
+
+.title,
+.container {
   left: 50%;
   transform: translateX(-50%);
   position: relative;
   width: 1080px;
+  max-width: 96%;
 }
 
 .title h1 {
@@ -14,140 +35,80 @@
 }
 
 .title h5 a {
-  color: #87d1df;
-}
-
-.canvas-main {
-  position: fixed;
-  width: 80%;
-  height: 80%;
-  transform: translate(-50%, -50%);
-  top: 50%;
-  left: 50%;
-  background: #fff;
-  display: none;
-  border: 1.5px solid #ddd;
-  padding: 20px;
-  box-sizing: border-box;
+  color: #6190e8;
 }
 
 .active {
-  color: lightblue;
+  color: #6190e8;
 }
 
-.can-color .active {
-  border: 1px solid lightblue !important;
-  width: 23px !important;
-  height: 13px !important;
-}
-
-.black {
-  background-color: black;
-}
-.red {
-  background-color: lightcoral;
-}
-.blue {
-  background-color: lightblue;
-}
-.green {
-  background-color: lightgreen;
-}
-.yellow {
-  background-color: lightyellow;
-}
-.orange {
-  background-color: lightsalmon;
-}
-.gray {
-  background-color: lightgray;
-}
-.pink {
-  background-color: lightpink;
-}
-.purple {
-  background-color: plum;
-}
-
-.canvas-container {
+.svg-container {
   float: left;
-  height: 100%;
-  width: 80%;
+  height: 500px;
+  width: 70%;
 }
 
-#canvas {
-  border: 1.5px solid #87d1df;
+#graff-svg {
+  border: 1.5px solid #6190e8;
   cursor: crosshair;
   padding: 0px;
+  touch-action: none;
+  background-image: url("/static/grid.png");
   width: 100%;
   height: 100%;
-  touch-action: none;
 }
 
-.graffiti {
-  border: 1px solid #87d1df;
-}
-
-#auxiliary-ele {
-  pointer-events: none;
-  border: 1.5px dashed #ddd;
-  position: fixed;
-  width: 10px;
-  height: 10px;
-  display: none;
-}
-
-.canvas-button {
-  border: 1.5px solid #87d1df;
+.svg-button {
+  border: 1.5px solid #6190e8;
   border-left: none;
   float: left;
-  height: 100%;
-  width: 20%;
+  height: 500px;
+  width: 30%;
   padding: 6px 16px;
   box-sizing: border-box;
   user-select: none;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
-.canvas-button h3 {
+.svg-button h3 {
   margin-top: 10px;
   margin-bottom: 5px;
 }
 
-.canvas-button ul {
+.svg-button > div {
   list-style: none;
   margin: 0px;
   padding: 0px;
 }
 
-.canvas-button ul li {
+.svg-button > div div {
   display: inline-block;
   margin-right: 10px;
   font-size: 15px;
   cursor: default;
 }
 
-.canvas-button ul li:hover {
-  border-bottom: 1px solid #000;
+.svg-button > div div:hover {
+  color: rgba(97, 144, 232, 0.63);
 }
 
-.canvas-button ul li span {
+.svg-button > div span {
   font-size: 13px;
 }
 
-.canvas-button .can-color li {
+.svg-button .can-color li {
   border: 1.5px solid #ddd;
   width: 20px;
   height: 10px;
 }
 
-.canvas-button .can-size .small {
+.svg-button .can-size .small {
   font-size: 12px;
 }
-.canvas-button .can-size .middle {
+.svg-button .can-size .middle {
   font-size: 16px;
 }
-.canvas-button .can-size .big {
+.svg-button .can-size .big {
   font-size: 18px;
 }
 
@@ -156,27 +117,6 @@
   clear: both;
 }
 
-#images img {
-  width: 240px;
-  height: 150px;
-  border: 1.5px solid #87d1df;
-}
-
-@media (max-width: 991px) {
-  .canvas-main {
-    width: 100%;
-    height: 80%;
-  }
-
-  .canvas-container {
-    width: 100%;
-    height: 70%;
-  }
-
-  .canvas-button {
-    width: 100%;
-    height: 30%;
-    border: 1.5px solid #87d1df;
-    border-top: none;
-  }
+#images textarea {
+  border: 1.5px solid #6190e8;
 }
