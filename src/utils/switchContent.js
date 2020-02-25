@@ -242,16 +242,20 @@ export function toHtml(val, isFull) {
       if (!isFull) {
         return text;
       } else {
-        let index = store.state.graffContent[$2].indexOf("|");
-        let size = store.state.graffContent[$2]
-          .substring(0, index)
-          .split(" ")
-          .map(item => parseFloat(item));
-        return `<svg class="graffiti" viewBox="${size[0]} ${size[1]} ${
-          size[2]
-        } ${size[3]}" data-hash="${$2}">${store.state.graffContent[
-          $2
-        ].substring(index + 1)}</svg>`;
+        if (store.state.graffContent[$2]) {
+          let index = store.state.graffContent[$2].indexOf("|");
+          let size = store.state.graffContent[$2]
+            .substring(0, index)
+            .split(" ")
+            .map(item => parseFloat(item));
+          return `<svg class="graffiti" viewBox="${size[0]} ${size[1]} ${
+            size[2]
+          } ${size[3]}" data-hash="${$2}">${store.state.graffContent[
+            $2
+          ].substring(index + 1)}</svg>`;
+        } else {
+          return `<svg class="graffiti" data-hash="${$2}"></svg>`;
+        }
       }
     });
     // [TOC]

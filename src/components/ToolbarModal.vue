@@ -16,7 +16,6 @@
           <table-item v-if="modal.content === 'table'" :data="modal.data"></table-item>
           <help-item v-if="modal.content === 'help'" :data="modal.data"></help-item>
           <info-item v-if="modal.content === 'info'" :data="modal.data"></info-item>
-          <graff-item v-if="modal.content === 'graff'" :data="modal.data"></graff-item>
         </div>
         <div class="xk-clear"></div>
         <div class="xk-modal-footer">
@@ -32,7 +31,6 @@
 </template>
 
 <script>
-import GraffItem from "./modal/Graff";
 import HelpItem from "./modal/Help";
 import ImageItem from "./modal/Image";
 import InfoItem from "./modal/Info";
@@ -52,7 +50,6 @@ library.add(fas);
 export default {
   name: "toolbar-modal",
   components: {
-    "graff-item": GraffItem,
     "help-item": HelpItem,
     "image-item": ImageItem,
     "info-item": InfoItem,

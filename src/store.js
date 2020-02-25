@@ -57,7 +57,6 @@ const state = Vue.observable({
       delayToHtml: 500,
       scrollBind: "both",
       imgUpload: false,
-      graffUrl: "static/",
       scrollMode: "anchor",
       pasteFormat: true,
       pasteImageUpload: true,
@@ -615,8 +614,13 @@ const actions = {
       actions.showtoolbarModal(operate, "添加视频");
       return;
     } else if (operate === "graff") {
-      actions.showtoolbarModal(operate, "上传涂鸦图");
-      return;
+      str =
+        "[graff]{" +
+        Math.random()
+          .toString(36)
+          .slice(6) +
+        "}";
+      isStart = true;
     } else if (operate === "setLocalStorage") {
       actions.showtoolbarModal("localStorage", "保存到本地");
       return;

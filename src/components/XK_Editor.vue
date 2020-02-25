@@ -695,6 +695,11 @@ export default {
   }
 }
 
+.graffiti {
+  border: 1px dashed #ccc;
+  cursor: pointer;
+}
+
 @media (max-width: 991px) {
   .xk-col-24 #previewHtml {
     float: left;
