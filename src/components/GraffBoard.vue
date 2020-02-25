@@ -7,16 +7,20 @@
       <div class="svg-button">
         <h3>画笔</h3>
         <div class="svg-pen">
-          <div class="svg-btn fa fa-pencil-alt" data-type="pen">
+          <div class="svg-btn" data-type="pen">
+            <fa-icon icon="pencil-alt" />
             <span>画笔</span>
           </div>
-          <div class="svg-btn fa fa-eraser" data-type="eraser">
+          <div class="svg-btn" data-type="eraser">
+            <fa-icon icon="eraser" />
             <span>橡皮擦</span>
           </div>
-          <div class="svg-btn fa fa-font" data-type="text">
+          <div class="svg-btn" data-type="text">
+            <fa-icon icon="font" />
             <span>文本</span>
           </div>
-          <div class="svg-btn fa fa-pencil-alt" data-type="select">
+          <div class="svg-btn" data-type="select">
+            <fa-icon icon="pencil-alt" />
             <span>选择</span>
           </div>
         </div>
@@ -69,37 +73,47 @@
         </div>
         <h3>形状</h3>
         <div class="svg-shape">
-          <div class="svg-btn fa fa-slash" data-type="line">
+          <div class="svg-btn" data-type="line">
+            <fa-icon icon="slash" />
             <span>直线</span>
           </div>
-          <div class="svg-btn fa fa-draw-polygon" data-type="polygon">
+          <div class="svg-btn" data-type="polygon">
+            <fa-icon icon="draw-polygon" />
             <span>多边形</span>
           </div>
-          <div class="svg-btn fa fa-square-full" data-type="rect">
+          <div class="svg-btn" data-type="rect">
+            <fa-icon icon="square-full" />
             <span>矩形</span>
           </div>
-          <div class="svg-btn fa fa-square" data-type="round-rect">
+          <div class="svg-btn" data-type="round-rect">
+            <fa-icon icon="square" />
             <span>圆角矩形</span>
           </div>
-          <div class="svg-btn fa fa-circle" data-type="circle">
+          <div class="svg-btn" data-type="circle">
+            <fa-icon icon="circle" />
             <span>圆形</span>
           </div>
-          <div class="svg-btn fa fa-circle" data-type="ellipse">
+          <div class="svg-btn" data-type="ellipse">
+            <fa-icon icon="circle" />
             <span>椭圆</span>
           </div>
-          <div class="svg-btn fa fa-layer-group" data-type="diamond">
+          <div class="svg-btn" data-type="diamond">
+            <fa-icon icon="layer-group" />
             <span>菱形</span>
           </div>
         </div>
         <h3>操作</h3>
         <div class="svg-operate">
-          <div class="svg-btn fa fa-reply" id="svg-undo">
+          <div class="svg-btn" id="svg-undo">
+            <fa-icon icon="reply" />
             <span>撤销</span>
           </div>
-          <div class="svg-btn fa fa-share" id="svg-redo">
+          <div class="svg-btn" id="svg-redo">
+            <fa-icon icon="share" />
             <span>重做</span>
           </div>
-          <div class="svg-btn fa fa-trash" id="svg-clean">
+          <div class="svg-btn" id="svg-clean">
+            <fa-icon icon="trash" />
             <span>清空画板</span>
           </div>
         </div>
@@ -117,8 +131,17 @@
 import "../assets/paint.css";
 import { mapState } from "../store";
 import initPaint from "../utils/paint";
+
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+library.add(fas);
+
 export default {
   name: "graff-board",
+  components: {
+    "fa-icon": FontAwesomeIcon
+  },
   computed: {
     ...mapState([
       "htmlViewContent",
