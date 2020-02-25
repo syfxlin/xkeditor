@@ -257,7 +257,7 @@ const actions = {
   },
   initGraff() {
     document.getElementById("previewHtml").addEventListener("click", e => {
-      if (e.target.classList.contains("graffiti") !== -1) {
+      if (e.target.classList.contains("graffiti")) {
         state.graffHash = e.target.getAttribute("data-hash");
         state.showGraff = true;
       }
