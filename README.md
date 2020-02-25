@@ -1,6 +1,6 @@
 # XK-Editor
 
-> 一个支持富文本和Markdown的编辑器
+> 一个支持富文本和 Markdown 的编辑器
 
 ![Version](https://img.shields.io/github/release/syfxlin/xkeditor.svg?label=Version&style=flat-square) ![Npm-Latest](https://img.shields.io/npm/v/xkeditor/latest.svg?style=flat-square) ![Author](https://img.shields.io/badge/Author-Otstar%20Lin-blue.svg?style=flat-square) ![Lincense](https://img.shields.io/github/license/syfxlin/xkeditor.svg?style=flat-square) ![Build Status](https://drone.lincdn.top/api/badges/syfxlin/xkeditor/status.svg)
 
@@ -15,7 +15,7 @@
     - [注意事项](#%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a1%b9)
     - [从 NPM 安装](#%e4%bb%8e-npm-%e5%ae%89%e8%a3%85)
     - [所需依赖](#%e6%89%80%e9%9c%80%e4%be%9d%e8%b5%96)
-    - [config](#config)
+    - [config && graff](#config--graff)
   - [运行代码块](#%e8%bf%90%e8%a1%8c%e4%bb%a3%e7%a0%81%e5%9d%97)
   - [文档 Doc](#%e6%96%87%e6%a1%a3-doc)
   - [维护者 Maintainer](#%e7%bb%b4%e6%8a%a4%e8%80%85-maintainer)
@@ -26,28 +26,28 @@
 
 `XK-Editor` = `Vue2.0` + `Ace` + `TinyMCE`;
 
-XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转，满足各种人的需求。
+XK-Editor 支持富文本编辑和 Markdown ，同时可以在 Markdown 和 HTML 互转，满足各种人的需求。
 
 ## 特性 Feature
 
-- [两种编辑器] 支持富文本编辑和Markdown编辑
-- [两种格式互转] 支持Markdown和HTML互转
+- [两种编辑器] 支持富文本编辑和 Markdown 编辑
+- [两种格式互转] 支持 Markdown 和 HTML 互转
 - [打字机模式] 支持打字机模式，编辑时无需使用鼠标滚轮，并可调节定位位置，满足各种屏幕和使用者的需求
-- [粘贴自动格式化] 支持在粘贴HTML时自动将HTML格式化为Markdown
+- [粘贴自动格式化] 支持在粘贴 HTML 时自动将 HTML 格式化为 Markdown
 - [图片粘贴自动上传] 支持粘贴图片自动上传，并自动填充链接
 - [嵌入运行块] 支持嵌入可运行的代码块，通过与后端交互可以支持多种语言
-- [下载] 支持导出下载Markdown和HTML格式的文件
+- [下载] 支持导出下载 Markdown 和 HTML 格式的文件
 - [即时保存] 支持即时保存到浏览器，无惧网络波动
 - [移动端优化] 优化移动端的编辑体验，支持惯性滚动，并默认关闭实时预览
 - [滚动绑定] 支持双向/单向滚动绑定，使预览能够跟随输入
-- [树形TOC] 目录可折叠，不用再翻阅很久来定位
-- [自定义主题] 支持自定义主题，可以通过替换CSS来更换显示样式
-- [Emoji表情] 支持Github语法的表情`:smile:`
-- [Task lists] 支持创建Task列表
-- [TeX公式] 支持插入KaTex公式
-- [流程图/时序图/甘特图] 支持mermaid语法编写各种图
-- [解析HTML] 支持解析各种HTML标签，并支持过滤标签
-- [独有的扩展语法] 支持通过`[text]{style|label}`的方式解析文字
+- [树形 TOC] 目录可折叠，不用再翻阅很久来定位
+- [自定义主题] 支持自定义主题，可以通过替换 CSS 来更换显示样式
+- [Emoji 表情] 支持 Github 语法的表情 `:smile:`
+- [Task lists] 支持创建 Task 列表
+- [TeX 公式] 支持插入 KaTex 公式
+- [流程图/时序图/甘特图] 支持 mermaid 语法编写各种图
+- [解析 HTML] 支持解析各种 HTML 标签，并支持过滤标签
+- [独有的扩展语法] 支持通过 `[text]{style|label}` 的方式解析文字
 - [自动补全] 支持语法自动补全
 - [图片上传] 支持图片上传
 - 还有多种神奇的功能等待你的发掘。
@@ -60,10 +60,10 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 
 ### 注意事项
 
-从 Version 1.0.8 开始，为了减小Vendor体积，防止加载时间过长，XK-Editor默认使用`jsDelivr CDN`加载部分`node_modules`
-需要在index.html中添加以下script标签，若您不打算使用该方式加载，请将`node_modules/xkeditor/components`下的文件中s所有的`import`注释取消。
+从 Version 1.0.8 开始，为了减小 Vendor 体积，防止加载时间过长，XK-Editor 默认使用 `jsDelivr CDN` 加载部分 `node_modules`
+需要在 index.html 中添加以下 script 标签，若您不打算使用该方式加载，请将 `node_modules/xkeditor/components` 下的文件中所有的 `import` 注释取消。
 
-从 Version 1.4.6 开始，模块默认通过`webpack externals`方式导入，所以您需要修改`webpack`的配置文件，添加对应的配置，如下
+从 Version 1.4.6 开始，模块默认通过 `webpack externals` 方式导入，所以您需要修改 `webpack` 的配置文件，添加对应的配置，如下
 
 ```html
 <!-- ACE Editor -->
@@ -113,35 +113,43 @@ module.exports = {
     katex: "katex",
     "katex/dist/contrib/auto-render": "renderMathInElement"
   }
-}
+};
 ```
 
 ### 从 NPM 安装
 
 你可以轻松将 XK-Editor 引入你现有的项目
 
-1. 安装XK-Editor
+1. 安装 XK-Editor
+
 ```bash
 npm i --save xkeditor
 ```
-2. 将XK-Editor static文件复制到项目根目录
+
+2. 将 XK-Editor static 文件复制到项目根目录
+
 ```bash
 cp -r ./node_modules/xkeditor/public/static ./
 ```
-3. 导入XK-Editor组件
+
+3. 导入 XK-Editor 组件
+
 ```javascript
-import XK_Editor from 'xkeditor'
+import XK_Editor from "xkeditor";
 export default {
-    components: {
-        'xk-editor': XK_Editor
-    }
-}
+  components: {
+    "xk-editor": XK_Editor
+  }
+};
 ```
-4. 使用XK-Editor组件
+
+4. 使用 XK-Editor 组件
+
 ```html
-<xk-editor :config="config" v-model="content" />
-<!-- config 是下方config内容，该参数是单向的，Editor内部的设置变动不会同步到父组件 -->
-<!-- v-model 对应Markdown内容，该参数是双向的，由于ACE和TinyMCE编辑器的限制，当该参数被外部修改的时候，即与内部Markdown内容不一致时，会触发ACE编辑器和TinyMCE的setValue，此时光标将会重置。 -->
+<xk-editor :config="config" v-model="content" :graff.sync="graff" />
+<!-- config(Object) 是下方 config 内容，该参数是单向的，Editor 内部的设置变动不会同步到父组件 -->
+<!-- v-model(String) 对应 Markdown 内容，该参数是双向的，由于 ACE 和 TinyMCE 编辑器的限制，当该参数被外部修改的时候，即与内部 Markdown 内容不一致时，会触发 ACE 编辑器和 TinyMCE 的 setValue，此时光标将会重置。 -->
+<!-- graff(Object) 是 SVG涂鸦板 的内容，该参数是双向的 -->
 ```
 
 ### 所需依赖
@@ -163,11 +171,11 @@ turndown
 turndown-plugin-gfm
 ```
 
-### config
+### config && graff
 
 ```javascript
 var config = {
-  // 该设置为TinyMCE的设置，详情见TinyMCE编辑器的文档
+  // 该设置为 TinyMCE 的设置，详情见 TinyMCE 编辑器的文档
   tinymceSetting: {
     language_url: "/static/tinymce/langs/zh_CN.js",
     language: "zh_CN",
@@ -187,9 +195,9 @@ var config = {
     spellchecker_dialog: true,
     spellchecker_whitelist: ["Ephox", "Moxiecode"]
   },
-  // 该设置为ACE编辑器的设置，详情见ACE编辑器文档
+  // 该设置为 ACE 编辑器的设置，详情见 ACE 编辑器文档
   aceSetting: {
-    // toolbar 为XK-Editor扩展的字段，语法和tinymce的toolbar字段一致
+    // toolbar 为 XK-Editor 扩展的字段，语法和 tinymce 的 toolbar 字段一致
     toolbar:
       "h1 h2 h3 h4 h5 h6 | bold italic underline strikethrough quote mark code | sup sub tex-$ tex-math | flow seq gantt mermaid | ul ol minus table time | link image video graff | toLine search toc typewriter switchPreview fullPreview fullScreen toHtmlEditor toTinyMCE format empty setting | undo redo | setLocalStorage getLocalStorage removeLocalStorage | help info | pasteFormat",
     minLines: 10,
@@ -203,31 +211,31 @@ var config = {
     enableBasicAutocompletion: true,
     value: "# XK-Editor"
   },
-  // XK-Editor相关设置
+  // XK-Editor 相关设置
   xkSetting: {
     // 暂时无用
     apiBaseUrl: "",
-    // 预览的CSS文件，类似于主题
+    // 预览的 CSS 文件，类似于主题
     previewCss: "/static/github-markdown.css",
-    // 预览的class
+    // 预览的 class
     previewClass: "markdown-body",
-    // 延迟渲染时间(ms)，由于性能因素XK-Editor限制该选项不能低于500ms
+    // 延迟渲染时间 (ms)，由于性能因素 XK-Editor 限制该选项不能低于 500ms
     delayToHtml: 500,
     // 滚动绑定，(left,right,both)
     scrollBind: "both",
     // 图片上传的地址
     imgUpload: "http://example.com/upload.php",
-    // 滚动模式，默认使用JavaScript的方式来滚动，防止与Hash Router冲突
+    // 滚动模式，默认使用 JavaScript 的方式来滚动，防止与 Hash Router 冲突
     scrollMode: "javascript",
     // 粘贴格式化
     pasteFormat: true,
     // 粘贴自动上传(仅对复制图像时有效，混合内容无效，需要设置图片上传地址)
     pasteImageUpload: true,
-    // 是否开启TinyMCE编辑器
+    // 是否开启 TinyMCE 编辑器
     enableTinyMCE: true,
-    // run-code的地址
+    // run-code 的地址
     judge0API: "https://example.com",
-    // run-code语言列表
+    // run-code 语言列表
     runCodeLangList: {
       c: 1,
       cpp: 2,
@@ -246,12 +254,18 @@ var config = {
     }
   }
 };
+var graff = {
+  // SVG Hash
+  "6b3117":
+    // viewBox|SVG innerHTML
+    '8.399999618530273 9 423.9984436035156 154|<path d="M 290.4,100 L 293.4,104 L 304.4,112 L 326.4,123 L 345.4,131 L 360.4,136 L 378.4,140 L 395.4,145 L 405.4,148 L 415.4,152 L 420.4,152 L 421.4,153 L 422.4,153" fill="none" stroke="#6190e8" stroke-width="2"></path><rect x="18.4" y="19" fill="none" stroke="#6190e8" stroke-width="2" width="131" height="69" d="M 18.4 19 h 131 v 69 h -131 Z"></rect>'
+};
 ```
 
 ## 运行代码块
 
-运行代码块除javascript不需要使用后端，其他语言都需要有后端负责执行代码。
-后端执行器基于 [judge0/api](https://github.com/judge0/api) 重新build而来，支持的语言详见 [run-code](https://github.com/syfxlin/run-code) ，若您有其他语言的需求，您可以自行参照教程重新build
+运行代码块除 javascript 不需要使用后端，其他语言都需要有后端负责执行代码。
+后端执行器基于 [judge0/api](https://github.com/judge0/api) 重新 build 而来，支持的语言详见 [run-code](https://github.com/syfxlin/run-code) ，若您有其他语言的需求，您可以自行参照教程重新 build
 
 [run-code](https://github.com/syfxlin/run-code)
 
@@ -261,7 +275,7 @@ var config = {
 
 ## 维护者 Maintainer
 
-XK-Editor 由 [Otstar Lin](https://ixk.me/)和下列[贡献者](https://github.com/syfxlin/xkeditor/graphs/contributors)的帮助下撰写和维护。
+XK-Editor 由 [Otstar Lin](https://ixk.me/) 和下列 [贡献者](https://github.com/syfxlin/xkeditor/graphs/contributors) 的帮助下撰写和维护。
 
 > Otstar Lin - [Personal Website](https://ixk.me/) · [Blog](https://blog.ixk.me/) · [Github](https://github.com/syfxlin)
 
