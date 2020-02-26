@@ -1059,8 +1059,10 @@ export default function initPaint(svgId, conf = null) {
 
   document.querySelectorAll(".svg-pen .svg-btn").forEach(item => {
     item.addEventListener("click", e => {
-      if (document.querySelector(".active")) {
-        document.querySelector(".active").classList.remove("active");
+      if (document.querySelector(".svg-button .active")) {
+        document
+          .querySelector(".svg-button .active")
+          .classList.remove("active");
       }
       item.classList.add("active");
       config.type = item.getAttribute("data-type");
@@ -1122,8 +1124,10 @@ export default function initPaint(svgId, conf = null) {
 
   document.querySelectorAll(".svg-shape .svg-btn").forEach(item => {
     item.addEventListener("click", e => {
-      if (document.querySelector(".active")) {
-        document.querySelector(".active").classList.remove("active");
+      if (document.querySelector(".svg-button .active")) {
+        document
+          .querySelector(".svg-button .active")
+          .classList.remove("active");
       }
       item.classList.add("active");
       config.type = item.getAttribute("data-type");

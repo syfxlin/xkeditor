@@ -1,3 +1,4 @@
+import Vue from "vue";
 import store from "../store";
 import heading from "./heading";
 import bold from "./bold";
