@@ -2,7 +2,7 @@
   <div>
     <label>行号(1-{{ data.allLine }})</label>
     <div class="xk-input">
-      <input v-model="data.line" placeholder="请输入行号" autofocus />
+      <input v-model="data.line" type="number" placeholder="请输入行号" autofocus />
     </div>
   </div>
 </template>

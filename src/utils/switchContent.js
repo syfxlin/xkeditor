@@ -44,7 +44,7 @@ function getTocHtmlTree(index, str) {
     .toLowerCase()
     .replace(/ /g, "-")
     .replace(/[^\u4e00-\u9fa5a-zA-Z0-9-]/g, "");
-  if (window.scrollMode === "anchor") {
+  if (store.state.setting.xkSetting.scrollMode === "anchor") {
     tocUrl = "#" + tocUrl;
   } else {
     tocUrl = "javascript:sta('" + tocUrl + "');";
@@ -242,15 +242,15 @@ export function toHtml(val, isFull) {
       if (!isFull) {
         return text;
       } else {
-        if (store.state.graffContent[$2]) {
-          let index = store.state.graffContent[$2].indexOf("|");
-          let size = store.state.graffContent[$2]
+        if (store.state.graffBoard.content[$2]) {
+          let index = store.state.graffBoard.content[$2].indexOf("|");
+          let size = store.state.graffBoard.content[$2]
             .substring(0, index)
             .split(" ")
             .map(item => parseFloat(item));
           return `<svg class="graffiti" viewBox="${size[0]} ${size[1]} ${
             size[2]
-          } ${size[3]}" data-hash="${$2}">${store.state.graffContent[
+          } ${size[3]}" data-hash="${$2}">${store.state.graffBoard.content[
             $2
           ].substring(index + 1)}</svg>`;
         } else {

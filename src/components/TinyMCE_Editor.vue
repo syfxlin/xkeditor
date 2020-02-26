@@ -19,9 +19,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss">
-.tinymce {
-  height: 100%;
-}
-</style>

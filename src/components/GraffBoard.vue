@@ -143,22 +143,14 @@ export default {
     "fa-icon": FontAwesomeIcon
   },
   computed: {
-    ...mapState([
-      "htmlViewContent",
-      "timeToast",
-      "showGraff",
-      "graffContent",
-      "graffHash"
-    ]),
-    graffEditContent: {
-      get() {
-        if (this.graffContent[this.graffHash]) {
-          return this.graffContent[this.graffHash].substring(
-            this.graffContent[this.graffHash].indexOf("|") + 1
-          );
-        } else {
-          return "";
-        }
+    ...mapState(["htmlViewContent", "timeToast", "graffBoard"]),
+    graffEditContent() {
+      if (this.graffBoard.content[this.graffBoard.hash]) {
+        return this.graffBoard.content[this.graffBoard.hash].substring(
+          this.graffBoard.content[this.graffBoard.hash].indexOf("|") + 1
+        );
+      } else {
+        return "";
       }
     }
   },
@@ -175,19 +167,17 @@ export default {
         20} ${size.height + 20}`;
       let content = document.querySelector("#graff-svg").innerHTML;
       let ele = document.querySelector(
-        `.graffiti[data-hash="${this.graffHash}"]`
+        `.graffiti[data-hash="${this.graffBoard.hash}"]`
       );
       ele.innerHTML = content;
       ele.setAttribute("viewBox", viewBox);
       content = `${viewBox}|` + content;
-      this.graffContent[this.graffHash] = content;
-      this.showGraff = false;
+      this.graffBoard.content[this.graffBoard.hash] = content;
+      this.graffBoard.hash = false;
     },
     cancel() {
-      this.showGraff = false;
+      this.graffBoard.hash = false;
     }
   }
 };
 </script>
-
-<style lang="scss"></style>

@@ -27,34 +27,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss">
-th {
-  text-align: left;
-}
-
-.ace-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-
-  .bookmarklet {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 20px;
-    height: 20px;
-    z-index: 2;
-    cursor: pointer;
-    border-width: 9px;
-    border-style: solid;
-    border-color: lightblue gray gray rgb(206, 173, 230);
-    border-image: initial;
-  }
-}
-
-.ace-editor {
-  flex: 1;
-}
-</style>

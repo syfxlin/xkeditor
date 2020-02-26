@@ -16,7 +16,6 @@ window.toggleToc = ele => {
 
 const state = Vue.observable({
   showToc: false,
-  showGraff: false,
   setting: {
     tinymceSetting: {
       language_url: "/static/tinymce/langs/zh_CN.js",
@@ -52,7 +51,9 @@ const state = Vue.observable({
     },
     xkSetting: {
       apiBaseUrl: "",
+      // 不可即时更新
       previewCss: "/static/github-markdown.css",
+      // 不可即时更新
       previewClass: "markdown-body",
       delayToHtml: 500,
       scrollBind: "both",
@@ -60,6 +61,7 @@ const state = Vue.observable({
       scrollMode: "anchor",
       pasteFormat: true,
       pasteImageUpload: true,
+      // 不可即时更新
       enableTinyMCE: true,
       judge0API: "https://run-code.lincdn.top",
       runCodeLangList: {
@@ -90,8 +92,10 @@ const state = Vue.observable({
   markdownContent: "",
   htmlContent: "",
   htmlViewContent: "",
-  graffContent: {},
-  graffHash: "123456",
+  graffBoard: {
+    content: {},
+    hash: false
+  },
   toolbarModal: {
     show: false,
     data: {},
@@ -137,107 +141,20 @@ const actions = {
     }
     actions.initKey();
   },
-  showtoolbarModal(operate, title = "") {
-    state.toolbarModal.show = true;
-    state.toolbarModal.content = operate;
-    state.toolbarModal.data.modalTitle = title;
-  },
-  hidetoolbarModal() {
-    state.toolbarModal.content = "";
-    state.toolbarModal.show = false;
-  },
   showToast(message, status = "", loading = false) {
     state.toast.message = message;
     state.toast.status = status;
     state.toast.loading = loading;
-    state.toast.show = true;
   },
   hideToast() {
-    state.toast.message = "";
+    state.toast.message = false;
     state.toast.loading = false;
-    state.toast.show = false;
   },
   timeToast(message, status = "", loading = false, delay = 1000) {
     actions.showToast(message, status, loading);
     setTimeout(() => {
       actions.hideToast();
     }, delay);
-  },
-  toolbarSubmit() {
-    let str = "";
-    let data = state.toolbarModal.data;
-    if (data.operate === "table") {
-      if (data.row > 1) {
-        data.row = parseInt(data.row) + 1;
-      }
-      for (let i = 0; i < data.row; i++) {
-        for (let j = 0; j < data.column; j++) {
-          str += "| ";
-          if (i == 1) {
-            if (data.type === "left" || data.type === "center") {
-              str += ":";
-            }
-            str += "----------";
-            if (data.type === "right" || data.type === "center") {
-              str += ":";
-            }
-          }
-          str += " ";
-        }
-        str += "|\n";
-      }
-    } else if (data.operate === "link") {
-      str = "[" + data.title + "](" + data.href + ")";
-    } else if (data.operate === "image") {
-      str = "![" + data.art + "](" + data.src + ")";
-    } else if (data.operate === "video") {
-      if (!/\w+\.(\w+)$/.test(data.src)) {
-        actions.timeToast("地址输入有误！请重新输入(无法识别扩展名)", "error");
-        return;
-      }
-      let type = data.src.match(/\w+\.(\w+)$/);
-      str =
-        '<video controls="controls" width="' +
-        data.width +
-        '" height="' +
-        data.height +
-        '"><source src="' +
-        data.src +
-        '" type="video/' +
-        type[1] +
-        '" /></video>';
-    } else if (data.operate === "graff") {
-      str = "[graff]{" + data.hash + "}";
-    } else if (data.operate === "toLine") {
-      state.aceEditor.gotoLine(data.line);
-      state.aceEditor.focus();
-      actions.hidetoolbarModal();
-      actions.toolbarCancer();
-      return;
-    } else if (data.operate === "setLocalStorage") {
-      window.XKEditor.setLocalStorage(state.toolbarModal.data.locationStorage);
-      actions.toolbarCancer();
-      return;
-    } else if (data.operate === "getLocalStorage") {
-      str = window.XKEditor.getLocalStorage(
-        state.toolbarModal.data.locationStorage
-      );
-      actions.setAceValue(str);
-      actions.toolbarCancer();
-      return;
-    } else if (data.operate === "removeLocalStorage") {
-      window.XKEditor.removeLocalStorage(
-        state.toolbarModal.data.locationStorage
-      );
-      actions.toolbarCancer();
-      return;
-    }
-    actions.hidetoolbarModal();
-    actions.operateAceContent(false, 0, str);
-    actions.toolbarCancer();
-  },
-  toolbarCancer() {
-    actions.hidetoolbarModal();
   },
   imgUpload() {
     if (document.getElementById("img-upload").files.length > 0) {
@@ -258,8 +175,7 @@ const actions = {
   initGraff() {
     document.getElementById("previewHtml").addEventListener("click", e => {
       if (e.target.classList.contains("graffiti")) {
-        state.graffHash = e.target.getAttribute("data-hash");
-        state.showGraff = true;
+        state.graffBoard.hash = e.target.getAttribute("data-hash");
       }
     });
   },
@@ -403,7 +319,6 @@ const actions = {
       return;
     } else if (command === "toc") {
       actions.switchToc();
-
       return;
     } else if (command === "switchPreview") {
       actions.switchPreviewShow();
@@ -534,131 +449,6 @@ const actions = {
         ele.classList.remove("active");
       }
     }
-  },
-  toolbarClick(operate) {
-    state.toolbarModal.data.operate = operate;
-    let str = "";
-    let isStart = false;
-    let toLeft = 0;
-    let selectText = state.aceEditor.getSelectedText();
-    if (operate.match(/^h(\d)/)) {
-      str = "#".repeat(operate.substring(1)) + " ";
-      isStart = true;
-    } else if (operate === "bold") {
-      str = "**" + selectText + "**";
-      toLeft = 2;
-    } else if (operate === "italic") {
-      str = "*" + selectText + "*";
-      toLeft = 1;
-    } else if (operate === "underline") {
-      str =
-        '<span style="text-decoration: underline">' + selectText + "</span>";
-      toLeft = 7;
-    } else if (operate === "strikethrough") {
-      str = "~" + selectText + "~";
-      toLeft = 1;
-    } else if (operate === "quote") {
-      str = "> ";
-      isStart = true;
-    } else if (operate === "mark") {
-      str = "`" + selectText + "`";
-      toLeft = 1;
-    } else if (operate === "code") {
-      str = "```\n```";
-      toLeft = 4;
-    } else if (operate === "sup") {
-      str = "<sup>" + selectText + "</sup>";
-      toLeft = 6;
-    } else if (operate === "sub") {
-      str = "<sub>" + selectText + "</sub>";
-      toLeft = 6;
-    } else if (operate === "tex-$") {
-      str = "$$" + selectText + "$$";
-      toLeft = 2;
-    } else if (operate === "tex-math") {
-      str = "```math\n\n```";
-      toLeft = 4;
-    } else if (operate === "flow") {
-      str = "```flow\n```";
-      toLeft = 4;
-    } else if (operate === "seq") {
-      str = "```seq\n\n```";
-      toLeft = 4;
-    } else if (operate === "gantt") {
-      str = "```gantt\n\n```";
-      toLeft = 4;
-    } else if (operate === "mermaid") {
-      str = "```mermaid\n\n```";
-      toLeft = 4;
-    } else if (operate === "ul") {
-      str = "- ";
-      isStart = true;
-    } else if (operate === "ol") {
-      str = "1. ";
-      isStart = true;
-    } else if (operate === "minus") {
-      str = "\n---\n\n";
-      isStart = true;
-    } else if (operate === "table") {
-      actions.showtoolbarModal(operate, "添加表格");
-      return;
-    } else if (operate === "time") {
-      str = new Date().toLocaleString();
-    } else if (operate === "link") {
-      actions.showtoolbarModal(operate, "添加链接");
-      return;
-    } else if (operate === "image") {
-      actions.showtoolbarModal(operate, "添加图片");
-      return;
-    } else if (operate === "video") {
-      actions.showtoolbarModal(operate, "添加视频");
-      return;
-    } else if (operate === "graff") {
-      str =
-        "[graff]{" +
-        Math.random()
-          .toString(36)
-          .slice(6) +
-        "}";
-      isStart = true;
-    } else if (operate === "setLocalStorage") {
-      actions.showtoolbarModal("localStorage", "保存到本地");
-      return;
-    } else if (operate === "getLocalStorage") {
-      actions.showtoolbarModal("localStorage", "从本地读取");
-      return;
-    } else if (operate === "removeLocalStorage") {
-      actions.showtoolbarModal("localStorage", "删除本地存储");
-      return;
-    } else if (operate === "help") {
-      actions.showtoolbarModal(operate, "帮助");
-      return;
-    } else if (operate === "info") {
-      actions.showtoolbarModal(operate, "关于");
-      return;
-    } else if (
-      /(toLine|search|toc|switchPreview|fullPreview|fullScreen|toHtmlEditor|toTinyMCE|empty|setting|undo|redo|typewriter|format|pasteFormat)/g.test(
-        operate
-      )
-    ) {
-      actions.execCommand(operate);
-      return;
-    }
-    actions.operateAceContent(isStart, toLeft, str);
-  },
-  operateAceContent(isStart, toLeft, str) {
-    let range = state.aceEditor.getSelectionRange();
-    if (isStart) {
-      for (let i = range.start.row; i <= range.end.row; i++) {
-        state.aceEditor.session.replace(new ace.Range(i, 0, i, 0), str);
-      }
-    } else {
-      state.aceEditor.session.replace(range, str);
-    }
-    if (toLeft) {
-      state.aceEditor.navigateLeft(toLeft);
-    }
-    state.aceEditor.focus();
   },
   initKey() {
     var keys = [
@@ -1113,8 +903,9 @@ const actions = {
     };
   },
   initScroll() {
-    window.scrollBind = (operate = null, bindType = "both") => {
-      var currentTab = 1;
+    var currentTab = 1;
+    var scale = 1;
+    actions.scrollBind = (operate = null) => {
       var editorDom = document.querySelector(".ace-editor");
       var previewHtmlDom = document.querySelector("#previewHtml");
       var aceContentHeight =
@@ -1122,36 +913,46 @@ const actions = {
         editorDom.offsetHeight;
       var previewHtmlHeight =
         previewHtmlDom.scrollHeight - previewHtmlDom.offsetHeight;
-      window.scale = previewHtmlHeight / aceContentHeight;
+      scale = previewHtmlHeight / aceContentHeight;
       if (operate === "init") {
-        if (bindType === "left") {
-          currentTab = 1;
-        } else if (bindType === "right") {
-          currentTab = 2;
-        } else {
-          editorDom.addEventListener("mouseover", () => {
-            currentTab = 1;
-          });
-          previewHtmlDom.addEventListener("mouseover", () => {
+        editorDom.addEventListener("mouseover", () => {
+          if (state.setting.xkSetting.scrollBind === "right") {
             currentTab = 2;
-          });
-          //兼容触摸设备
-          editorDom.addEventListener("touchstart", () => {
+          } else {
             currentTab = 1;
-          });
-          previewHtmlDom.addEventListener("touchstart", () => {
+          }
+        });
+        previewHtmlDom.addEventListener("mouseover", () => {
+          if (state.setting.xkSetting.scrollBind === "left") {
+            currentTab = 1;
+          } else {
             currentTab = 2;
-          });
-        }
+          }
+        });
+        //兼容触摸设备
+        editorDom.addEventListener("touchstart", () => {
+          if (state.setting.xkSetting.scrollBind === "right") {
+            currentTab = 2;
+          } else {
+            currentTab = 1;
+          }
+        });
+        previewHtmlDom.addEventListener("touchstart", () => {
+          if (state.setting.xkSetting.scrollBind === "left") {
+            currentTab = 1;
+          } else {
+            currentTab = 2;
+          }
+        });
         window.XKEditor.ace.session.on("changeScrollTop", data => {
           if (currentTab === 1) {
-            previewHtmlDom.scrollTop = data * window.scale;
+            previewHtmlDom.scrollTop = data * scale;
           }
         });
         previewHtmlDom.addEventListener("scroll", () => {
           if (currentTab === 2) {
             window.XKEditor.ace.session.setScrollTop(
-              previewHtmlDom.scrollTop / window.scale
+              previewHtmlDom.scrollTop / scale
             );
           }
         });
@@ -1159,7 +960,7 @@ const actions = {
         previewHtmlDom.addEventListener("touchmove", () => {
           if (currentTab === 2) {
             window.XKEditor.ace.session.setScrollTop(
-              previewHtmlDom.scrollTop / window.scale
+              previewHtmlDom.scrollTop / scale
             );
           }
         });
@@ -1204,7 +1005,6 @@ const actions = {
       }
     };
     // 模拟锚点
-    window.scrollMode = state.setting.xkSetting.scrollMode;
     window.sta = anchorName => {
       if (anchorName) {
         let anchorElement = document.getElementById(anchorName);
@@ -1216,11 +1016,12 @@ const actions = {
     //初始化滚动绑定
     Vue.nextTick(() => {
       setTimeout(() => {
-        window.scrollBind("init", state.setting.xkSetting.scrollBind);
+        actions.scrollBind("init");
       }, 1000);
     });
   },
   initPaste() {
+    // TODO: 寻找更好的方案
     if (
       state.setting.xkSetting.pasteFormat &&
       document.getElementById("toolbar-pasteFormat")
@@ -1237,13 +1038,14 @@ const actions = {
         }
       }
     });
-    if (
-      state.setting.xkSetting.pasteImageUpload &&
-      state.setting.xkSetting.imgUpload
-    ) {
-      document
-        .getElementsByClassName("ace-container")[0]
-        .addEventListener("paste", e => {
+
+    document
+      .getElementsByClassName("ace-container")[0]
+      .addEventListener("paste", e => {
+        if (
+          state.setting.xkSetting.pasteImageUpload &&
+          state.setting.xkSetting.imgUpload
+        ) {
           if (!(e.clipboardData && e.clipboardData.items)) {
             return;
           }
@@ -1262,8 +1064,8 @@ const actions = {
               );
             }
           }
-        });
-    }
+        }
+      });
   },
   initTocTree() {
     //注册TOC按钮
@@ -1424,6 +1226,30 @@ const actions = {
       });
     };
     return init;
+  },
+  /**
+   * 插入字符到ACE编辑器
+   * @param {object} insert { left?: string, right?: string, replace?:string } 插入的字符
+   * @param {boolean} [fromStart=false] 是否在行首填充
+   * @param {number} [moveToLeft=0] 填充完向左移动光标
+   */
+  insertTextToAce(insert, fromStart = false, moveToLeft = 0) {
+    let selectText = state.aceEditor.getSelectedText();
+    let str = insert.replace
+      ? insert.replace
+      : insert.left + selectText + insert.right;
+    let range = state.aceEditor.getSelectionRange();
+    if (fromStart) {
+      for (let i = range.start.row; i <= range.end.row; i++) {
+        state.aceEditor.session.replace(new ace.Range(i, 0, i, 0), str);
+      }
+    } else {
+      state.aceEditor.session.replace(range, str);
+    }
+    if (moveToLeft) {
+      state.aceEditor.navigateLeft(moveToLeft);
+    }
+    state.aceEditor.focus();
   }
 };
 
