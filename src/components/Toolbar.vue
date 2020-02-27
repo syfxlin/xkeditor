@@ -50,7 +50,8 @@ export default {
       "toolbarHtmlShow",
       "setting",
       "previewShow",
-      "showToc"
+      "showToc",
+      "typewriterMode"
     ]),
     toolbar() {
       return tb.toolbar;
@@ -64,7 +65,7 @@ export default {
     }
   },
   watch: {
-    setting: {
+    "setting.xkSetting.pasteFormat": {
       handler() {
         tb.watcher.forEach(fn => fn());
       },
@@ -77,6 +78,12 @@ export default {
       deep: true
     },
     showToc: {
+      handler() {
+        tb.watcher.forEach(fn => fn());
+      },
+      deep: true
+    },
+    typewriterMode: {
       handler() {
         tb.watcher.forEach(fn => fn());
       },
