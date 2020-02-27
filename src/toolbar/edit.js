@@ -5,7 +5,7 @@ export default {
     title: "格式化(美化)",
     operate: "format",
     icon: "atom",
-    hander() {
+    handler() {
       store.actions.execCommand("format");
     }
   },
@@ -13,15 +13,19 @@ export default {
     title: "粘贴转化",
     operate: "pasteFormat",
     icon: "paste",
-    hander() {
+    active: store.state.setting.xkSetting.pasteFormat,
+    handler() {
       store.actions.execCommand("pasteFormat");
+    },
+    watcher() {
+      this.active = store.state.setting.xkSetting.pasteFormat;
     }
   },
   empty: {
     title: "清空",
     operate: "empty",
     icon: "eraser",
-    hander() {
+    handler() {
       store.actions.execCommand("empty");
     }
   },
@@ -29,7 +33,7 @@ export default {
     title: "撤销",
     operate: "undo",
     icon: "undo",
-    hander() {
+    handler() {
       store.actions.execCommand("undo");
     }
   },
@@ -37,7 +41,7 @@ export default {
     title: "重做",
     operate: "redo",
     icon: "redo",
-    hander() {
+    handler() {
       store.actions.execCommand("redo");
     }
   }

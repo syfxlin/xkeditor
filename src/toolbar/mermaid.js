@@ -5,7 +5,7 @@ export default {
     title: "添加流程图",
     operate: "flow",
     icon: "ellipsis-h",
-    hander() {
+    handler() {
       store.actions.insertTextToAce(
         {
           replace: "```flow\n\n```"
@@ -19,7 +19,7 @@ export default {
     title: "添加时序图",
     operate: "seq",
     icon: "circle",
-    hander() {
+    handler() {
       store.actions.insertTextToAce(
         {
           replace: "```seq\n\n```"
@@ -33,7 +33,7 @@ export default {
     title: "添加甘特图",
     operate: "gantt",
     icon: "square",
-    hander() {
+    handler() {
       store.actions.insertTextToAce(
         {
           replace: "```gantt\n\n```"
@@ -47,7 +47,7 @@ export default {
     title: "添加图",
     operate: "mermaid",
     icon: "cubes",
-    hander() {
+    handler() {
       store.actions.insertTextToAce(
         {
           replace: "```mermaid\n\n```"

@@ -67,16 +67,18 @@ const all = {
   setting
 };
 
-const toolbar = [];
+export const toolbar = Vue.observable([]);
+export const watcher = Vue.observable([]);
 
 const selects = store.state.setting.aceSetting.toolbar.split(" ");
 
 selects.forEach(item => {
   if (all[item]) {
     toolbar.push(all[item]);
+    if (all[item].watcher) {
+      watcher.push(all[item].watcher.bind(all[item]));
+    }
   } else {
     console.warn(`Not toolbar item: ${item}`);
   }
 });
-
-export default toolbar;

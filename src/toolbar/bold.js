@@ -4,7 +4,7 @@ export default {
   title: "粗体",
   operate: "bold",
   icon: "bold",
-  hander() {
+  handler() {
     store.actions.insertTextToAce(
       {
         left: "**",

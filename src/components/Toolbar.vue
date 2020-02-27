@@ -5,11 +5,11 @@
         <span v-if="item.icon === '|'" :key="item.id">|</span>
         <template v-else>
           <button
-            class="xk-button"
+            :class="`xk-button ${item.active ? 'active' : ''}`"
             :key="item.id"
             type="text"
             :title="item.title"
-            @click="item.hander()"
+            @click="item.handler()"
             :id="'toolbar-' + item.operate"
           >
             <b v-if="typeof item.icon === 'number'">H{{ item.icon }}</b>
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import toolbarObj from "../toolbar";
+import * as tb from "../toolbar";
 import { mapActions, mapState } from "../store";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -41,17 +41,46 @@ export default {
   },
   data() {
     return {
-      toolbar: toolbarObj
+      // toolbar: tb.toolbar
     };
   },
   computed: {
-    ...mapState(["toolbarShow", "toolbarHtmlShow"])
+    ...mapState([
+      "toolbarShow",
+      "toolbarHtmlShow",
+      "setting",
+      "previewShow",
+      "showToc"
+    ]),
+    toolbar() {
+      return tb.toolbar;
+    }
   },
   methods: {
     ...mapActions(["switchEditorMode"]),
     switchToHtml() {
       this.toolbarShow = true;
       this.switchEditorMode();
+    }
+  },
+  watch: {
+    setting: {
+      handler() {
+        tb.watcher.forEach(fn => fn());
+      },
+      deep: true
+    },
+    previewShow: {
+      handler() {
+        tb.watcher.forEach(fn => fn());
+      },
+      deep: true
+    },
+    showToc: {
+      handler() {
+        tb.watcher.forEach(fn => fn());
+      },
+      deep: true
     }
   }
 };

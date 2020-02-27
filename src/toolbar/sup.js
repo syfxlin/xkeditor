@@ -4,7 +4,7 @@ export default {
   title: "上标",
   operate: "sup",
   icon: "superscript",
-  hander() {
+  handler() {
     store.actions.insertTextToAce(
       {
         left: "<sup>",

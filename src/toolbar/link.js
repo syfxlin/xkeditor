@@ -8,7 +8,7 @@ export default {
     href: "",
     title: ""
   },
-  hander() {
+  handler() {
     store.state.toolbarModal = this;
   },
   submit() {

@@ -9,7 +9,7 @@ export default {
     column: 2,
     type: "normal"
   },
-  hander() {
+  handler() {
     store.state.toolbarModal = this;
   },
   submit() {

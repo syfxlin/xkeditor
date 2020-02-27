@@ -4,7 +4,7 @@ export default {
   title: "代码块",
   operate: "code",
   icon: "terminal",
-  hander() {
+  handler() {
     store.actions.insertTextToAce(
       {
         replace: "```\n```"

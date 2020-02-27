@@ -4,7 +4,7 @@ export default {
   title: "时间",
   operate: "time",
   icon: "clock",
-  hander() {
+  handler() {
     store.actions.insertTextToAce(
       {
         left: new Date().toLocaleString(),

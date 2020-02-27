@@ -7,7 +7,7 @@ for (let i = 1; i <= 6; i++) {
     title: `标题${i}`,
     operate: `h${i}`,
     icon: i,
-    hander() {
+    handler() {
       store.actions.insertTextToAce(
         {
           replace: `${"#".repeat(i)} `

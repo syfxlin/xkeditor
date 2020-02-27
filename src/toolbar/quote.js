@@ -4,7 +4,7 @@ export default {
   title: "引用",
   operate: "quote",
   icon: "quote-left",
-  hander() {
+  handler() {
     store.actions.insertTextToAce(
       {
         replace: "> "

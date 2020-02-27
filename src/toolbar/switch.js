@@ -5,7 +5,7 @@ export default {
     title: "转换为HTML编辑",
     operate: "toHtmlEditor",
     icon: "file-code",
-    hander() {
+    handler() {
       store.actions.execCommand("toHtmlEditor");
     }
   },
@@ -13,7 +13,7 @@ export default {
     title: "转换为TinyMCE编辑器",
     operate: "toTinyMCE",
     icon: "sync-alt",
-    hander() {
+    handler() {
       store.actions.execCommand("toTinyMCE");
     }
   }

@@ -8,7 +8,7 @@ export default {
     src: "",
     alt: ""
   },
-  hander() {
+  handler() {
     store.state.toolbarModal = this;
   },
   submit() {

@@ -5,7 +5,7 @@ export default {
     title: "帮助",
     operate: "help",
     icon: "question-circle",
-    hander() {
+    handler() {
       store.state.toolbarModal = this;
     },
     submit() {
@@ -19,7 +19,7 @@ export default {
     title: "关于",
     operate: "info",
     icon: "info-circle",
-    hander() {
+    handler() {
       store.state.toolbarModal = this;
     },
     submit() {

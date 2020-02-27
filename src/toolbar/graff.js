@@ -4,7 +4,7 @@ export default {
   title: "涂鸦",
   operate: "graff",
   icon: "palette",
-  hander() {
+  handler() {
     store.actions.insertTextToAce(
       {
         replace: `[graff]{${Math.random()

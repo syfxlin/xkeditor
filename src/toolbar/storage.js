@@ -8,7 +8,7 @@ export default {
     data: {
       locationStorage: ""
     },
-    hander() {
+    handler() {
       store.state.toolbarModal = this;
     },
     submit() {
@@ -26,7 +26,7 @@ export default {
     data: {
       locationStorage: ""
     },
-    hander() {
+    handler() {
       store.state.toolbarModal = this;
     },
     submit() {
@@ -46,7 +46,7 @@ export default {
     data: {
       locationStorage: ""
     },
-    hander() {
+    handler() {
       store.state.toolbarModal = this;
     },
     submit() {

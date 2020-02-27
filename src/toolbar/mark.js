@@ -4,7 +4,7 @@ export default {
   title: "标记",
   operate: "mark",
   icon: "code",
-  hander() {
+  handler() {
     store.actions.insertTextToAce(
       {
         left: "`",

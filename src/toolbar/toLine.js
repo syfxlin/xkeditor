@@ -8,7 +8,7 @@ export default {
     allLine: 10,
     line: 0
   },
-  hander() {
+  handler() {
     this.data.allLine = store.state.aceEditor.session.getLength();
     this.data.line = store.state.aceEditor.getCursorPosition().row + 1;
     store.state.toolbarModal = this;

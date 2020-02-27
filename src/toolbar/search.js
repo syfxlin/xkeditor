@@ -4,7 +4,7 @@ export default {
   title: "搜索",
   operate: "search",
   icon: "search",
-  hander() {
+  handler() {
     store.state.aceEditor.commands.commands.find.exec(store.state.aceEditor);
   }
 };

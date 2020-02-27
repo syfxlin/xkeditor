@@ -4,7 +4,7 @@ export default {
   title: "下标",
   operate: "sub",
   icon: "subscript",
-  hander() {
+  handler() {
     store.actions.insertTextToAce(
       {
         left: "<sub>",

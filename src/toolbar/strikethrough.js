@@ -4,7 +4,7 @@ export default {
   title: "删除线",
   operate: "strikethrough",
   icon: "strikethrough",
-  hander() {
+  handler() {
     store.actions.insertTextToAce(
       {
         left: "~",

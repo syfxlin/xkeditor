@@ -5,7 +5,7 @@ export default {
     title: "无序列表",
     operate: "ul",
     icon: "list-ul",
-    hander() {
+    handler() {
       store.actions.insertTextToAce(
         {
           replace: "- "
@@ -18,7 +18,7 @@ export default {
     title: "有序列表",
     operate: "ol",
     icon: "list-ol",
-    hander() {
+    handler() {
       store.actions.insertTextToAce(
         {
           replace: "1. "

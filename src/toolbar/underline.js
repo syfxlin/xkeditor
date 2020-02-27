@@ -4,7 +4,7 @@ export default {
   title: "下划线",
   operate: "underline",
   icon: "underline",
-  hander() {
+  handler() {
     store.actions.insertTextToAce(
       {
         left: '<span style="text-decoration: underline">',

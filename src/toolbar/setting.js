@@ -4,7 +4,7 @@ export default {
   title: "设置",
   operate: "setting",
   icon: "cog",
-  hander() {
+  handler() {
     store.actions.execCommand("setting");
   }
 };

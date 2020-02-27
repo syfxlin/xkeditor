@@ -181,12 +181,6 @@ const actions = {
   },
   switchToc() {
     state.showToc = !state.showToc;
-    let ele = document.getElementById("toolbar-toc");
-    if (state.showToc) {
-      ele.classList.add("active");
-    } else {
-      ele.classList.remove("active");
-    }
   },
   switchResizor(curr) {
     let left = document.querySelector(".xkeditor-left");
@@ -201,25 +195,17 @@ const actions = {
   },
   switchPreviewShow(show = null) {
     let curr = show !== null ? show : state.previewShow === "hide";
-    let ele1 = document.getElementById("toolbar-switchPreview");
-    let ele2 = document.getElementById("toolbar-fullPreview");
     if (!curr) {
       state.previewShow = "hide";
-      ele1.classList.add("active");
     } else {
       state.previewShow = "show";
-      ele1.classList.remove("active");
-      ele2.classList.remove();
     }
     actions.switchResizor(curr);
   },
   switchPreviewFull(show = null) {
     let curr = show !== null ? show : state.previewShow === "full";
-    let ele1 = document.getElementById("toolbar-fullPreview");
-    let ele2 = document.getElementById("toolbar-switchPreview");
     if (!curr) {
       state.previewShow = "full";
-      ele1.classList.add("active");
       Vue.nextTick(() => {
         var preEle = document.getElementById("previewHtml");
         if (
@@ -233,22 +219,18 @@ const actions = {
       });
     } else {
       state.previewShow = "show";
-      ele1.classList.remove("active");
-      ele2.classList.remove("active");
       document.getElementById("toc-button").style.display = "block";
       state.showToc = false;
     }
     actions.switchResizor(curr);
   },
   operateFullScreen() {
-    let ele = document.getElementById("toolbar-fullScreen");
     if (
       document.fullscreenElement ||
       document.msFullscreenElement ||
       document.mozFullScreenElement ||
       document.webkitFullscreenElement
     ) {
-      ele.classList.remove("active");
       if (document.exitFullscreen) {
         return document.exitFullscreen();
       } else if (document.webkitExitFullscreen) {
@@ -259,7 +241,6 @@ const actions = {
         return document.msExitFullscreen();
       }
     } else {
-      ele.classList.add("active");
       var root = document.documentElement;
       if (root.requestFullscreen) {
         return root.requestFullscreen();
@@ -423,13 +404,10 @@ const actions = {
         };
       }
       state.typewriterMode = !state.typewriterMode;
-      let ele = document.getElementById("toolbar-typewriter");
       if (state.typewriterMode) {
         state.aceEditor.selection.on("changeCursor", window.$typewriter);
-        ele.classList.add("active");
       } else {
         state.aceEditor.selection.off("changeCursor", window.$typewriter);
-        ele.classList.remove("active");
       }
       return;
     } else if (command === "format") {
@@ -442,12 +420,6 @@ const actions = {
     } else if (command === "pasteFormat") {
       state.setting.xkSetting.pasteFormat = !state.setting.xkSetting
         .pasteFormat;
-      let ele = document.getElementById("toolbar-pasteFormat");
-      if (state.setting.xkSetting.pasteFormat) {
-        ele.classList.add("active");
-      } else {
-        ele.classList.remove("active");
-      }
     }
   },
   initKey() {
@@ -1021,13 +993,6 @@ const actions = {
     });
   },
   initPaste() {
-    // TODO: 寻找更好的方案
-    if (
-      state.setting.xkSetting.pasteFormat &&
-      document.getElementById("toolbar-pasteFormat")
-    ) {
-      document.getElementById("toolbar-pasteFormat").classList.add("active");
-    }
     state.aceEditor.on("paste", e => {
       if (state.setting.xkSetting.pasteFormat) {
         if (e.event.clipboardData.getData("text/html")) {

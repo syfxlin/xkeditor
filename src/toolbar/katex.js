@@ -5,7 +5,7 @@ export default {
     title: "添加行内公式",
     operate: "tex-$",
     icon: "dollar-sign",
-    hander() {
+    handler() {
       store.actions.insertTextToAce(
         {
           left: "$$",
@@ -20,7 +20,7 @@ export default {
     title: "添加块公式",
     operate: "tex-math",
     icon: "divide",
-    hander() {
+    handler() {
       store.actions.insertTextToAce(
         {
           replace: "```math\n\n```"
