@@ -810,8 +810,8 @@ const actions = {
           return window.tinymce;
         }
       },
-      switchTypewriter: data => {
-        actions.execCommand("typewriter", true);
+      switchTypewriter: () => {
+        actions.execCommand("typewriter");
       },
       formatContent() {
         actions.execCommand("format");
@@ -951,7 +951,6 @@ const actions = {
             function scrollToTop(v, sTime, contentY) {
               var dir = v > 0 ? -1 : 1;
               var deceleration = dir * 0.0018;
-              var duration = v / deceleration;
               function inertiaMove() {
                 // if(stopInertia) return
                 var nowTime = Date.now();

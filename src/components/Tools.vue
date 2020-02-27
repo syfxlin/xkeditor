@@ -4,7 +4,9 @@
       class="xk-button close-preview-full"
       @click="switchPreviewFull()"
       v-show="editorMode === 'ace' && previewShow === 'full'"
-    >关闭</button>
+    >
+      关闭
+    </button>
     <transition name="slide-fade">
       <div id="toc" v-show="showToc"></div>
     </transition>

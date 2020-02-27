@@ -4,19 +4,23 @@
     <div class="editor-container">
       <div
         :class="
-            'xkeditor-left ' +
-              (previewShow === 'show' ? 'xk-col-12' : 'xk-col-24')
-          "
+          'xkeditor-left ' +
+            (previewShow === 'show' ? 'xk-col-12' : 'xk-col-24')
+        "
         v-show="isAceMode && previewShow !== 'full'"
       >
         <ace ref="ace"></ace>
       </div>
-      <div id="resizor" title="拖动我" v-show="isAceMode && previewShow === 'show'"></div>
+      <div
+        id="resizor"
+        title="拖动我"
+        v-show="isAceMode && previewShow === 'show'"
+      ></div>
       <div
         :class="
-            'xkeditor-right ' +
-              (previewShow === 'show' ? 'xk-col-12' : 'xk-col-24')
-          "
+          'xkeditor-right ' +
+            (previewShow === 'show' ? 'xk-col-12' : 'xk-col-24')
+        "
         v-show="isAceMode && previewShow !== 'hide'"
       >
         <div
@@ -26,7 +30,11 @@
           ref="htmlView"
         ></div>
       </div>
-      <div class="xk-col-24" v-show="!isAceMode" v-if="setting.xkSetting.enableTinyMCE">
+      <div
+        class="xk-col-24"
+        v-show="!isAceMode"
+        v-if="setting.xkSetting.enableTinyMCE"
+      >
         <tinymce ref="tinymce"></tinymce>
       </div>
     </div>
