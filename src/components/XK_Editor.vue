@@ -11,11 +11,7 @@
       >
         <ace ref="ace"></ace>
       </div>
-      <div
-        id="resizor"
-        title="拖动我"
-        v-show="isAceMode && previewShow === 'show'"
-      ></div>
+      <div id="resizor" title="拖动我" v-show="isAceMode && previewShow === 'show'"></div>
       <div
         :class="
           'xkeditor-right ' +
@@ -30,11 +26,7 @@
           ref="htmlView"
         ></div>
       </div>
-      <div
-        class="xk-col-24"
-        v-show="!isAceMode"
-        v-if="setting.xkSetting.enableTinyMCE"
-      >
+      <div class="xk-col-24" v-show="!isAceMode" v-if="setting.xkSetting.enableTinyMCE">
         <tinymce ref="tinymce"></tinymce>
       </div>
     </div>
@@ -53,8 +45,6 @@ import Tools from "./Tools";
 
 //HTML和Markdown互转
 import { toHtml, toMarkdown, getTocHtml } from "../utils/switchContent";
-import Prism from "prismjs";
-import katex from "katex";
 import renderMathInElement from "katex/dist/contrib/auto-render";
 import mermaid from "mermaid";
 
@@ -122,7 +112,7 @@ export default {
       "initResizor",
       "updateRunCode",
       "setValue",
-      "mergeTinyMCEOptions"
+      "initTinyMceEditor"
     ]),
     loadCss(url) {
       let css = document.createElement("link");
@@ -195,7 +185,7 @@ export default {
         this.setting = val;
         if (window.XKEditor) {
           window.XKEditor.tinymce.remove();
-          window.XKEditor.tinymce.init(this.mergeTinyMCEOptions());
+          this.initTinyMceEditor();
           window.XKEditor.ace.setOptions(val.aceSetting);
         }
       },

@@ -18,9 +18,6 @@ export default {
       this.setting.aceSetting,
       this.$refs.ace
     );
-    this.aceEditor.getSession().on("change", () => {
-      this.markdownContent = this.aceEditor.getValue();
-    });
   },
   methods: {
     ...mapActions(["initAceEditor"])

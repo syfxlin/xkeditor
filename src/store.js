@@ -115,6 +115,7 @@ const state = Vue.observable({
 });
 
 const actions = {
+  // Set value
   setValue(val) {
     if (state.editorMode === "ace") {
       actions.setAceValue(val);
@@ -129,6 +130,7 @@ const actions = {
     state.htmlContent = val;
     tinyMCE.editors["tinymce-textarea"].setContent(state.htmlContent);
   },
+  // Init editors
   initAceEditor(value, setting, ele) {
     setting.value = value ? value : "";
     ace.config.set(
@@ -140,287 +142,99 @@ const actions = {
       actions.execCommand("switchPreview");
     }
     actions.initKey();
+    state.aceEditor.on("change", () => {
+      state.markdownContent = state.aceEditor.getValue();
+    });
   },
-  showToast(message, status = "", loading = false) {
-    state.toast.message = message;
-    state.toast.status = status;
-    state.toast.loading = loading;
-  },
-  hideToast() {
-    state.toast.message = false;
-    state.toast.loading = false;
-  },
-  timeToast(message, status = "", loading = false, delay = 1000) {
-    actions.showToast(message, status, loading);
-    setTimeout(() => {
-      actions.hideToast();
-    }, delay);
-  },
-  imgUpload() {
-    if (document.getElementById("img-upload").files.length > 0) {
-      let file = document.getElementById("img-upload").files[0];
-      window.XKEditorAPI.imgUpload(
-        file,
-        response => {
-          Vue.set(state.toolbarModal.data, "src", response.data.path);
-        },
-        error => {
-          console.log(error);
-        }
-      );
-    } else {
-      actions.timeToast("当前未选择文件！", "error");
+  initTinyMceEditor() {
+    let init = state.setting.tinymceSetting;
+    init.selector = "#tinymce-textarea";
+    //上传功能
+    if (state.setting.xkSetting.imgUpload) {
+      init.images_upload_handler = (blobInfo, success, failure) => {
+        window.XKEditorAPI.imgUpload(
+          blobInfo.blob(),
+          response => {
+            success(response.data.path);
+          },
+          error => {
+            failure(error);
+          }
+        );
+      };
     }
+    //添加自定义按钮
+    init.setup = editor => {
+      editor.ui.registry.addButton("tex-$", {
+        text: "行内公式",
+        onAction(_) {
+          editor.insertContent("<p>$$$$</p>");
+        }
+      });
+      editor.ui.registry.addButton("tex-math", {
+        text: "块公式",
+        onAction(_) {
+          editor.insertContent("<pre>&nbsp;```math&nbsp;```&nbsp;</pre>");
+        }
+      });
+      editor.ui.registry.addButton("flow", {
+        text: "流程图",
+        onAction(_) {
+          editor.insertContent('<pre class="xkeditor-mermaid">graph </pre>');
+        }
+      });
+      editor.ui.registry.addButton("seq", {
+        text: "时序图",
+        onAction(_) {
+          editor.insertContent(
+            '<pre class="xkeditor-mermaid">sequenceDiagram&nbsp;</pre>'
+          );
+        }
+      });
+      editor.ui.registry.addButton("gantt", {
+        text: "甘特图",
+        onAction(_) {
+          editor.insertContent(
+            '<pre class="xkeditor-mermaid">gantt&nbsp;</pre>'
+          );
+        }
+      });
+      editor.ui.registry.addButton("mermaid", {
+        text: "添加图",
+        onAction(_) {
+          editor.insertContent('<pre class="xkeditor-mermaid">&nbsp;</pre>');
+        }
+      });
+      editor.ui.registry.addButton("prismjs", {
+        text: "代码块",
+        onAction(_) {
+          editor.insertContent(
+            '<pre><code class="line-numbers language-javascript">&nbsp;</code></pre>'
+          );
+        }
+      });
+      editor.ui.registry.addButton("toMarkdownEditor", {
+        text: "切换编辑器",
+        onAction(_) {
+          window.XKEditor.switchEditor();
+        }
+      });
+      editor.on("init", () => {
+        editor.setContent(state.htmlContent);
+        editor.on("KeyUp", e => {
+          state.htmlContent = editor.getContent();
+        });
+      });
+    };
+    tinyMCE.init(init);
   },
+  // Init other
   initGraff() {
     document.getElementById("previewHtml").addEventListener("click", e => {
       if (e.target.classList.contains("graffiti")) {
         state.graffBoard.hash = e.target.getAttribute("data-hash");
       }
     });
-  },
-  switchToc() {
-    state.showToc = !state.showToc;
-  },
-  switchResizor(curr) {
-    let left = document.querySelector(".xkeditor-left");
-    let right = document.querySelector(".xkeditor-right");
-    if (curr) {
-      left.style.width = state.resizor.left;
-      right.style.width = state.resizor.right;
-    } else {
-      left.style.width = "";
-      right.style.width = "";
-    }
-  },
-  switchPreviewShow(show = null) {
-    let curr = show !== null ? show : state.previewShow === "hide";
-    if (!curr) {
-      state.previewShow = "hide";
-    } else {
-      state.previewShow = "show";
-    }
-    actions.switchResizor(curr);
-  },
-  switchPreviewFull(show = null) {
-    let curr = show !== null ? show : state.previewShow === "full";
-    if (!curr) {
-      state.previewShow = "full";
-      Vue.nextTick(() => {
-        var preEle = document.getElementById("previewHtml");
-        if (
-          Math.round(
-            (preEle.offsetWidth / preEle.parentElement.offsetWidth) * 100
-          ) <= 80
-        ) {
-          document.getElementById("toc-button").style.display = "none";
-          state.showToc = true;
-        }
-      });
-    } else {
-      state.previewShow = "show";
-      document.getElementById("toc-button").style.display = "block";
-      state.showToc = false;
-    }
-    actions.switchResizor(curr);
-  },
-  operateFullScreen() {
-    if (
-      document.fullscreenElement ||
-      document.msFullscreenElement ||
-      document.mozFullScreenElement ||
-      document.webkitFullscreenElement
-    ) {
-      if (document.exitFullscreen) {
-        return document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        return document.webkitExitFullscreen();
-      } else if (document.mozCancelFullScreen) {
-        return document.mozCancelFullScreen();
-      } else if (document.msExitFullscreen) {
-        return document.msExitFullscreen();
-      }
-    } else {
-      var root = document.documentElement;
-      if (root.requestFullscreen) {
-        return root.requestFullscreen();
-      } else if (root.webkitRequestFullscreen) {
-        return root.webkitRequestFullscreen();
-      } else if (root.mozRequestFullScreen) {
-        return root.mozRequestFullScreen();
-      } else if (root.msRequestFullscreen) {
-        return root.msRequestFullscreen();
-      }
-    }
-  },
-  switchToHtml() {
-    if (state.isMarkdownMode) {
-      state.aceEditor.session.setMode("ace/mode/html");
-      actions.setAceValue(
-        toHtml(state.aceEditor.getSession().getValue(), false)
-      );
-      state.isMarkdownMode = false;
-    }
-  },
-  switchToMarkdown() {
-    if (!state.isMarkdownMode) {
-      state.aceEditor.session.setMode("ace/mode/markdown");
-      actions.setAceValue(
-        toMarkdown(state.aceEditor.getSession().getValue(), true)
-      );
-      state.isMarkdownMode = true;
-    }
-  },
-  switchEditorMode() {
-    if (state.isMarkdownMode) {
-      actions.switchToHtml();
-    } else {
-      actions.switchToMarkdown();
-    }
-  },
-  switchEditor() {
-    if (!state.setting.xkSetting.enableTinyMCE) return false;
-    if (state.editorMode !== "ace") {
-      state.markdownContent = toMarkdown(state.htmlContent, true);
-      actions.setAceValue(state.markdownContent);
-      state.editorMode = "ace";
-    } else if (state.editorMode !== "tinymce") {
-      state.htmlContent = toHtml(state.markdownContent, false);
-      actions.setTinyValue(state.htmlContent);
-      state.editorMode = "tinymce";
-    }
-  },
-  execCommand(command, data = null) {
-    if (command === "toLine") {
-      state.toolbarModal.data.allLine = state.aceEditor.session.getLength();
-      actions.showtoolbarModal(command, "跳转到指定行");
-      return;
-    } else if (command === "search") {
-      state.aceEditor.commands.commands.find.exec(state.aceEditor);
-      return;
-    } else if (command === "toc") {
-      actions.switchToc();
-      return;
-    } else if (command === "switchPreview") {
-      actions.switchPreviewShow();
-      Vue.nextTick(() => {
-        state.aceEditor.resize(state.aceEditor);
-      });
-      return;
-    } else if (command === "fullPreview") {
-      actions.switchPreviewFull();
-      Vue.nextTick(() => {
-        state.aceEditor.resize(state.aceEditor);
-      });
-      return;
-    } else if (command === "fullScreen") {
-      actions.operateFullScreen();
-      return;
-    } else if (command === "toHtmlEditor") {
-      actions.switchEditorMode();
-      state.toolbarShow = false;
-      return;
-    } else if (command === "toTinyMCE") {
-      actions.switchEditor();
-      return;
-    } else if (command === "empty") {
-      state.aceEditor.setValue("");
-      return;
-    } else if (command === "setting") {
-      state.aceEditor.commands.commands.showSettingsMenu.exec(state.aceEditor);
-      return;
-    } else if (command === "undo") {
-      state.aceEditor.undo();
-      return;
-    } else if (command === "redo") {
-      state.aceEditor.redo();
-      return;
-    } else if (command === "toolbar") {
-      state.toolbarShow = !state.toolbarShow;
-      state.toolbarHtmlShow = !state.toolbarHtmlShow;
-      return;
-    } else if (command === "resize") {
-      Vue.nextTick(() => {
-        state.aceEditor.resize(state.aceEditor);
-      });
-      return;
-    } else if (command === "addKeys") {
-      for (let i = 0; i < data.length; i++) {
-        state.aceEditor.commands.addCommand({
-          name: data[i].name,
-          bindKey: { win: data[i].win, mac: data[i].mac },
-          exec: data[i].exec,
-          readOnly: true
-        });
-      }
-    } else if (command === "removeKeys") {
-      for (let i = 0; i < data.length; i++) {
-        state.aceEditor.commands.removeCommand(data[i]);
-      }
-    } else if (command === "typewriter") {
-      var isOne = true;
-      var lastRow = state.aceEditor.selection.getCursor().row;
-      if (!window.$typewriter) {
-        window.$typewriter = event => {
-          if (
-            event &&
-            event.type &&
-            !/(mousedown|mouseup|touchstart|touchend|touchmove)/g.test(
-              event.type
-            )
-          ) {
-            var nowRow = state.aceEditor.selection.getCursor().row;
-            let scroll = 0;
-            if (isOne) {
-              scroll =
-                state.aceEditor.session.getScrollTop() +
-                (parseFloat(
-                  document
-                    .getElementsByClassName("ace_cursor")[0]
-                    .style.top.replace("px", "")
-                ) -
-                  document.getElementsByClassName("ace-editor")[0]
-                    .offsetHeight /
-                    3);
-              isOne = false;
-            } else {
-              let rows = nowRow - lastRow;
-              if (rows === 0) {
-                if (event.key === "ArrowDown") {
-                  rows = 1;
-                } else if (event.key === "ArrowUp") {
-                  rows = -1;
-                }
-              }
-              scroll =
-                state.aceEditor.session.getScrollTop() +
-                rows * state.aceEditor.renderer.lineHeight;
-            }
-            if (scroll != 0) {
-              state.aceEditor.session.setScrollTop(scroll);
-            }
-            lastRow = nowRow;
-          }
-        };
-      }
-      state.typewriterMode = !state.typewriterMode;
-      if (state.typewriterMode) {
-        state.aceEditor.selection.on("changeCursor", window.$typewriter);
-      } else {
-        state.aceEditor.selection.off("changeCursor", window.$typewriter);
-      }
-      return;
-    } else if (command === "format") {
-      if (!window.prettier) return;
-      let formated = window.prettier.format(state.markdownContent, {
-        parser: "markdown",
-        plugins: window.prettierPlugins
-      });
-      actions.setAceValue(formated);
-    } else if (command === "pasteFormat") {
-      state.setting.xkSetting.pasteFormat = !state.setting.xkSetting
-        .pasteFormat;
-    }
   },
   initKey() {
     var keys = [
@@ -675,6 +489,466 @@ const actions = {
     ];
     actions.execCommand("addKeys", keys);
   },
+  initScroll() {
+    var currentTab = 1;
+    var scale = 1;
+    actions.scrollBind = (operate = null) => {
+      var editorDom = document.querySelector(".ace-editor");
+      var previewHtmlDom = document.querySelector("#previewHtml");
+      var aceContentHeight =
+        window.XKEditor.ace.renderer.scrollBarV.scrollHeight -
+        editorDom.offsetHeight;
+      var previewHtmlHeight =
+        previewHtmlDom.scrollHeight - previewHtmlDom.offsetHeight;
+      scale = previewHtmlHeight / aceContentHeight;
+      if (operate === "init") {
+        editorDom.addEventListener("mouseover", () => {
+          if (state.setting.xkSetting.scrollBind === "right") {
+            currentTab = 2;
+          } else {
+            currentTab = 1;
+          }
+        });
+        previewHtmlDom.addEventListener("mouseover", () => {
+          if (state.setting.xkSetting.scrollBind === "left") {
+            currentTab = 1;
+          } else {
+            currentTab = 2;
+          }
+        });
+        //兼容触摸设备
+        editorDom.addEventListener("touchstart", () => {
+          if (state.setting.xkSetting.scrollBind === "right") {
+            currentTab = 2;
+          } else {
+            currentTab = 1;
+          }
+        });
+        previewHtmlDom.addEventListener("touchstart", () => {
+          if (state.setting.xkSetting.scrollBind === "left") {
+            currentTab = 1;
+          } else {
+            currentTab = 2;
+          }
+        });
+        window.XKEditor.ace.session.on("changeScrollTop", data => {
+          if (currentTab === 1) {
+            previewHtmlDom.scrollTop = data * scale;
+          }
+        });
+        previewHtmlDom.addEventListener("scroll", () => {
+          if (currentTab === 2) {
+            window.XKEditor.ace.session.setScrollTop(
+              previewHtmlDom.scrollTop / scale
+            );
+          }
+        });
+        //兼容触摸设备
+        previewHtmlDom.addEventListener("touchmove", () => {
+          if (currentTab === 2) {
+            window.XKEditor.ace.session.setScrollTop(
+              previewHtmlDom.scrollTop / scale
+            );
+          }
+        });
+        //惯性滚动
+        var inertiaScrollTime = null;
+        editorDom.addEventListener("touchstart", event => {
+          clearTimeout(inertiaScrollTime);
+          var startY = event.changedTouches[0].pageY;
+          var endY = 0;
+          var startTime = Date.now();
+          var endTime = 0;
+          editorDom.addEventListener("touchend", event => {
+            endY = event.changedTouches[0].pageY;
+            endTime = Date.now();
+            var _v = ((endY - startY) / (endTime - startTime)) * 1.5;
+            function scrollToTop(v, sTime, contentY) {
+              var dir = v > 0 ? -1 : 1;
+              var deceleration = dir * 0.0018;
+              function inertiaMove() {
+                // if(stopInertia) return
+                var nowTime = Date.now();
+                var t = nowTime - sTime;
+                var nowV = v + t * deceleration;
+                // 速度方向变化表示速度达到0了
+                if (dir * nowV > 0) {
+                  return;
+                }
+                var moveY = (-(v + nowV) / 2) * t;
+                window.XKEditor.ace.session.setScrollTop(contentY + moveY);
+                inertiaScrollTime = setTimeout(inertiaMove, 10);
+              }
+              inertiaMove();
+            }
+            scrollToTop(
+              _v,
+              endTime,
+              window.XKEditor.ace.session.getScrollTop()
+            );
+          });
+        });
+      }
+    };
+    // 模拟锚点
+    window.sta = anchorName => {
+      if (anchorName) {
+        let anchorElement = document.getElementById(anchorName);
+        if (anchorElement) {
+          anchorElement.scrollIntoView(true);
+        }
+      }
+    };
+    //初始化滚动绑定
+    Vue.nextTick(() => {
+      setTimeout(() => {
+        actions.scrollBind("init");
+      }, 1000);
+    });
+  },
+  initPaste() {
+    state.aceEditor.on("paste", e => {
+      if (state.setting.xkSetting.pasteFormat) {
+        if (e.event.clipboardData.getData("text/html")) {
+          e.text = toMarkdown(
+            e.event.clipboardData.getData("text/html"),
+            false
+          );
+        }
+      }
+    });
+
+    document
+      .getElementsByClassName("ace-container")[0]
+      .addEventListener("paste", e => {
+        if (
+          state.setting.xkSetting.pasteImageUpload &&
+          state.setting.xkSetting.imgUpload
+        ) {
+          if (!(e.clipboardData && e.clipboardData.items)) {
+            return;
+          }
+          for (var i = 0, len = e.clipboardData.items.length; i < len; i++) {
+            var item = e.clipboardData.items[i];
+            if (item.kind === "file") {
+              var pasteFile = item.getAsFile();
+              window.XKEditorAPI.imgUpload(
+                pasteFile,
+                response => {
+                  state.aceEditor.insert("![](" + response.data.path + ")");
+                },
+                error => {
+                  console.log(error);
+                }
+              );
+            }
+          }
+        }
+      });
+  },
+  initTocTree() {
+    //注册TOC按钮
+    document.getElementById("toc-button").addEventListener("click", () => {
+      actions.switchToc();
+    });
+    actions.updateTocTree();
+  },
+  initResizor() {
+    let isResizing = false;
+    let resizor = document.getElementById("resizor");
+    let left = document.querySelector(".xkeditor-left");
+    let right = document.querySelector(".xkeditor-right");
+    let container = document.querySelector(".xkeditor");
+    resizor.addEventListener("mousedown", e => {
+      isResizing = true;
+      right.style.userSelect = "none";
+    });
+    container.addEventListener("mousemove", e => {
+      if (!isResizing) return true;
+      var offsetLeft = e.clientX - container.clientLeft - container.offsetLeft;
+      // 判断左右拖动范围
+      if (
+        offsetLeft < container.clientWidth * 0.2 ||
+        offsetLeft >= container.clientWidth * 0.8
+      ) {
+        isResizing = false;
+        return true;
+      }
+      left.style.width = offsetLeft + "px";
+      resizor.style.left = offsetLeft + "px";
+      right.style.width = container.clientWidth - offsetLeft + "px";
+      state.resizor.left = offsetLeft + "px";
+      state.resizor.right = container.clientWidth - offsetLeft + "px";
+    });
+    container.addEventListener("mouseup", e => {
+      isResizing = false;
+      state.aceEditor.resize();
+      right.style.userSelect = "unset";
+    });
+  },
+  // Toast
+  showToast(message, status = "", loading = false) {
+    state.toast.message = message;
+    state.toast.status = status;
+    state.toast.loading = loading;
+  },
+  hideToast() {
+    state.toast.message = false;
+    state.toast.loading = false;
+  },
+  timeToast(message, status = "", loading = false, delay = 1000) {
+    actions.showToast(message, status, loading);
+    setTimeout(() => {
+      actions.hideToast();
+    }, delay);
+  },
+  // Switch
+  switchToc() {
+    state.showToc = !state.showToc;
+  },
+  switchResizor(curr) {
+    let left = document.querySelector(".xkeditor-left");
+    let right = document.querySelector(".xkeditor-right");
+    if (curr) {
+      left.style.width = state.resizor.left;
+      right.style.width = state.resizor.right;
+    } else {
+      left.style.width = "";
+      right.style.width = "";
+    }
+  },
+  switchPreview(show = null) {
+    let curr = show !== null ? show : state.previewShow === "hide";
+    if (!curr) {
+      state.previewShow = "hide";
+    } else {
+      state.previewShow = "show";
+    }
+    actions.switchResizor(curr);
+  },
+  switchPreviewFull(show = null) {
+    let curr = show !== null ? show : state.previewShow === "full";
+    if (!curr) {
+      state.previewShow = "full";
+      Vue.nextTick(() => {
+        var preEle = document.getElementById("previewHtml");
+        if (
+          Math.round(
+            (preEle.offsetWidth / preEle.parentElement.offsetWidth) * 100
+          ) <= 80
+        ) {
+          document.getElementById("toc-button").style.display = "none";
+          state.showToc = true;
+        }
+      });
+    } else {
+      state.previewShow = "show";
+      document.getElementById("toc-button").style.display = "block";
+      state.showToc = false;
+    }
+    actions.switchResizor(curr);
+  },
+  switchFullScreen() {
+    if (
+      document.fullscreenElement ||
+      document.msFullscreenElement ||
+      document.mozFullScreenElement ||
+      document.webkitFullscreenElement
+    ) {
+      if (document.exitFullscreen) {
+        return document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        return document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        return document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        return document.msExitFullscreen();
+      }
+    } else {
+      var root = document.documentElement;
+      if (root.requestFullscreen) {
+        return root.requestFullscreen();
+      } else if (root.webkitRequestFullscreen) {
+        return root.webkitRequestFullscreen();
+      } else if (root.mozRequestFullScreen) {
+        return root.mozRequestFullScreen();
+      } else if (root.msRequestFullscreen) {
+        return root.msRequestFullscreen();
+      }
+    }
+  },
+  switchAceMode() {
+    if (state.isMarkdownMode) {
+      state.aceEditor.session.setMode("ace/mode/html");
+      actions.setAceValue(toHtml(state.aceEditor.getValue(), false));
+      state.isMarkdownMode = false;
+    } else {
+      state.aceEditor.session.setMode("ace/mode/markdown");
+      actions.setAceValue(toMarkdown(state.aceEditor.getValue(), true));
+      state.isMarkdownMode = true;
+    }
+  },
+  switchEditor() {
+    if (!state.setting.xkSetting.enableTinyMCE) return false;
+    if (state.editorMode !== "ace") {
+      state.markdownContent = toMarkdown(state.htmlContent, true);
+      actions.setAceValue(state.markdownContent);
+      state.editorMode = "ace";
+    } else if (state.editorMode !== "tinymce") {
+      state.htmlContent = toHtml(state.markdownContent, false);
+      actions.setTinyValue(state.htmlContent);
+      state.editorMode = "tinymce";
+    }
+  },
+  // Other
+  imgUpload() {
+    if (document.getElementById("img-upload").files.length > 0) {
+      let file = document.getElementById("img-upload").files[0];
+      window.XKEditorAPI.imgUpload(
+        file,
+        response => {
+          Vue.set(state.toolbarModal.data, "src", response.data.path);
+        },
+        error => {
+          console.log(error);
+        }
+      );
+    } else {
+      actions.timeToast("当前未选择文件！", "error");
+    }
+  },
+  execCommand(command, data = null) {
+    if (command === "toLine") {
+      state.toolbarModal.data.allLine = state.aceEditor.session.getLength();
+      actions.showtoolbarModal(command, "跳转到指定行");
+      return;
+    } else if (command === "search") {
+      state.aceEditor.commands.commands.find.exec(state.aceEditor);
+      return;
+    } else if (command === "toc") {
+      actions.switchToc();
+      return;
+    } else if (command === "switchPreview") {
+      actions.switchPreview();
+      Vue.nextTick(() => {
+        state.aceEditor.resize(state.aceEditor);
+      });
+      return;
+    } else if (command === "fullPreview") {
+      actions.switchPreviewFull();
+      Vue.nextTick(() => {
+        state.aceEditor.resize(state.aceEditor);
+      });
+      return;
+    } else if (command === "fullScreen") {
+      actions.switchFullScreen();
+      return;
+    } else if (command === "toHtmlEditor") {
+      actions.switchAceMode();
+      state.toolbarShow = false;
+      return;
+    } else if (command === "toTinyMCE") {
+      actions.switchEditor();
+      return;
+    } else if (command === "empty") {
+      state.aceEditor.setValue("");
+      return;
+    } else if (command === "setting") {
+      state.aceEditor.commands.commands.showSettingsMenu.exec(state.aceEditor);
+      return;
+    } else if (command === "undo") {
+      state.aceEditor.undo();
+      return;
+    } else if (command === "redo") {
+      state.aceEditor.redo();
+      return;
+    } else if (command === "toolbar") {
+      state.toolbarShow = !state.toolbarShow;
+      state.toolbarHtmlShow = !state.toolbarHtmlShow;
+      return;
+    } else if (command === "resize") {
+      Vue.nextTick(() => {
+        state.aceEditor.resize(state.aceEditor);
+      });
+      return;
+    } else if (command === "addKeys") {
+      for (let i = 0; i < data.length; i++) {
+        state.aceEditor.commands.addCommand({
+          name: data[i].name,
+          bindKey: { win: data[i].win, mac: data[i].mac },
+          exec: data[i].exec,
+          readOnly: true
+        });
+      }
+    } else if (command === "removeKeys") {
+      for (let i = 0; i < data.length; i++) {
+        state.aceEditor.commands.removeCommand(data[i]);
+      }
+    } else if (command === "typewriter") {
+      var isOne = true;
+      var lastRow = state.aceEditor.selection.getCursor().row;
+      if (!window.$typewriter) {
+        window.$typewriter = event => {
+          if (
+            event &&
+            event.type &&
+            !/(mousedown|mouseup|touchstart|touchend|touchmove)/g.test(
+              event.type
+            )
+          ) {
+            var nowRow = state.aceEditor.selection.getCursor().row;
+            let scroll = 0;
+            if (isOne) {
+              scroll =
+                state.aceEditor.session.getScrollTop() +
+                (parseFloat(
+                  document
+                    .getElementsByClassName("ace_cursor")[0]
+                    .style.top.replace("px", "")
+                ) -
+                  document.getElementsByClassName("ace-editor")[0]
+                    .offsetHeight /
+                    3);
+              isOne = false;
+            } else {
+              let rows = nowRow - lastRow;
+              if (rows === 0) {
+                if (event.key === "ArrowDown") {
+                  rows = 1;
+                } else if (event.key === "ArrowUp") {
+                  rows = -1;
+                }
+              }
+              scroll =
+                state.aceEditor.session.getScrollTop() +
+                rows * state.aceEditor.renderer.lineHeight;
+            }
+            if (scroll != 0) {
+              state.aceEditor.session.setScrollTop(scroll);
+            }
+            lastRow = nowRow;
+          }
+        };
+      }
+      state.typewriterMode = !state.typewriterMode;
+      if (state.typewriterMode) {
+        state.aceEditor.selection.on("changeCursor", window.$typewriter);
+      } else {
+        state.aceEditor.selection.off("changeCursor", window.$typewriter);
+      }
+      return;
+    } else if (command === "format") {
+      if (!window.prettier) return;
+      let formated = window.prettier.format(state.markdownContent, {
+        parser: "markdown",
+        plugins: window.prettierPlugins
+      });
+      actions.setAceValue(formated);
+    } else if (command === "pasteFormat") {
+      state.setting.xkSetting.pasteFormat = !state.setting.xkSetting
+        .pasteFormat;
+    }
+  },
   setInterface() {
     var downloadFun = (filename, data, type) => {
       var aLink = document.createElement("a");
@@ -874,170 +1148,6 @@ const actions = {
       }
     };
   },
-  initScroll() {
-    var currentTab = 1;
-    var scale = 1;
-    actions.scrollBind = (operate = null) => {
-      var editorDom = document.querySelector(".ace-editor");
-      var previewHtmlDom = document.querySelector("#previewHtml");
-      var aceContentHeight =
-        window.XKEditor.ace.renderer.scrollBarV.scrollHeight -
-        editorDom.offsetHeight;
-      var previewHtmlHeight =
-        previewHtmlDom.scrollHeight - previewHtmlDom.offsetHeight;
-      scale = previewHtmlHeight / aceContentHeight;
-      if (operate === "init") {
-        editorDom.addEventListener("mouseover", () => {
-          if (state.setting.xkSetting.scrollBind === "right") {
-            currentTab = 2;
-          } else {
-            currentTab = 1;
-          }
-        });
-        previewHtmlDom.addEventListener("mouseover", () => {
-          if (state.setting.xkSetting.scrollBind === "left") {
-            currentTab = 1;
-          } else {
-            currentTab = 2;
-          }
-        });
-        //兼容触摸设备
-        editorDom.addEventListener("touchstart", () => {
-          if (state.setting.xkSetting.scrollBind === "right") {
-            currentTab = 2;
-          } else {
-            currentTab = 1;
-          }
-        });
-        previewHtmlDom.addEventListener("touchstart", () => {
-          if (state.setting.xkSetting.scrollBind === "left") {
-            currentTab = 1;
-          } else {
-            currentTab = 2;
-          }
-        });
-        window.XKEditor.ace.session.on("changeScrollTop", data => {
-          if (currentTab === 1) {
-            previewHtmlDom.scrollTop = data * scale;
-          }
-        });
-        previewHtmlDom.addEventListener("scroll", () => {
-          if (currentTab === 2) {
-            window.XKEditor.ace.session.setScrollTop(
-              previewHtmlDom.scrollTop / scale
-            );
-          }
-        });
-        //兼容触摸设备
-        previewHtmlDom.addEventListener("touchmove", () => {
-          if (currentTab === 2) {
-            window.XKEditor.ace.session.setScrollTop(
-              previewHtmlDom.scrollTop / scale
-            );
-          }
-        });
-        //惯性滚动
-        var inertiaScrollTime = null;
-        editorDom.addEventListener("touchstart", event => {
-          clearTimeout(inertiaScrollTime);
-          var startY = event.changedTouches[0].pageY;
-          var endY = 0;
-          var startTime = Date.now();
-          var endTime = 0;
-          editorDom.addEventListener("touchend", event => {
-            endY = event.changedTouches[0].pageY;
-            endTime = Date.now();
-            var _v = ((endY - startY) / (endTime - startTime)) * 1.5;
-            function scrollToTop(v, sTime, contentY) {
-              var dir = v > 0 ? -1 : 1;
-              var deceleration = dir * 0.0018;
-              function inertiaMove() {
-                // if(stopInertia) return
-                var nowTime = Date.now();
-                var t = nowTime - sTime;
-                var nowV = v + t * deceleration;
-                // 速度方向变化表示速度达到0了
-                if (dir * nowV > 0) {
-                  return;
-                }
-                var moveY = (-(v + nowV) / 2) * t;
-                window.XKEditor.ace.session.setScrollTop(contentY + moveY);
-                inertiaScrollTime = setTimeout(inertiaMove, 10);
-              }
-              inertiaMove();
-            }
-            scrollToTop(
-              _v,
-              endTime,
-              window.XKEditor.ace.session.getScrollTop()
-            );
-          });
-        });
-      }
-    };
-    // 模拟锚点
-    window.sta = anchorName => {
-      if (anchorName) {
-        let anchorElement = document.getElementById(anchorName);
-        if (anchorElement) {
-          anchorElement.scrollIntoView(true);
-        }
-      }
-    };
-    //初始化滚动绑定
-    Vue.nextTick(() => {
-      setTimeout(() => {
-        actions.scrollBind("init");
-      }, 1000);
-    });
-  },
-  initPaste() {
-    state.aceEditor.on("paste", e => {
-      if (state.setting.xkSetting.pasteFormat) {
-        if (e.event.clipboardData.getData("text/html")) {
-          e.text = toMarkdown(
-            e.event.clipboardData.getData("text/html"),
-            false
-          );
-        }
-      }
-    });
-
-    document
-      .getElementsByClassName("ace-container")[0]
-      .addEventListener("paste", e => {
-        if (
-          state.setting.xkSetting.pasteImageUpload &&
-          state.setting.xkSetting.imgUpload
-        ) {
-          if (!(e.clipboardData && e.clipboardData.items)) {
-            return;
-          }
-          for (var i = 0, len = e.clipboardData.items.length; i < len; i++) {
-            var item = e.clipboardData.items[i];
-            if (item.kind === "file") {
-              var pasteFile = item.getAsFile();
-              window.XKEditorAPI.imgUpload(
-                pasteFile,
-                response => {
-                  state.aceEditor.insert("![](" + response.data.path + ")");
-                },
-                error => {
-                  console.log(error);
-                }
-              );
-            }
-          }
-        }
-      });
-  },
-  initTocTree() {
-    //注册TOC按钮
-    document.getElementById("toc-button").addEventListener("click", () => {
-      actions.switchToc();
-    });
-    actions.updateTocTree();
-  },
   updateTocTree() {
     var items = document.querySelectorAll(
       "#toc .toc-icon ~ ul,.toc .toc-icon ~ ul"
@@ -1049,39 +1159,6 @@ const actions = {
         "toggleToc(this)"
       );
     }
-  },
-  initResizor() {
-    let isResizing = false;
-    let resizor = document.getElementById("resizor");
-    let left = document.querySelector(".xkeditor-left");
-    let right = document.querySelector(".xkeditor-right");
-    let container = document.querySelector(".xkeditor");
-    resizor.addEventListener("mousedown", e => {
-      isResizing = true;
-      right.style.userSelect = "none";
-    });
-    container.addEventListener("mousemove", e => {
-      if (!isResizing) return true;
-      var offsetLeft = e.clientX - container.clientLeft - container.offsetLeft;
-      // 判断左右拖动范围
-      if (
-        offsetLeft < container.clientWidth * 0.2 ||
-        offsetLeft >= container.clientWidth * 0.8
-      ) {
-        isResizing = false;
-        return true;
-      }
-      left.style.width = offsetLeft + "px";
-      resizor.style.left = offsetLeft + "px";
-      right.style.width = container.clientWidth - offsetLeft + "px";
-      state.resizor.left = offsetLeft + "px";
-      state.resizor.right = container.clientWidth - offsetLeft + "px";
-    });
-    container.addEventListener("mouseup", e => {
-      isResizing = false;
-      state.aceEditor.resize();
-      right.style.userSelect = "unset";
-    });
   },
   updateRunCode() {
     document.querySelectorAll(".run-code-btn").forEach(item => {
@@ -1108,88 +1185,6 @@ const actions = {
         area.style.display = area.style.display === "block" ? "none" : "block";
       });
     });
-  },
-  mergeTinyMCEOptions() {
-    let init = state.setting.tinymceSetting;
-    init.selector = "#tinymce-textarea";
-    //上传功能
-    if (state.setting.xkSetting.imgUpload) {
-      init.images_upload_handler = (blobInfo, success, failure) => {
-        window.XKEditorAPI.imgUpload(
-          blobInfo.blob(),
-          response => {
-            success(response.data.path);
-          },
-          error => {
-            failure(error);
-          }
-        );
-      };
-    }
-    //添加自定义按钮
-    init.setup = editor => {
-      editor.ui.registry.addButton("tex-$", {
-        text: "行内公式",
-        onAction(_) {
-          editor.insertContent("<p>$$$$</p>");
-        }
-      });
-      editor.ui.registry.addButton("tex-math", {
-        text: "块公式",
-        onAction(_) {
-          editor.insertContent("<pre>&nbsp;```math&nbsp;```&nbsp;</pre>");
-        }
-      });
-      editor.ui.registry.addButton("flow", {
-        text: "流程图",
-        onAction(_) {
-          editor.insertContent('<pre class="xkeditor-mermaid">graph </pre>');
-        }
-      });
-      editor.ui.registry.addButton("seq", {
-        text: "时序图",
-        onAction(_) {
-          editor.insertContent(
-            '<pre class="xkeditor-mermaid">sequenceDiagram&nbsp;</pre>'
-          );
-        }
-      });
-      editor.ui.registry.addButton("gantt", {
-        text: "甘特图",
-        onAction(_) {
-          editor.insertContent(
-            '<pre class="xkeditor-mermaid">gantt&nbsp;</pre>'
-          );
-        }
-      });
-      editor.ui.registry.addButton("mermaid", {
-        text: "添加图",
-        onAction(_) {
-          editor.insertContent('<pre class="xkeditor-mermaid">&nbsp;</pre>');
-        }
-      });
-      editor.ui.registry.addButton("prismjs", {
-        text: "代码块",
-        onAction(_) {
-          editor.insertContent(
-            '<pre><code class="line-numbers language-javascript">&nbsp;</code></pre>'
-          );
-        }
-      });
-      editor.ui.registry.addButton("toMarkdownEditor", {
-        text: "切换编辑器",
-        onAction(_) {
-          window.XKEditor.switchEditor();
-        }
-      });
-      editor.on("init", () => {
-        editor.setContent(state.htmlContent);
-        editor.on("KeyUp", e => {
-          state.htmlContent = editor.getContent();
-        });
-      });
-    };
-    return init;
   },
   /**
    * 插入字符到ACE编辑器
