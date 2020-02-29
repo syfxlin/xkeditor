@@ -37,7 +37,7 @@
 <script>
 //导入基础组件
 import "../utils/dialogDrag";
-import mergeDeep from "../utils/mergeDeep";
+import deepAssign from "../utils/deepAssign";
 import Ace from "./ACE_Editor";
 import TinyMCE from "./TinyMCE_Editor";
 import ToolBar from "./Toolbar";
@@ -61,7 +61,7 @@ export default {
   props: {
     config: Object,
     value: String,
-    graff: Object
+    data: Object
   },
   data() {
     return {
@@ -89,9 +89,9 @@ export default {
   },
   created() {
     this.markdownContent = this.value || "";
-    this.setting = mergeDeep(this.setting, this.config);
+    this.setting = deepAssign(this.setting, this.config);
     this.htmlViewContent = toHtml(this.markdownContent, true);
-    this.graffBoard.content = this.graff || {};
+    this.graffBoard.content = this.data.graff || {};
     this.loadCss(this.setting.xkSetting.previewCss);
   },
   mounted() {
@@ -209,15 +209,15 @@ export default {
     htmlContent(val) {
       this.$emit("input", toMarkdown(val));
     },
-    graff: {
+    data: {
       handler(val) {
-        this.graffBoard.content = val;
+        this.graffBoard.content = val.graff;
       },
       deep: true
     },
     "graffBoard.content": {
       handler(val) {
-        this.$emit("update:graff", val);
+        this.$emit("update:data.graff", val);
       },
       deep: true
     }

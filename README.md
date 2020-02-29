@@ -15,7 +15,7 @@
     - [注意事项](#%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a1%b9)
     - [从 NPM 安装](#%e4%bb%8e-npm-%e5%ae%89%e8%a3%85)
     - [所需依赖](#%e6%89%80%e9%9c%80%e4%be%9d%e8%b5%96)
-    - [config && graff](#config--graff)
+    - [config && data](#config--data)
   - [运行代码块](#%e8%bf%90%e8%a1%8c%e4%bb%a3%e7%a0%81%e5%9d%97)
   - [文档 Doc](#%e6%96%87%e6%a1%a3-doc)
   - [维护者 Maintainer](#%e7%bb%b4%e6%8a%a4%e8%80%85-maintainer)
@@ -59,6 +59,8 @@ XK-Editor 支持富文本编辑和 Markdown ，同时可以在 Markdown 和 HTML
 ## 安装 Install
 
 ### 注意事项
+
+**XK-Editor 还在不断的改进中 API 可能会更改**
 
 从 Version 1.0.8 开始，为了减小 Vendor 体积，防止加载时间过长，XK-Editor 默认使用 `jsDelivr CDN` 加载部分 `node_modules`
 需要在 index.html 中添加以下 script 标签，若您不打算使用该方式加载，请将 `node_modules/xkeditor/components` 下的文件中所有的 `import` 注释取消。
@@ -146,10 +148,10 @@ export default {
 4. 使用 XK-Editor 组件
 
 ```html
-<xk-editor :config="config" v-model="content" :graff.sync="graff" />
+<xk-editor :config="config" v-model="content" :data.sync="data" />
 <!-- config(Object) 是下方 config 内容，该参数是单向的，Editor 内部的设置变动不会同步到父组件 -->
 <!-- v-model(String) 对应 Markdown 内容，该参数是双向的，由于 ACE 和 TinyMCE 编辑器的限制，当该参数被外部修改的时候，即与内部 Markdown 内容不一致时，会触发 ACE 编辑器和 TinyMCE 的 setValue，此时光标将会重置。 -->
-<!-- graff(Object) 是 SVG涂鸦板 的内容，该参数是双向的 -->
+<!-- data(Object) 是 XK-Editor 扩展的数据内容，用来存储一些非 Markdown 的数据，该参数是双向的 -->
 ```
 
 ### 所需依赖
@@ -171,7 +173,7 @@ turndown
 turndown-plugin-gfm
 ```
 
-### config && graff
+### config && data
 
 ```javascript
 var config = {
@@ -254,12 +256,14 @@ var config = {
     }
   }
 };
-var graff = {
-  // SVG Hash
-  "6b3117":
-    // viewBox|SVG innerHTML
-    '8.399999618530273 9 423.9984436035156 154|<path d="M 290.4,100 L 293.4,104 L 304.4,112 L 326.4,123 L 345.4,131 L 360.4,136 L 378.4,140 L 395.4,145 L 405.4,148 L 415.4,152 L 420.4,152 L 421.4,153 L 422.4,153" fill="none" stroke="#6190e8" stroke-width="2"></path><rect x="18.4" y="19" fill="none" stroke="#6190e8" stroke-width="2" width="131" height="69" d="M 18.4 19 h 131 v 69 h -131 Z"></rect>'
-};
+var data = {
+  graff: {
+    // SVG Hash
+    "6b3117":
+      // viewBox|SVG innerHTML
+      '8.399999618530273 9 423.9984436035156 154|<path d="M 290.4,100 L 293.4,104 L 304.4,112 L 326.4,123 L 345.4,131 L 360.4,136 L 378.4,140 L 395.4,145 L 405.4,148 L 415.4,152 L 420.4,152 L 421.4,153 L 422.4,153" fill="none" stroke="#6190e8" stroke-width="2"></path><rect x="18.4" y="19" fill="none" stroke="#6190e8" stroke-width="2" width="131" height="69" d="M 18.4 19 h 131 v 69 h -131 Z"></rect>'
+  }
+}
 ```
 
 ## 运行代码块
