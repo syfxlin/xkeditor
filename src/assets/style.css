@@ -340,6 +340,7 @@ th {
           flex: 1;
   display: -webkit-box;
   display: flex;
+  position: relative;
 }
 
 #previewHtml {
