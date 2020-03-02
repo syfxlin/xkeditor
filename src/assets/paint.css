@@ -59,8 +59,8 @@
   border: 1px solid #6190e8;
 }
 
-.title,
-.container {
+.graff-main .title,
+.graff-main .container {
   left: 50%;
   transform: translateX(-50%);
   position: relative;
@@ -68,29 +68,29 @@
   max-width: 96%;
 }
 
-.title h1 {
+.graff-main .title h1 {
   margin-bottom: 10px;
 }
 
-.title h5 {
+.graff-main .title h5 {
   margin: 5px 0px;
 }
 
-.title h5 a {
+.graff-main .title h5 a {
   color: #6190e8;
 }
 
-.active {
+.graff-main .active {
   color: #6190e8;
 }
 
-.svg-container {
+.graff-main .svg-container {
   float: left;
   height: 500px;
   width: 70%;
 }
 
-#graff-svg {
+.graff-main #graff-svg {
   border: 1.5px solid #6190e8;
   cursor: crosshair;
   padding: 0px;
@@ -100,7 +100,7 @@
   height: 100%;
 }
 
-.svg-button {
+.graff-main .svg-button {
   border: 1.5px solid #6190e8;
   border-left: none;
   float: left;
@@ -112,59 +112,59 @@
   overflow-y: auto;
 }
 
-.svg-button h3 {
+.graff-main .svg-button h3 {
   margin-top: 10px;
   margin-bottom: 5px;
 }
 
-.svg-button > div {
+.graff-main .svg-button > div {
   list-style: none;
   margin: 0px;
   padding: 0px;
 }
 
-.svg-button > div div {
+.graff-main .svg-button > div div {
   display: inline-block;
   margin-right: 10px;
   font-size: 15px;
   cursor: default;
 }
 
-.svg-button > div div:hover {
+.graff-main .svg-button > div div:hover {
   color: rgba(97, 144, 232, 0.63);
 }
 
-.svg-button > div span {
+.graff-main .svg-button > div span {
   font-size: 13px;
 }
 
-.svg-button .can-color li {
+.graff-main .svg-button .can-color li {
   border: 1.5px solid #ddd;
   width: 20px;
   height: 10px;
 }
 
-.svg-button .can-size .small {
+.graff-main .svg-button .can-size .small {
   font-size: 12px;
 }
-.svg-button .can-size .middle {
+.graff-main .svg-button .can-size .middle {
   font-size: 16px;
 }
-.svg-button .can-size .big {
+.graff-main .svg-button .can-size .big {
   font-size: 18px;
 }
 
-.svg-btn svg {
+.graff-main .svg-btn svg {
   width: 1rem !important;
   padding-right: 0.1rem;
   height: 0.9rem;
 }
 
-#images {
+.graff-main #images {
   padding-top: 10px;
   clear: both;
 }
 
-#images textarea {
+.graff-main #images textarea {
   border: 1.5px solid #6190e8;
 }
