@@ -4,7 +4,7 @@ export default {
   title: "显示/隐藏目录",
   operate: "toc",
   icon: "bars",
-  active: store.state.showToc,
+  active: false,
   handler() {
     store.actions.execCommand("toc");
   },

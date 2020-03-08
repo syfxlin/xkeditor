@@ -4,7 +4,7 @@ export default {
   title: "开启/关闭打字机模式",
   operate: "typewriter",
   icon: "i-cursor",
-  active: store.state.typewriterMode,
+  active: false,
   handler() {
     store.actions.execCommand("typewriter");
     store.state.aceEditor.focus();

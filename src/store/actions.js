@@ -1,118 +1,11 @@
 import Vue from "vue";
 import ace from "ace-builds";
 import tinyMCE from "tinymce/tinymce";
-import { toHtml, toMarkdown } from "./utils/switchContent";
+import { toHtml, toMarkdown } from "../utils/switchContent";
 import axios from "axios";
-import runCode from "./utils/runCode";
-
-window.isMobile = /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i.test(
-  navigator.userAgent
-);
-
-window.toggleToc = ele => {
-  ele.classList.toggle("active");
-  ele.nextElementSibling.nextElementSibling.classList.toggle("active");
-};
-
-const state = Vue.observable({
-  showToc: false,
-  setting: {
-    tinymceSetting: {
-      language_url: "/static/tinymce/langs/zh_CN.js",
-      language: "zh_CN",
-      skin_url: "/static/tinymce/skins/ui/oxide",
-      body_class: "markdown-body",
-      content_css: "/static/github-markdown.css",
-      plugins:
-        "print preview fullpage searchreplace autolink directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern",
-      toolbar:
-        "formatselect | fontsizeselect | bold italic underline strikethrough blockquote forecolor backcolor prismjs | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | tex-$ tex-math flow seq gantt mermaid | removeformat code toMarkdownEditor | undo redo",
-      image_advtab: true,
-      importcss_append: true,
-      height: "100%",
-      template_cdate_format: "[CDATE: %m/%d/%Y : %H:%M:%S]",
-      template_mdate_format: "[MDATE: %m/%d/%Y : %H:%M:%S]",
-      image_caption: true,
-      spellchecker_dialog: true,
-      spellchecker_whitelist: ["Ephox", "Moxiecode"]
-    },
-    aceSetting: {
-      toolbar:
-        "h1 h2 h3 h4 h5 h6 | bold italic underline strikethrough quote mark code | sup sub tex-$ tex-math | flow seq gantt mermaid | ul ol minus table time | link image video graff | toLine search toc typewriter switchPreview fullPreview fullScreen toHtmlEditor toTinyMCE format empty setting | undo redo | setLocalStorage getLocalStorage removeLocalStorage | help info | pasteFormat",
-      minLines: 10,
-      theme: "ace/theme/solarized_light",
-      mode: "ace/mode/markdown",
-      tabSize: 4,
-      fontSize: "17px",
-      wrap: true,
-      enableSnippets: true,
-      enableLiveAutocompletion: true,
-      enableBasicAutocompletion: true
-    },
-    xkSetting: {
-      apiBaseUrl: "",
-      // 不可即时更新
-      previewCss: "/static/github-markdown.css",
-      // 不可即时更新
-      previewClass: "markdown-body",
-      delayToHtml: 500,
-      scrollBind: "both",
-      imgUpload: false,
-      scrollMode: "anchor",
-      pasteFormat: true,
-      pasteImageUpload: true,
-      // 不可即时更新
-      enableTinyMCE: true,
-      judge0API: "https://run-code.lincdn.top",
-      runCodeLangList: {
-        c: 1,
-        cpp: 2,
-        bash: 3,
-        csharp: 4,
-        go: 5,
-        java: 6,
-        node: 7,
-        php: 8,
-        python: 9,
-        python2: 10,
-        ruby: 11,
-        rust: 12,
-        scala: 13,
-        typescript: 14
-      }
-    }
-  },
-  aceEditor: null,
-  toolbarShow: true,
-  toolbarHtmlShow: true,
-  previewShow: "show",
-  typewriterMode: false,
-  isMarkdownMode: true,
-  editorMode: "ace",
-  markdownContent: "",
-  htmlContent: "",
-  htmlViewContent: "",
-  graffBoard: {
-    content: {},
-    hash: false
-  },
-  toolbarModal: {
-    show: false,
-    data: {},
-    content: ""
-  },
-  toast: {
-    show: false,
-    message: "",
-    status: "",
-    loading: false
-  },
-  resizor: {
-    enable: true,
-    left: "",
-    right: ""
-  }
-});
+import runCode from "../utils/runCode";
+import state from "./state";
+import { toolbar as tb } from "../toolbar";
 
 const actions = {
   // Set value
@@ -243,7 +136,7 @@ const actions = {
         win: "F1",
         mac: "F1",
         exec: () => {
-          actions.toolbarClick("toHtmlEditor");
+          tb.toHtmlEditor.handler();
         }
       },
       {
@@ -251,7 +144,7 @@ const actions = {
         win: "F2",
         mac: "F2",
         exec: () => {
-          actions.toolbarClick("toTinyMCE");
+          tb.toTinyMCE.handler();
         }
       },
       {
@@ -259,7 +152,7 @@ const actions = {
         win: "F7",
         mac: "F7",
         exec: () => {
-          actions.toolbarClick("toc");
+          tb.toc.handler();
         }
       },
       {
@@ -267,7 +160,7 @@ const actions = {
         win: "F8",
         mac: "F8",
         exec: () => {
-          actions.toolbarClick("typewriter");
+          tb.typewriter.handler();
         }
       },
       {
@@ -275,7 +168,7 @@ const actions = {
         win: "F9",
         mac: "F9",
         exec: () => {
-          actions.toolbarClick("switchPreview");
+          tb.switchPreview.handler();
         }
       },
       {
@@ -283,7 +176,7 @@ const actions = {
         win: "F10",
         mac: "F10",
         exec: () => {
-          actions.toolbarClick("fullPreview");
+          tb.fullPreview.handler();
         }
       },
       {
@@ -291,7 +184,7 @@ const actions = {
         win: "F11",
         mac: "F11",
         exec: () => {
-          actions.toolbarClick("fullScreen");
+          tb.fullScreen.handler();
         }
       },
       {
@@ -299,7 +192,7 @@ const actions = {
         win: "Ctrl-1",
         mac: "Command-1",
         exec: () => {
-          actions.toolbarClick("h1");
+          tb.h1.handler();
         }
       },
       {
@@ -307,7 +200,7 @@ const actions = {
         win: "Ctrl-2",
         mac: "Command-2",
         exec: () => {
-          actions.toolbarClick("h2");
+          tb.h2.handler();
         }
       },
       {
@@ -315,7 +208,7 @@ const actions = {
         win: "Ctrl-3",
         mac: "Command-3",
         exec: () => {
-          actions.toolbarClick("h3");
+          tb.h3.handler();
         }
       },
       {
@@ -323,7 +216,7 @@ const actions = {
         win: "Ctrl-4",
         mac: "Command-4",
         exec: () => {
-          actions.toolbarClick("h4");
+          tb.h4.handler();
         }
       },
       {
@@ -331,7 +224,7 @@ const actions = {
         win: "Ctrl-5",
         mac: "Command-5",
         exec: () => {
-          actions.toolbarClick("h5");
+          tb.h5.handler();
         }
       },
       {
@@ -339,7 +232,7 @@ const actions = {
         win: "Ctrl-6",
         mac: "Command-6",
         exec: () => {
-          actions.toolbarClick("h6");
+          tb.h6.handler();
         }
       },
       {
@@ -347,7 +240,7 @@ const actions = {
         win: "Ctrl-B",
         mac: "Command-B",
         exec: () => {
-          actions.toolbarClick("bold");
+          tb.bold.handler();
         }
       },
       {
@@ -355,7 +248,7 @@ const actions = {
         win: "Ctrl-D",
         mac: "Command-D",
         exec: () => {
-          actions.toolbarClick("time");
+          tb.time.handler();
         }
       },
       {
@@ -363,7 +256,7 @@ const actions = {
         win: "Ctrl-H",
         mac: "Command-H",
         exec: () => {
-          actions.toolbarClick("minus");
+          tb.minus.handler();
         }
       },
       {
@@ -371,7 +264,7 @@ const actions = {
         win: "Ctrl-I",
         mac: "Command-I",
         exec: () => {
-          actions.toolbarClick("italic");
+          tb.italic.handler();
         }
       },
       {
@@ -379,7 +272,7 @@ const actions = {
         win: "Ctrl-K",
         mac: "Command-K",
         exec: () => {
-          actions.toolbarClick("mark");
+          tb.mark.handler();
         }
       },
       {
@@ -387,7 +280,7 @@ const actions = {
         win: "Ctrl-L",
         mac: "Command-L",
         exec: () => {
-          actions.toolbarClick("link");
+          tb.link.handler();
         }
       },
       {
@@ -395,7 +288,7 @@ const actions = {
         win: "Ctrl-U",
         mac: "Command-U",
         exec: () => {
-          actions.toolbarClick("ul");
+          tb.ul.handler();
         }
       },
       {
@@ -403,7 +296,7 @@ const actions = {
         win: "Ctrl-Shift-I",
         mac: "Command-Shift-I",
         exec: () => {
-          actions.toolbarClick("image");
+          tb.image.handler();
         }
       },
       {
@@ -411,7 +304,7 @@ const actions = {
         win: "Ctrl-Shift-K",
         mac: "Command-Shift-K",
         exec: () => {
-          actions.toolbarClick("tex-$");
+          tb["tex-$"].handler();
         }
       },
       {
@@ -419,7 +312,7 @@ const actions = {
         win: "Ctrl-Shift-O",
         mac: "Command-Shift-O",
         exec: () => {
-          actions.toolbarClick("ol");
+          tb.ol.handler();
         }
       },
       {
@@ -427,7 +320,7 @@ const actions = {
         win: "Ctrl-Shift-P",
         mac: "Command-Shift-P",
         exec: () => {
-          actions.toolbarClick("code");
+          tb.code.handler();
         }
       },
       {
@@ -435,7 +328,7 @@ const actions = {
         win: "Ctrl-Shift-Q",
         mac: "Command-Shift-Q",
         exec: () => {
-          actions.toolbarClick("quote");
+          tb.quote.handler();
         }
       },
       {
@@ -443,7 +336,7 @@ const actions = {
         win: "Ctrl-Shift-S",
         mac: "Command-Shift-S",
         exec: () => {
-          actions.toolbarClick("strikethrough");
+          tb.strikethrough.handler();
         }
       },
       {
@@ -451,7 +344,7 @@ const actions = {
         win: "Ctrl-Shift-T",
         mac: "Command-Shift-T",
         exec: () => {
-          actions.toolbarClick("table");
+          tb.table.handler();
         }
       },
       {
@@ -459,7 +352,7 @@ const actions = {
         win: "Ctrl-Shift-H",
         mac: "Command-Shift-H",
         exec: () => {
-          actions.toolbarClick("help");
+          tb.help.handler();
         }
       },
       {
@@ -467,7 +360,7 @@ const actions = {
         win: "Ctrl-Shift-G",
         mac: "Command-Shift-G",
         exec: () => {
-          actions.toolbarClick("toLine");
+          tb.toLine.handler();
         }
       },
       {
@@ -845,7 +738,7 @@ const actions = {
       return;
     } else if (command === "toHtmlEditor") {
       actions.switchAceMode();
-      state.toolbarShow = false;
+      state.toolbarShow = !state.toolbarShow;
       return;
     } else if (command === "toTinyMCE") {
       actions.switchEditor();
@@ -1212,63 +1105,4 @@ const actions = {
   }
 };
 
-const store = {
-  state,
-  actions
-};
-
-export const mapState = states => {
-  let ret = {};
-  if (states instanceof Array) {
-    for (let i = 0; i < states.length; i++) {
-      ret[states[i]] = {
-        get() {
-          return store.state[states[i]];
-        },
-        set(value) {
-          store.state[states[i]] = value;
-        }
-      };
-    }
-  } else {
-    for (const key in states) {
-      if (states[key] instanceof Function) {
-        ret[key] = {
-          get() {
-            return states[key](store.state);
-          }
-        };
-      } else {
-        ret[key] = {
-          get() {
-            return store.state[states[key]];
-          },
-          set(value) {
-            store.state[states[key]] = value;
-          }
-        };
-      }
-    }
-  }
-  return ret;
-};
-
-export const mapActions = actions => {
-  let ret = {};
-  if (actions instanceof Array) {
-    for (let i = 0; i < actions.length; i++) {
-      ret[actions[i]] = store.actions[actions[i]];
-    }
-  } else {
-    for (const key in actions) {
-      if (actions[key] instanceof Function) {
-        ret[key] = actions[key](store.actions);
-      } else {
-        ret[key] = store.actions[actions[key]];
-      }
-    }
-  }
-  return ret;
-};
-
-export default store;
+export default actions;

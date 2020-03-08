@@ -1,5 +1,5 @@
 import Vue from "vue";
-import store from "../store";
+import state from "../store/state";
 import heading from "./heading";
 import bold from "./bold";
 import italic from "./italic";
@@ -31,7 +31,7 @@ import storage from "./storage";
 import other from "./other";
 import setting from "./setting";
 
-const all = {
+export const toolbar = Vue.observable({
   "|": {
     icon: "|"
   },
@@ -65,20 +65,19 @@ const all = {
   ...storage,
   ...other,
   setting
-};
-
-export const toolbar = Vue.observable([]);
-export const watcher = Vue.observable([]);
-
-const selects = store.state.setting.aceSetting.toolbar.split(" ");
-
-selects.forEach(item => {
-  if (all[item]) {
-    toolbar.push(all[item]);
-    if (all[item].watcher) {
-      watcher.push(all[item].watcher.bind(all[item]));
-    }
-  } else {
-    console.warn(`Not toolbar item: ${item}`);
-  }
 });
+
+export let selects = null;
+export let watcher = Vue.observable(
+  Object.values(toolbar)
+    .filter(item => item.watcher)
+    .map(item => item.watcher.bind(item))
+);
+
+export function tbWatcher() {
+  selects = Vue.observable(state.setting.aceSetting.toolbar.split(" "));
+}
+
+tbWatcher();
+
+console.log(watcher);

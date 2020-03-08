@@ -5,20 +5,19 @@ export default {
     title: "切换实时预览",
     operate: "switchPreview",
     icon: "eye",
-    active: store.state.previewShow === "hide",
+    active: false,
     handler() {
       store.actions.execCommand("switchPreview");
     },
     watcher() {
       this.active = store.state.previewShow === "hide";
-      console.log(this.active);
     }
   },
   fullPreview: {
     title: "全窗口预览",
     operate: "fullPreview",
     icon: "tv",
-    active: store.state.previewShow === "full",
+    active: false,
     handler() {
       store.actions.execCommand("fullPreview");
     },

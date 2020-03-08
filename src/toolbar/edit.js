@@ -13,7 +13,7 @@ export default {
     title: "粘贴转化",
     operate: "pasteFormat",
     icon: "paste",
-    active: store.state.setting.xkSetting.pasteFormat,
+    active: true,
     handler() {
       store.actions.execCommand("pasteFormat");
     },

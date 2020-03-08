@@ -18,8 +18,16 @@
         </template>
       </template>
     </div>
-    <div class="toolbar-html xk-toolbar" v-show="!toolbarShow && toolbarHtmlShow">
-      <button class="xk-button" type="text" title="转换为Markdown模式" @click="switchToHtml()">
+    <div
+      class="toolbar-html xk-toolbar"
+      v-show="!toolbarShow && toolbarHtmlShow"
+    >
+      <button
+        class="xk-button"
+        type="text"
+        title="转换为Markdown模式"
+        @click="switchToHtml()"
+      >
         <fa-icon icon="file-code" />转换为Markdown模式
       </button>
     </div>
@@ -41,7 +49,7 @@ export default {
   },
   data() {
     return {
-      // toolbar: tb.toolbar
+      toolbar: tb.selects.map(key => tb.toolbar[key])
     };
   },
   computed: {
@@ -52,10 +60,7 @@ export default {
       "previewShow",
       "showToc",
       "typewriterMode"
-    ]),
-    toolbar() {
-      return tb.toolbar;
-    }
+    ])
   },
   methods: {
     ...mapActions(["switchAceMode"]),
@@ -65,6 +70,14 @@ export default {
     }
   },
   watch: {
+    "setting.aceSetting.toolbar": {
+      handler() {
+        console.log("watch");
+        tb.tbWatcher();
+        this.toolbar = tb.selects.map(key => tb.toolbar[key]);
+      },
+      deep: true
+    },
     "setting.xkSetting.pasteFormat": {
       handler() {
         tb.watcher.forEach(fn => fn());
