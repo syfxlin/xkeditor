@@ -9,7 +9,11 @@ export default {
     store.actions.execCommand("typewriter");
     store.state.aceEditor.focus();
   },
-  watcher() {
-    this.active = store.state.typewriterMode;
+  watcher: {
+    obj: "typewriterMode",
+    handler() {
+      this.active = store.state.typewriterMode;
+    },
+    deep: true
   }
 };

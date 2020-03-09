@@ -8,7 +8,11 @@ export default {
   handler() {
     store.actions.execCommand("toc");
   },
-  watcher() {
-    this.active = store.state.showToc;
+  watcher: {
+    obj: "showToc",
+    handler() {
+      this.active = store.state.showToc;
+    },
+    deep: true
   }
 };

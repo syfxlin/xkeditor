@@ -67,17 +67,20 @@ export const toolbar = Vue.observable({
   setting
 });
 
+let watchers = Object.values(toolbar).filter(item => item.watcher);
+
 export let selects = null;
-export let watcher = Vue.observable(
-  Object.values(toolbar)
-    .filter(item => item.watcher)
-    .map(item => item.watcher.bind(item))
-);
+export let watcher = Vue.observable({});
+
+for (const item of watchers) {
+  watcher[item.watcher.obj] = {
+    handler: item.watcher.handler.bind(item),
+    deep: item.watcher.deep
+  };
+}
 
 export function tbWatcher() {
   selects = Vue.observable(state.setting.aceSetting.toolbar.split(" "));
 }
 
 tbWatcher();
-
-console.log(watcher);

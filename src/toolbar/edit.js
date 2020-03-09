@@ -17,8 +17,12 @@ export default {
     handler() {
       store.actions.execCommand("pasteFormat");
     },
-    watcher() {
-      this.active = store.state.setting.xkSetting.pasteFormat;
+    watcher: {
+      obj: "setting.xkSetting.pasteFormat",
+      handler() {
+        this.active = store.state.setting.xkSetting.pasteFormat;
+      },
+      deep: true
     }
   },
   empty: {

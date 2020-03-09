@@ -9,8 +9,12 @@ export default {
     handler() {
       store.actions.execCommand("switchPreview");
     },
-    watcher() {
-      this.active = store.state.previewShow === "hide";
+    watcher: {
+      obj: "previewShow",
+      handler() {
+        this.active = store.state.previewShow === "hide";
+      },
+      deep: true
     }
   },
   fullPreview: {
@@ -21,8 +25,12 @@ export default {
     handler() {
       store.actions.execCommand("fullPreview");
     },
-    watcher() {
-      this.active = store.state.previewShow === "full";
+    watcher: {
+      obj: "previewShow",
+      handler() {
+        this.active = store.state.previewShow === "full";
+      },
+      deep: true
     }
   },
   fullScreen: {

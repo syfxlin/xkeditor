@@ -72,36 +72,12 @@ export default {
   watch: {
     "setting.aceSetting.toolbar": {
       handler() {
-        console.log("watch");
         tb.tbWatcher();
         this.toolbar = tb.selects.map(key => tb.toolbar[key]);
       },
       deep: true
     },
-    "setting.xkSetting.pasteFormat": {
-      handler() {
-        tb.watcher.forEach(fn => fn());
-      },
-      deep: true
-    },
-    previewShow: {
-      handler() {
-        tb.watcher.forEach(fn => fn());
-      },
-      deep: true
-    },
-    showToc: {
-      handler() {
-        tb.watcher.forEach(fn => fn());
-      },
-      deep: true
-    },
-    typewriterMode: {
-      handler() {
-        tb.watcher.forEach(fn => fn());
-      },
-      deep: true
-    }
+    ...tb.watcher
   }
 };
 </script>
