@@ -1,5 +1,3 @@
-[graff]{6b3117}
-
 # XK-Editor
 
 > 一个支持富文本和Markdown的编辑器
@@ -28,12 +26,14 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 - [TeX公式] 支持插入KaTex公式
 - [流程图/时序图/甘特图] 支持mermaid语法编写各种图
 - [解析HTML] 支持解析各种HTML标签，并支持过滤标签
-- [独有的扩展语法] 支持通过`[text]{style|label}`的方式解析文字
+- [独有的扩展语法] 拥有一些扩展语法
 - [自动补全] 支持语法自动补全
 - [图片上传] 支持图片上传
 - 还有多种神奇的功能等待你的发掘。
 
 ---
+
+## 目录
 
 [TOC :fold]
 
@@ -49,7 +49,7 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 
 ###### Heading 6
 
-### 字符效果和横线等
+## 字符效果和横线等
 
 ---
 
@@ -57,7 +57,7 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 
 上标：X<sup>2</sup>，下标：O<sub>2</sub>
 
-### 特有语法
+## 特有语法
 
 [这是带有CSS的文字]{color:blue}
 
@@ -65,7 +65,7 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 
 [这是带有CSS的文字]{text-align:center}
 
-### 引用 Blockquotes
+## 引用 Blockquotes
 
 > 引用文本 Blockquotes
 
@@ -73,7 +73,7 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 
 > 引用：如果想要插入空白换行`即<br />标签`，在插入处先键入两个以上的空格然后回车即可，[普通链接](http://localhost/)。
 
-### 锚点与链接 Links
+## 锚点与链接 Links
 
 [普通链接](http://localhost/)
 
@@ -81,11 +81,11 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 
 [锚点链接](#锚点与链接-links)
 
-### 行内代码 Inline code
+## 行内代码 Inline code
 
 执行命令：`npm install marked`
 
-### 缩进风格
+## 缩进风格
 
 即缩进四个空格，也做为实现类似 `<pre>` 预格式化文本 ( Preformatted Text ) 的功能。
 
@@ -98,7 +98,7 @@ XK-Editor支持富文本编辑和Markdown，同时可以在Markdown和HTML互转
 | Content Cell | Content Cell  |
 ```
 
-#### JS代码
+### JS代码
 
 ```javascript
 importScripts('https://cdn.jsdelivr.net/npm/workbox-cdn@3.6.3/workbox/workbox-sw.js');
@@ -113,7 +113,7 @@ if (workbox) {
 }
 ```
 
-#### HTML 代码 HTML codes
+### HTML 代码 HTML codes
 
 ```html
 <!DOCTYPE html>
@@ -128,22 +128,22 @@ if (workbox) {
 </html>
 ```
 
-### 图片 Images
+## 图片 Images
 
 ![](https://www.ixk.me/bg.jpg)
 ![](https://cn.bing.com/th?id=OHR.CoastalFog_EN-CN6289780759_800x480.jpg)
 
 ---
 
-### 列表 Lists
+## 列表 Lists
 
-#### 无序列表 Unordered Lists1
+### 无序列表 Unordered Lists1
 
 - 列表一
 - 列表二
 - 列表三
 
-#### 无序列表 Unordered Lists2
+### 无序列表 Unordered Lists2
 
 - 列表一
 - 列表二
@@ -155,13 +155,13 @@ if (workbox) {
   - 列表二
   - 列表三
 
-#### 有序列表 Ordered Lists
+### 有序列表 Ordered Lists
 
 1. 第一行
 2. 第二行
 3. 第三行
 
-#### GFM task list
+### GFM task list
 
 - [x]  GFM task list 1
 - [x]  GFM task list 2
@@ -175,7 +175,7 @@ if (workbox) {
 
 ---
 
-### 绘制表格 Tables
+## 绘制表格 Tables
 
 | First Header | Second Header |
 |--------------|---------------|
@@ -195,11 +195,11 @@ if (workbox) {
 
 ---
 
-### Emoji表情 :smiley:
+## Emoji表情 :smiley:
 
 :smiley:
 
-### 科学公式 TeX(KaTeX)
+## 科学公式 TeX(KaTeX)
 
 $$E=mc^2$$
 
@@ -213,7 +213,7 @@ $$sin(alpha)^{theta}=sum_{i=0}^{n}(x^i + cos(f))$$
 sin(alpha)^{theta}=sum_{i=0}^{n}(x^i + cos(f))
 ```
 
-### 流程图
+## 流程图
 
 ```flowTD
 A-->B;
@@ -222,7 +222,7 @@ B-->D;
 C-->D;
 ```
 
-### 时序图
+## 时序图
 
 ```seq
 participant Alice
@@ -237,7 +237,7 @@ John->Bob: How about you?
 Bob-->John: Jolly good!
 ```
 
-### 甘特图
+## 甘特图
 
 ```gantt
 dateFormat  YYYY-MM-DD
@@ -256,7 +256,7 @@ Create tests for renderer           :2d
 Add to mermaid                      :1d
 ```
 
-### 运行代码
+## 运行代码
 
 > 本功能除javascript不需要使用后端，其他语言都需要有后端负责执行代码。
 > 后端执行器基于 [judge0/api](https://github.com/judge0/api) 重新build而来，支持以下的语言，若您有其他语言的需求，您可以自行参照教程重新build
@@ -267,15 +267,6 @@ Add to mermaid                      :1d
 console.log("Hello, World!")
 ```
 
-```run-c
-#include <stdio.h>
-
-int main() {
-    printf("Hello, World!");
-    return 0;
-}
-```
-
 ```run-cpp
 #include <iostream>
 using namespace std;
@@ -284,30 +275,6 @@ int main()
 {
     cout << "Hello, World!";
     return 0;
-}
-```
-
-```run-csharp
-using System;
-namespace HelloWorldApplication
-{
-    class HelloWorld
-    {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello, World!");
-        }
-    }
-}
-```
-
-```run-go
-package main
-
-import "fmt"
-
-func main() {
-    fmt.Println("Hello, World!")
 }
 ```
 
@@ -328,24 +295,42 @@ console.log("Hello, World!");
 echo "Hello, World!";
 ```
 
-```run-python
-print ("Hello, World!")
-```
-
-```run-python2
-print "Hello, World!"
-```
-
-```run-ruby
-puts "Hello, World!";
-```
-
-```run-rust
-fn main() {
-    println!("Hello, World!");
-}
-```
-
 ```run-typescript
 console.log("Hello, World!")
 ```
+
+## 涂鸦板
+
+[graff]{6b3117}
+
+## 扩展语法
+
+[带 CSS 的文字]{color:white;background:lightblue;padding:2px}
+
+[可以自定义文字标签，默认为 span]{color:blue|p}
+
+[也可以快速的设置文字颜色]{white,lightblue}
+
+[det :有时候也可能需要折叠内容]
+XK-Editor 提供了一个简短的语法，这样就不用写 HTML 标签了
+[/det]
+
+> :white,lightblue 提示框
+
+需要的时候也可以方便的引用音频和视频
+
+![aud summer.mp3](https://lab.ixk.me/assets/media/Summer.mp3)
+
+![vid movie.mp4](https://lab.ixk.me/assets/media/movie.mp4)
+
+媒体文件也可以方便的设置属性
+
+![image](https://lab.ixk.me/api/bing ":width=50%;|title")
+
+不需要的时候也可以直接按 Markdown 的格式使用
+
+![image](https://lab.ixk.me/api/bing "title")
+
+如果需要引用外部的部分支持的类型文件也可以用简便的语法，目前仅支持 iframe，markdown 和 code 不久后也会得到支持
+
+[inc=iframe](https://ixk.me ":width=100%;height=500px|title")

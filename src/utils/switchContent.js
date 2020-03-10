@@ -267,12 +267,13 @@ export function toHtml(val, isFull) {
     text = text.replace(/\[(|\/)(det|details)([^\]]*)\]/g, function(
       $1,
       $2,
-      $3
+      $3,
+      $4
     ) {
-      if ($2 !== "/" && $3.substring(0, 2) === " :") {
-        $3 = `<summary>${$3.substring(2)}</summary>\n`;
+      if ($2 !== "/" && $4.substring(0, 2) === " :") {
+        $4 = `<summary>${$4.substring(2)}</summary>\n`;
       }
-      return `<${$2}details>${$3}`;
+      return `<${$2}details>${$4}`;
     });
     args[0] = text;
     return marked.Renderer.prototype.paragraph.apply(this, args);

@@ -335,7 +335,7 @@ th {
 }
 
 .editor-container {
-  overflow: auto;
+  overflow: hidden;
   -webkit-box-flex: 1;
           flex: 1;
   display: -webkit-box;
