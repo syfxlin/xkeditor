@@ -188,11 +188,13 @@ var Colors = {
 };
 
 // 公用解析器
-function commonParse(text) {
+function commonParse(text, isExport = false) {
   // :emoji:
-  text = text.replace(/(:.*:)/g, function($1, $2) {
-    return emoji.replace_colons($2);
-  });
+  if (!isExport) {
+    text = text.replace(/(:.*:)/g, function($1, $2) {
+      return emoji.replace_colons($2);
+    });
+  }
   // [Text]{style|label}
   // [Text]{color,bg_color}
   text = text.replace(
@@ -220,6 +222,83 @@ function commonParse(text) {
   return text;
 }
 
+function detailsParse(text) {
+  // details summary [det :text][/det]
+  return text.replace(/\[(|\/)(det|details)([^\]]*)\]/g, function(
+    $1,
+    $2,
+    $3,
+    $4
+  ) {
+    if ($2 !== "/" && $4.substring(0, 2) === " :") {
+      $4 = `<summary>${$4.substring(2)}</summary>\n`;
+    }
+    return `<${$2}details>${$4}`;
+  });
+}
+
+function mediaParse(href, title, text) {
+  let options = "controls ";
+  if (title && title.charAt(0) === ":") {
+    let optTemp = "";
+    [optTemp, title] = title.substring(1).split("|");
+    for (const opt of optTemp.split(";")) {
+      if (opt.indexOf("=") === -1) {
+        options += opt + " ";
+      } else {
+        options += opt.replace("=", '="') + '"';
+      }
+    }
+  }
+  // ![vid alt](src ":option|title")
+  if (/^(vid|video)/g.test(text)) {
+    text = text.replace(/^(vid|video)(| )/g, "");
+    return `<video src="${href}" ${
+      title ? 'title="' + title + '"' : ""
+    } ${options}>${text}</video>`;
+  }
+  // ![aud alt](src ":option|title")
+  if (/^(aud|audio)/g.test(text)) {
+    text = text.replace(/^(aud|audio)(| )/g, "");
+    return `<audio src="${href}" ${
+      title ? 'title="' + title + '"' : ""
+    } ${options}>${text}</audio>`;
+  }
+  // ![alt](src ":option|title")
+  return `<img src="${href}" ${
+    title ? 'title="' + title + '"' : ""
+  } ${options} alt="${text}" />`;
+}
+
+function incParse(href, title, text, render = null) {
+  let type = text.replace(/^(inc|include)=/g, "");
+  let options = "";
+  if (title && title.charAt(0) === ":") {
+    let optTemp = "";
+    [optTemp, title] = title.substring(1).split("|");
+    for (const opt of optTemp.split(";")) {
+      if (opt.indexOf("=") === -1) {
+        options += opt + " ";
+      } else {
+        options += opt.replace("=", '="') + '"';
+      }
+    }
+  }
+  if (type === "iframe") {
+    return `<iframe src="${href}" ${
+      title ? 'title="' + title + '"' : ""
+    } ${options}></iframe>`;
+  }
+  if (type === "md" || type === "markdown") {
+    // TODO: async load
+    return toHtml("# this is embed", isFull);
+  }
+  if (type === "code" && render !== null) {
+    // TODO: async load
+    return render.code('console.log("This is embed")', "javascript");
+  }
+}
+
 function htmlRestore(str) {
   return str
     .replace(/&amp;/g, "&")
@@ -229,6 +308,41 @@ function htmlRestore(str) {
     .replace(/&#39;/g, "'")
     .replace(/&quot;/g, '"')
     .replace(/(<br \/>|<br>)/g, "\n");
+}
+
+export function toExport(val) {
+  // [Text]{style|label}
+  // [Text]{color,bg_color}
+  val = commonParse(val, true);
+  // details summary [det :text][/det]
+  val = detailsParse(val);
+  // > :color,bg_color text
+  // TODO: 待定
+  // ![vid alt](src ":option|title")
+  // ![aud alt](src ":option|title")
+  // ![alt](src ":option|title")
+  val = val.replace(/!\[([^\]]*)\]\(([^)"]*)[ ]*["]?([^)"]*)["]?\)/g, function(
+    $1,
+    $2,
+    $3,
+    $4
+  ) {
+    if ($4.indexOf("|") === -1 && !/(video|vid|audio|aud)/g.test($2)) {
+      return `![${$4}](${$3}${$4 ? '"' + $4 + '"' : ""})`;
+    }
+    return mediaParse($3, $4, $2);
+  });
+  // [inc=type](href ":option|title")
+  val = val.replace(
+    /[^!]\[([^\]]*)\]\(([^)"]*)[ ]*["]?([^)"]*)["]?\)/g,
+    function($1, $2, $3, $4) {
+      if (/^(inc|include)=/g.test($2)) {
+        return incParse($3, $4, $2, new marked.Renderer());
+      }
+      return `[${$4}](${$3}${$4 ? '"' + $4 + '"' : ""})`;
+    }
+  );
+  return val;
 }
 
 export function toHtml(val, isFull) {
@@ -263,18 +377,7 @@ export function toHtml(val, isFull) {
     text = text.replace(/\[TOC([^\]]*)\]/g, function($1, $2) {
       return `<div class="toc ${$2 === " :fold" ? "default-fold" : ""}"></div>`;
     });
-    // details summary [det :text][/det]
-    text = text.replace(/\[(|\/)(det|details)([^\]]*)\]/g, function(
-      $1,
-      $2,
-      $3,
-      $4
-    ) {
-      if ($2 !== "/" && $4.substring(0, 2) === " :") {
-        $4 = `<summary>${$4.substring(2)}</summary>\n`;
-      }
-      return `<${$2}details>${$4}`;
-    });
+    text = detailsParse(text);
     args[0] = text;
     return marked.Renderer.prototype.paragraph.apply(this, args);
   };
@@ -298,72 +401,14 @@ export function toHtml(val, isFull) {
     return marked.Renderer.prototype.blockquote.apply(this, args);
   };
   markedRenderer.image = function(href, title, text) {
-    // var args = arguments;
-    let options = "controls ";
-    if (title && title.charAt(0) === ":") {
-      let optTemp = "";
-      [optTemp, title] = title.substring(1).split("|");
-      for (const opt of optTemp.split(";")) {
-        if (opt.indexOf("=") === -1) {
-          options += opt + " ";
-        } else {
-          options += opt.replace("=", '="') + '"';
-        }
-      }
-    }
-    // ![vid alt](src ":option|title")
-    if (/^(vid|video)/g.test(text)) {
-      text = text.replace(/^(vid|video)(| )/g, "");
-      return `<video src="${href}" ${
-        title ? 'title="' + title + '"' : ""
-      } ${options}>${text}</video>`;
-    }
-    // ![aud alt](src ":option|title")
-    if (/^(aud|audio)/g.test(text)) {
-      text = text.replace(/^(aud|audio)(| )/g, "");
-      return `<audio src="${href}" ${
-        title ? 'title="' + title + '"' : ""
-      } ${options}>${text}</audio>`;
-    }
+    return mediaParse(href, title, text);
     // return marked.Renderer.prototype.image.apply(this, args);
-    // ![alt](src ":option|title")
-    return `<img src="${href}" ${
-      title ? 'title="' + title + '"' : ""
-    } ${options} alt="${text}" />`;
   };
   markedRenderer.link = function(href, title, text) {
     var args = arguments;
     // [inc=type](href ":option|title")
     if (/^(inc|include)=/g.test(text)) {
-      let type = text.replace(/^(inc|include)=/g, "");
-      let options = "";
-      if (title && title.charAt(0) === ":") {
-        let optTemp = "";
-        [optTemp, title] = title.substring(1).split("|");
-        for (const opt of optTemp.split(";")) {
-          if (opt.indexOf("=") === -1) {
-            options += opt + " ";
-          } else {
-            options += opt.replace("=", '="') + '"';
-          }
-        }
-      }
-      if (type === "iframe") {
-        return `<iframe src="${href}" ${
-          title ? 'title="' + title + '"' : ""
-        } ${options}></iframe>`;
-      }
-      if (type === "md" || type === "markdown") {
-        // TODO: async load
-        return toHtml("# this is embed", isFull);
-      }
-      if (type === "code") {
-        // TODO: async load
-        return markedRenderer.code(
-          'console.log("This is embed")',
-          "javascript"
-        );
-      }
+      return incParse(href, title, text, markedRenderer);
     }
     return marked.Renderer.prototype.link.apply(this, args);
   };

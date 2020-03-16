@@ -1,7 +1,7 @@
 import Vue from "vue";
 import ace from "ace-builds";
 import tinyMCE from "tinymce/tinymce";
-import { toHtml, toMarkdown } from "../utils/switchContent";
+import { toHtml, toMarkdown, toExport } from "../utils/switchContent";
 import axios from "axios";
 import runCode from "../utils/runCode";
 import state from "./state";
@@ -907,6 +907,9 @@ const actions = {
           window.XKEditor.tinymce.init(setting.tinymceSetting);
           window.XKEditor.ace.setOptions(setting.aceSetting);
         }
+      },
+      getExportMarkdown: () => {
+        return toExport(state.markdownContent);
       },
       getMarkdown: () => {
         return state.markdownContent;
