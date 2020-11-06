@@ -2,6 +2,9 @@
 
 > 一个支持富文本和 Markdown 的编辑器
 
+> **XK-Editor v2 已经开始开发，由于是从头写起的（为了适应新的编辑器，重写会好一点），所以与 v1 不兼容，v1 将在不久后停止维护。**
+> **v2 版本采用了类似于 Typora 的所见即所得的模式，同时也支持分栏的模式。**
+
 ![Version](https://img.shields.io/github/release/syfxlin/xkeditor.svg?label=Version&style=flat-square) ![Npm-Latest](https://img.shields.io/npm/v/xkeditor/latest.svg?style=flat-square) ![Author](https://img.shields.io/badge/Author-Otstar%20Lin-blue.svg?style=flat-square) ![Lincense](https://img.shields.io/github/license/syfxlin/xkeditor.svg?style=flat-square) ![Build Status](https://drone.lincdn.top/api/badges/syfxlin/xkeditor/status.svg)
 
 ## 目录 Contents
