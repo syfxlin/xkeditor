@@ -1,24 +1,21 @@
-name: XK-Editor
 
+name: GitHub Pages Build and Deploy
 on: [push, pull_request, repository_dispatch]
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+        uses: actions/checkout@master
+
       - name: Build
-        run: |
-          yarn install
-          yarn build
+        run: yarn && CI='' yarn build
+
       - name: Deploy
-        uses: garygrossgarten/github-action-scp@release
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          local: dist
-          remote: ${{ secrets.TARGET }}
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          port: ${{ secrets.PORT }}
+          personal_token: ${{ secrets.PERSONAL_TOKEN }}
+          publish_dir: ./dist
+          cname: xkeditor.ixk.me
+          enable_jekyll: false
+          force_orphan: true
